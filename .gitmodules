@@ -1,0 +1,3 @@
+[submodule "lib/vendor/altumo"]
+	path = lib/vendor/altumo
+	url = git@github.com:homer6/altumo.git
