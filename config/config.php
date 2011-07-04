@@ -13,3 +13,6 @@
     }
     
 */
+
+// Include the Altumo auto loader
+    require_once( dirname(__FILE__) . '/../lib/vendor/altumo/source/php/loader.php' );
