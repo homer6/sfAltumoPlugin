@@ -25,6 +25,10 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
         // Include the Altumo loader.
             require_once( dirname(__FILE__) . '/../lib/vendor/altumo/source/php/loader.php' );
         
+        // Add altumo paths to sfConfig
+            sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );
+            sfConfig::set( 'altumo_javascript_lib_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/lib/javascript' );
+            sfConfig::set( 'altumo_javascript_src_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/source/javascript' );
         
         /**
         * Upon execution, add the Altumo global web assets to the response
