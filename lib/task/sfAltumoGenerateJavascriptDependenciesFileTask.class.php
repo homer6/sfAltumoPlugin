@@ -37,6 +37,7 @@ class sfAltumoGenerateJavascriptDependenciesFileTask extends sfAltumoBaseTask {
 
 
         $this->name = 'generate_javascript_dependencies_file';
+        $this->aliases = array( $this->namespace. ':jsdeps' );
 
         $this->briefDescription = 'Generates a Javascript dependencies file for the entire application';
 
@@ -51,6 +52,9 @@ This task uses Closure's DepsWriter to generate a "deps file" which maps paths t
 ** This task must be executed every time a new javascript file is added to the assets folder **
 EOF;
     }
+
+
+
 
 
   /**
@@ -70,7 +74,7 @@ EOF;
               . ' --output_file="'       . sfConfig::get( 'sf_web_dir' ) . '/js/app-deps.js"';
 
 
-            $this->logSection( "Executing: " . $command );
+            $this->log( "\nExecuting: " . $command );
 
             `$command`;
             
