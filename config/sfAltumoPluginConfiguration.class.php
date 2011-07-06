@@ -47,17 +47,25 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
                 
                 $protocol = $request->isSecure() ? 'https' : 'http';
                 
-                $javascripts = array(
-                    'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js',
-                    '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js',
-                    '/altumo/js/src/core/base.js'
-                );
+                
+                
+                $javascripts = array();
+                
+                // Include jQuery
+                    $javascripts[] = 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js';
+                
+                // Include Closure
+                    $javascripts[] = '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js';
                 
                 // If this is a development environment, add the deps file generated
                 // by closure to tell the library where to include javascripts from.
                     if( !in_array( $context->getConfiguration()->getEnvironment(), array( 'prod', 'production', 'testing', 'staging' ) ) ){
                         $javascripts[] = '/js/app-deps.js';
                     }
+                    
+                // Include Altumo core
+                    $javascripts[] = '/altumo/js/src/core/base.js';
+                
                 
                 // Add javascripts to the response
                     foreach( $javascripts as $javascript ){

@@ -69,8 +69,8 @@ EOF;
 
 
             $command = $deps_writer
-              . ' --root_with_prefix="'  . sfConfig::get( 'sf_web_dir' ) . '/altumo/js/src' . ' /altumo/js"'
-              . ' --root_with_prefix="'  . sfConfig::get( 'sf_web_dir' ) . '/js' . ' /js"'
+              . ' --root_with_prefix="'  . sfConfig::get( 'sf_web_dir' ) . '/altumo/js/src' . ' /../../../../../../../../../altumo/js/src"'
+              . ' --root_with_prefix="'  . sfConfig::get( 'sf_web_dir' ) . '/js' . ' /../../../../../../../../../js"'
               . ' --output_file="'       . sfConfig::get( 'sf_web_dir' ) . '/js/app-deps.js"';
 
 
