@@ -1,0 +1,7 @@
+# Handled by the Altumo loader in the plugin configuration file.
+#autoload:
+#  sfAltumoPlugin_lib:
+#    name:           Altumo Plugin
+#    path:           <?php echo realpath(dirname(__FILE__).'/../lib')."\n" ?>
+#    recursive:      true
+#    exclude:        [vendor]
