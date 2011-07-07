@@ -52,7 +52,10 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
                 $javascripts = array();
                 
                 // Include jQuery
-                    $javascripts[] = 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js';
+                    $javascripts[] = 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js';   
+        
+                // Include Crockford's JSON library
+                    $javascripts[] = '/altumo/js/lib/vendor/douglascrockford/json2.js';
                 
                 // Include Closure
                     $javascripts[] = '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js';
