@@ -2,16 +2,16 @@ propel:
   _attributes:
     package: plugins.sfAltumo.lib.model
 
-  user:
-    _attributes:            { phpName: User }
-    id:
-    email:                  { type: varchar(128), required: true, index: unique }
-    salt:                   { type: varchar(128), required: true }
-    password:               { type: varchar(128), required: true }
-    password_reset_key:     { type: varchar(16), required: false, unique: true, index: unique }
-    active:                 { type: boolean, index: true, required: true, default: true }
-    created_at:
-    updated_at:
+#  user:
+#    _attributes:            { phpName: User }
+#    id:
+#    email:                  { type: varchar(128), required: true, index: unique }
+#    salt:                   { type: varchar(128), required: true }
+#    password:               { type: varchar(128), required: true }
+#    password_reset_key:     { type: varchar(16), required: false, unique: true, index: unique }
+#    active:                 { type: boolean, index: true, required: true, default: true }
+#    created_at:
+#    updated_at:
     
   session:
     _attributes:            { phpName: Session }
