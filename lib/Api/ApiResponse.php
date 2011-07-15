@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Altumo library.
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
  *
@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
  
-namespace Altumo\Api;
+namespace sfAltumoPlugin\Api;
 
 
 
 /**
 * This class represents a JSON API response.
-* 
+*
+* @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
 class ApiResponse extends sfWebResponse{
             
@@ -34,7 +35,7 @@ class ApiResponse extends sfWebResponse{
     public function __construct( sfEventDispatcher $dispatcher, $options = array() ){
         
         $this->initialize($dispatcher, $options);
-        $this->setResponseBody( new ApiResponseBody() );
+        $this->setResponseBody( new \sfAltumoPlugin\Api\ApiResponseBody() );
         
     }
     
@@ -43,7 +44,7 @@ class ApiResponse extends sfWebResponse{
     * Makes a JSON or JSONP response, based on the supplied response.
     * This method disables the layout and outputs to the browser.
     * 
-    * @param ApiResponseBody $response_body
+    * @param \sfAltumoPlugin\Api\ApiResponseBody $response_body
     * @return sfView::NONE
     */
     public function respond( $response_body = null ){
@@ -59,7 +60,7 @@ class ApiResponse extends sfWebResponse{
             }
         
         //get the response body (format it if required)
-            if( !is_null($response_body) && $response_body instanceof ApiResponseBody ){
+            if( !is_null($response_body) && $response_body instanceof \sfAltumoPlugin\Api\ApiResponseBody ){
                 $response = $response_body->getReponseBody( $format_response, $errors );
             }else{
                 $response = $this->getResponseBody()->getReponseBody( $format_response, $errors );
@@ -152,7 +153,7 @@ class ApiResponse extends sfWebResponse{
     /**
     * Setter for the response_body field on this ApiResponse.
     * 
-    * @param ApiResponseBody $response_body
+    * @param \sfAltumoPlugin\Api\ApiResponseBody $response_body
     */
     public function setResponseBody( $response_body ){
     
@@ -164,7 +165,7 @@ class ApiResponse extends sfWebResponse{
     /**
     * Getter for the response_body field on this ApiResponse.
     * 
-    * @return ApiResponseBody
+    * @return \sfAltumoPlugin\Api\ApiResponseBody
     */
     public function getResponseBody(){
     
@@ -177,7 +178,9 @@ class ApiResponse extends sfWebResponse{
     * Setter for the errors field on this ApiResponse.
     * 
     * @param array $errors
-    * @throws Exception if $errors isn't an array of ApiError objects
+    * @throws \Exception                    // if $errors isn't an array of 
+    *                                          \sfAltumoPlugin\Api\ApiError 
+    *                                          objects
     */
     public function setErrors( $errors ){
     
@@ -213,13 +216,21 @@ class ApiResponse extends sfWebResponse{
     /**
     * Adds a single error to this ApiResponse.
     * 
-    * @param ApiError|string $error  //Either a string (which becomes an error message) or an ApiError object.
-    * @param integer $remote_id  //Optional - defaults to null.  Is ignored if $error is an ApiError
-    * @throws Exception if $error isn't an ApiError object or string
+    * @param \sfAltumoPlugin\Api\ApiError|string $error  
+    *                                       //Either a string (which becomes an 
+    *                                         error message) or an ApiError 
+    *                                         object.
+    * 
+    * @param integer $remote_id             //Optional - defaults to null.  Is 
+    *                                         ignored if $error is an ApiError
+    * 
+    * @throws Exception                     // if $error isn't an 
+    *                                         \sfAltumoPlugin\Api\ApiError 
+    *                                         object or string
     */
     public function addError( $error, $remote_id = null ){
     
-        if( !( $error instanceof ApiError ) ){
+        if( !( $error instanceof \sfAltumoPlugin\Api\ApiError ) ){
             if( !is_string($error) ){
                 throw new \Exception('Error must be an ApiError object or a string.');
             }else{
@@ -231,7 +242,7 @@ class ApiResponse extends sfWebResponse{
                         $remote_id = null;
                     }
                 }
-                $error = new ApiError( $error, $remote_id );
+                $error = new \sfAltumoPlugin\Api\ApiError( $error, $remote_id );
             }
         }
         $this->errors[] = $error;

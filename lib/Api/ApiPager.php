@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Altumo library.
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
  
-namespace Altumo\Api;
+namespace sfAltumoPlugin\Api;
 
 
 
@@ -17,7 +17,7 @@ namespace Altumo\Api;
 * This class represents the collection of information 
 * necessary to support paged result sets.
 *
-*
+* @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
 class ApiPager{
         
@@ -34,7 +34,7 @@ class ApiPager{
     * @param boolean $paged  //determines if this result is going to be wrapped around a result set //set this true for queries
     * @param ApiRequest $request
     * 
-    * @return ApiPager
+    * @return \sfAltumoPlugin\Api\ApiPager
     */
     public function __construct( $paged = false, $request = null ){     
     

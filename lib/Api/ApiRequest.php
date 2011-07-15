@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Altumo library.
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
  *
@@ -9,14 +9,15 @@
  * file that was distributed with this source code.
  */
  
-namespace Altumo\Api;
+namespace sfAltumoPlugin\Api;
 
 
 
 /**
 * An incoming symfony 1.4 http request for the API. 
 * You will need to change the factories.yml in order to use this.
-* 
+*
+* @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
 class ApiRequest extends sfWebRequest{
     

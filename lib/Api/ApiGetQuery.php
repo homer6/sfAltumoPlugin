@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Altumo library.
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
  
-namespace Altumo\Api;
+namespace sfAltumoPlugin\Api;
 
 
   
@@ -17,7 +17,7 @@ namespace Altumo\Api;
 * This class represents a HTTP GET request designed to retrieve records.
 * It supports paging.
 *
-*
+* @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
 class ApiGetQuery{
         
@@ -36,7 +36,7 @@ class ApiGetQuery{
     * @param string $body_name
     * @param function $modify_result
     * 
-    * @return ApiGetQuery
+    * @return \sfAltumoPlugin\Api\ApiGetQuery
     */
     public function __construct( $request, $response, $query, $body_name, $modify_result = null ){    
         
@@ -45,8 +45,8 @@ class ApiGetQuery{
         }
         
     
-        $pager = new ApiPager( true, $request );
-        $response_body = new ApiResponseBody( array(), $body_name, $pager );
+        $pager = new \sfAltumoPlugin\Api\ApiPager( true, $request );
+        $response_body = new \sfAltumoPlugin\Api\ApiResponseBody( array(), $body_name, $pager );
         $response->setResponseBody($response_body);
         
         $this->setRequest( $request );
@@ -133,7 +133,7 @@ class ApiGetQuery{
     /**
     * Setter for the pager field on this ApiGetQuery.
     * 
-    * @param ApiPager $pager
+    * @param \sfAltumoPlugin\Api\ApiPager $pager
     */
     protected function setPager( $pager ){
     
@@ -145,7 +145,7 @@ class ApiGetQuery{
     /**
     * Getter for the pager field on this ApiGetQuery.
     * 
-    * @return ApiPager
+    * @return \sfAltumoPlugin\Api\ApiPager
     */
     protected function getPager(){
     

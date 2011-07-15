@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Altumo library.
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
  
-namespace Altumo\Api;
+namespace sfAltumoPlugin\Api;
 
 
 
@@ -30,14 +30,14 @@ class ApiResponseBody{
     * 
     * @param array $body
     * @param string $body_name
-    * @param ApiPager $pager
+    * @param \sfAltumoPlugin\Api\ApiPager $pager
     * 
-    * @return ApiResponseBody
+    * @return \sfAltumoPlugin\Api\ApiResponseBody
     */
     public function __construct( $body = null, $body_name = 'results', $pager = null ){    
     
         if( is_null($pager) ){
-            $pager = new ApiPager();
+            $pager = new \sfAltumoPlugin\Api\ApiPager();
         }
         
         $this->setPager( $pager );
@@ -113,7 +113,7 @@ class ApiResponseBody{
     /**
     * Setter for the pager field on this ApiResponseBody.
     * 
-    * @param ApiPager $pager
+    * @param \sfAltumoPlugin\Api\ApiPager $pager
     */
     public function setPager( $pager ){
     
@@ -125,7 +125,7 @@ class ApiResponseBody{
     /**
     * Getter for the pager field on this ApiResponseBody.
     * 
-    * @return ApiPager
+    * @return \sfAltumoPlugin\Api\ApiPager
     */
     public function getPager(){
     

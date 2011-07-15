@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Altumo library.
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
  
-namespace Altumo\Api;
+namespace sfAltumoPlugin\Api;
 
 
 
@@ -17,7 +17,7 @@ namespace Altumo\Api;
 * This class represents an error in an API method call. There may be many 
 * errors for a given API method call.
 *
-*
+* @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
 class ApiError{
         
@@ -31,7 +31,7 @@ class ApiError{
     * @param string $message
     * @param integer $remote_id //optional - defaults to null
     * 
-    * @return ApiError
+    * @return \sfAltumoPlugin\Api\ApiError
     */
     public function __construct( $message, $remote_id = null ){    
     
@@ -87,8 +87,7 @@ class ApiError{
         return $this->message;
         
     }
-     
-    
+        
 
     /**
     * Gets this model's member variable values as an array of strings for insertion into a database.

@@ -1,9 +1,8 @@
 <?php
 /*
- * This file is part of the sfAltumoPlugin package
+ * This file is part of the sfAltumoPlugin library.
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
- * (c) Juan Jaramillo <steve.sperandeo@altumo.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,6 +16,7 @@
  * 
  * @package    altumo
  * @subpackage task
+ * @author Juan Jaramillo <juan.jaramillo@altumo.com>
  */
 class sfAltumoGenerateJavascriptDependenciesFileTask extends sfAltumoBaseTask {
 
@@ -36,7 +36,7 @@ class sfAltumoGenerateJavascriptDependenciesFileTask extends sfAltumoBaseTask {
         ));
 
 
-        $this->name = 'generate_javascript_dependencies_file';
+        $this->name = 'generate-javascript-dependencies-file';
         $this->aliases = array( $this->namespace. ':jsdeps' );
 
         $this->briefDescription = 'Generates a Javascript dependencies file for the entire application';
