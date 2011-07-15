@@ -13,12 +13,12 @@ namespace sfAltumoPlugin\Routing;
 
 
 /**
-* This class contains some helper functions that make it possible to dump
+* This class contains some helper functions that make it possible to export
 * routes in multiple formats and applying multiple rules / filters.
 * 
 * @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
-class RoutingDumper{
+class RouteExporter{
     
     
     /**
