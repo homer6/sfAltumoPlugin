@@ -3,7 +3,6 @@
  * This file is part of the sfAltumoPlugin package
  *
  * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
- * (c) Juan Jaramillo <steve.sperandeo@altumo.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,6 +13,7 @@
  * 
  * @package    sfAltumoPlugin
  * @subpackage config
+ * @author Juan Jaramillo <steve.sperandeo@altumo.com>
  */
 class sfAltumoPluginConfiguration extends sfPluginConfiguration {
     
@@ -29,6 +29,9 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
             sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );
             sfConfig::set( 'altumo_javascript_lib_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/lib/javascript' );
             sfConfig::set( 'altumo_javascript_src_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/source/javascript' );
+            
+        // Add altumo Api Settings            
+            sfConfig::set( 'altumo_api_session_cookie_name', 'api_session' );
         
         /**
         * Upon execution, add the Altumo global web assets to the response
@@ -52,7 +55,10 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
                 $javascripts = array();
                 
                 // Include jQuery
-                    $javascripts[] = 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js';
+                    $javascripts[] = 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js';   
+        
+                // Include Crockford's JSON library
+                    $javascripts[] = '/altumo/js/lib/vendor/douglascrockford/json2.js';
                 
                 // Include Closure
                     $javascripts[] = '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js';
