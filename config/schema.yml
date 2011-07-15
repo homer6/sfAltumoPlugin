@@ -2,16 +2,24 @@ propel:
   _attributes:
     package: plugins.sfAltumo.lib.model
 
-#  user:
-#    _attributes:            { phpName: User }
-#    id:
-#    email:                  { type: varchar(128), required: true, index: unique }
-#    salt:                   { type: varchar(128), required: true }
-#    password:               { type: varchar(128), required: true }
-#    password_reset_key:     { type: varchar(16), required: false, unique: true, index: unique }
-#    active:                 { type: boolean, index: true, required: true, default: true }
-#    created_at:
-#    updated_at:
+  user:
+    _attributes:            { phpName: User }
+    id:
+    sf_guard_user_id:       { type: integer, foreignTable: sf_guard_user, foreignReference: id, required: true, onDelete: cascade, index: unique }
+    password_reset_key:     { type: varchar(16), required: false, unique: true, index: unique }
+    active:                 { type: boolean, index: true, required: true, default: true }
+    created_at:
+    updated_at:
+    
+  api_key:
+    _attributes:            { phpName: ApiKey }
+    id:  
+    user_id:                { type: integer, foreignTable: user, foreignReference: id, required: true, onDelete: cascade, onUpdate: restrict }
+    api_key:                { type: char, size: 20, required: false, index: unique }
+    secret_access_key:      { type: char, size: 40, index: true }
+    active:                 { type: boolean, index: true, default: true }
+    created_at:
+    updated_at:
     
   session:
     _attributes:            { phpName: Session }
