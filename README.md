@@ -2,6 +2,7 @@ Overview
 ------------
 sfAltumoPlugin integrates Altumo into symfony 1.4.*/1.3.*
 
+
 Altumo is a library of tools for web development under the MIT License. ( See altumo for vendor license information )
 
 
