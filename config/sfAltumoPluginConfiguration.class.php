@@ -23,7 +23,24 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
     public function initialize() {
 
         // Include the Altumo loader.
-            require_once( dirname(__FILE__) . '/../lib/vendor/altumo/source/php/loader.php' );
+            //require_once( dirname(__FILE__) . '/../lib/vendor/altumo/source/php/loader.php' );
+        
+    //set default timezone
+        date_default_timezone_set( 'America/Los_Angeles' );
+  
+    //symfony 2 autoloader (for classes within namespaces)
+        
+        $altumo_php_source_path = __DIR__ . '/../lib/vendor/altumo/source/php';
+    
+        require_once $altumo_php_source_path . '/Utils/UniversalClassLoader.php';
+        
+        $loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
+        $loader->registerNamespaces(array(
+            'sfAltumoPlugin' => __DIR__ . '/../lib',
+            'Altumo' => $altumo_php_source_path
+        ));
+        $loader->register();
+        
         
         // Add altumo paths to sfConfig
             sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );

@@ -48,12 +48,15 @@ class RoutingDumper{
     * 
     * @return array
     */
+    
     public static function getRoutesAsKeyValuePairArray( $regex_pattern = null, $required_options = null ){
+        
+        $all_routes = \sfContext::getInstance()->getRouting()->getRoutes();
 
-        $all_routes = sfContext::getInstance()->getRouting()->getRoutes();
+        $routes = array();
 
         foreach( $all_routes as $route_key => $route ){
-            if( 0 ) $route = new sfPropelRoute();
+            if( 0 ) $route = new \sfPropelRoute();
 
             if ( is_null( $regex_pattern ) || preg_match( $regex_pattern, $route_key ) ) {
                 
