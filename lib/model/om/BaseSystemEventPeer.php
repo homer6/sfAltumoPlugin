@@ -31,6 +31,9 @@ abstract class BaseSystemEventPeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 7;
+
 	/** the column name for the ID field */
 	const ID = 'system_event.ID';
 
@@ -52,6 +55,9 @@ abstract class BaseSystemEventPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'system_event.UPDATED_AT';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of SystemEvent objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -74,7 +80,7 @@ abstract class BaseSystemEventPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'UniqueKey', 'Slug', 'Enabled', 'CreatedAt', 'UpdatedAt', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'uniqueKey', 'slug', 'enabled', 'createdAt', 'updatedAt', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::UNIQUE_KEY, self::SLUG, self::ENABLED, self::CREATED_AT, self::UPDATED_AT, ),
@@ -89,7 +95,7 @@ abstract class BaseSystemEventPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'UniqueKey' => 2, 'Slug' => 3, 'Enabled' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'uniqueKey' => 2, 'slug' => 3, 'enabled' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::UNIQUE_KEY => 2, self::SLUG => 3, self::ENABLED => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, ),
@@ -314,7 +320,7 @@ abstract class BaseSystemEventPeer {
 	 * @param      SystemEvent $value A SystemEvent object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(SystemEvent $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -475,7 +481,7 @@ abstract class BaseSystemEventPeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + SystemEventPeer::NUM_COLUMNS;
+			$col = $startcol + SystemEventPeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = SystemEventPeer::OM_CLASS;
 			$obj = new $cls();
@@ -751,7 +757,7 @@ abstract class BaseSystemEventPeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(SystemEvent $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

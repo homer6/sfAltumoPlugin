@@ -58,9 +58,9 @@ class ContactInformationTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('State', 'State', RelationMap::MANY_TO_ONE, array('state_id' => 'id', ), 'CASCADE', null);
+    $this->addRelation('User', 'User', RelationMap::ONE_TO_MANY, array('id' => 'contact_information_id', ), 'RESTRICT', null);
     $this->addRelation('ClientRelatedByDefaultBillingContactInformationId', 'Client', RelationMap::ONE_TO_MANY, array('id' => 'default_billing_contact_information_id', ), 'CASCADE', null);
     $this->addRelation('ClientRelatedByDefaultShippingContactInformationId', 'Client', RelationMap::ONE_TO_MANY, array('id' => 'default_shipping_contact_information_id', ), 'CASCADE', null);
-    $this->addRelation('User', 'User', RelationMap::ONE_TO_MANY, array('id' => 'contact_information_id', ), 'RESTRICT', null);
 	} // buildRelations()
 
 	/**

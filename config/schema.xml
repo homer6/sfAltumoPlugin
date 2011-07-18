@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="propel" package="plugins.sfAltumoPlugin.lib.model" defaultIdMethod="native">
 
-    <table name="country">
+    <table name="country" package="plugins.sfAltumoPlugin.lib.model">
         
         <!-- Fixture representing a Country --> 
         
@@ -37,7 +37,7 @@
     </table>
 
 
-    <table name="state">
+    <table name="state" package="plugins.sfAltumoPlugin.lib.model">
 
         <!-- Fixture representing a State or Country political subdivision --> 
         
@@ -79,7 +79,7 @@
     </table>
     
     
-    <table name="contact_information">
+    <table name="contact_information" package="plugins.sfAltumoPlugin.lib.model">
         
         <!-- Contact information for an entity. Can be associated to any object that is contactable -->
         
@@ -118,7 +118,7 @@
 
     
 
-    <table name="user">
+    <table name="user" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="email" type="varchar" required="true" size="128" />
         <column name="contact_information_id" type="INTEGER" required="false" />
@@ -151,7 +151,7 @@
     </table>
 
 
-    <table name="session">
+    <table name="session" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="session_key" type="varchar" required="true" size="32" />
         <column name="data" type="blob" />
@@ -182,7 +182,7 @@
     </table>
 
 
-    <table name="single_sign_on_key">
+    <table name="single_sign_on_key" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="secret" type="varchar" required="true" size="32" />
         <column name="used" type="boolean" required="true" default="" />
@@ -213,7 +213,7 @@
     </table>
 
 
-    <table name="system_event">
+    <table name="system_event" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="name" type="varchar" required="true" size="64" />
         <column name="unique_key" type="varchar" required="true" size="64" />
@@ -242,7 +242,7 @@
     </table>
 
 
-    <table name="system_event_subscription">
+    <table name="system_event_subscription" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="system_event_id" type="integer" required="true" />
         <column name="user_id" type="integer" required="true" />
@@ -267,7 +267,7 @@
     </table>
 
 
-    <table name="system_event_instance">
+    <table name="system_event_instance" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="system_event_id" type="integer" required="true" />
         <column name="user_id" type="integer" />
@@ -286,7 +286,7 @@
     </table>
 
 
-    <table name="system_event_instance_message">
+    <table name="system_event_instance_message" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="system_event_instance_id" type="integer" required="true" />
         <column name="system_event_subscription_id" type="integer" required="true" />

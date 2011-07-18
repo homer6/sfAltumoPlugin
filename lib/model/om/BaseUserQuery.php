@@ -34,10 +34,6 @@
  * @method     UserQuery rightJoinContactInformation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContactInformation relation
  * @method     UserQuery innerJoinContactInformation($relationAlias = null) Adds a INNER JOIN clause to the query using the ContactInformation relation
  *
- * @method     UserQuery leftJoinClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the Client relation
- * @method     UserQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
- * @method     UserQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
- *
  * @method     UserQuery leftJoinSession($relationAlias = null) Adds a LEFT JOIN clause to the query using the Session relation
  * @method     UserQuery rightJoinSession($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Session relation
  * @method     UserQuery innerJoinSession($relationAlias = null) Adds a INNER JOIN clause to the query using the Session relation
@@ -49,6 +45,10 @@
  * @method     UserQuery leftJoinSystemEventInstance($relationAlias = null) Adds a LEFT JOIN clause to the query using the SystemEventInstance relation
  * @method     UserQuery rightJoinSystemEventInstance($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SystemEventInstance relation
  * @method     UserQuery innerJoinSystemEventInstance($relationAlias = null) Adds a INNER JOIN clause to the query using the SystemEventInstance relation
+ *
+ * @method     UserQuery leftJoinClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the Client relation
+ * @method     UserQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
+ * @method     UserQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
  *
  * @method     User findOne(PropelPDO $con = null) Return the first User matching the query
  * @method     User findOneOrCreate(PropelPDO $con = null) Return the first User matching the query, or a new User object populated from the query conditions when no match is found
@@ -150,7 +150,7 @@ abstract class BaseUserQuery extends ModelCriteria
 	 * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
 	 */
 	public function findPks($keys, $con = null)
-	{	
+	{
 		$criteria = $this->isKeepQuery() ? clone $this : $this;
 		return $this
 			->filterByPrimaryKeys($keys)
@@ -184,8 +184,17 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the id column
 	 * 
-	 * @param     int|array $id The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterById(1234); // WHERE id = 1234
+	 * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+	 * $query->filterById(array('min' => 12)); // WHERE id > 12
+	 * </code>
+	 *
+	 * @param     mixed $id The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -201,8 +210,14 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the email column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByEmail('fooValue');   // WHERE email = 'fooValue'
+	 * $query->filterByEmail('%fooValue%'); // WHERE email LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $email The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -223,8 +238,19 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the contact_information_id column
 	 * 
-	 * @param     int|array $contactInformationId The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByContactInformationId(1234); // WHERE contact_information_id = 1234
+	 * $query->filterByContactInformationId(array(12, 34)); // WHERE contact_information_id IN (12, 34)
+	 * $query->filterByContactInformationId(array('min' => 12)); // WHERE contact_information_id > 12
+	 * </code>
+	 *
+	 * @see       filterByContactInformation()
+	 *
+	 * @param     mixed $contactInformationId The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -254,8 +280,14 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the salt column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterBySalt('fooValue');   // WHERE salt = 'fooValue'
+	 * $query->filterBySalt('%fooValue%'); // WHERE salt LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $salt The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -276,8 +308,14 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the password column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByPassword('fooValue');   // WHERE password = 'fooValue'
+	 * $query->filterByPassword('%fooValue%'); // WHERE password LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $password The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -298,8 +336,14 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the password_reset_key column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByPasswordResetKey('fooValue');   // WHERE password_reset_key = 'fooValue'
+	 * $query->filterByPasswordResetKey('%fooValue%'); // WHERE password_reset_key LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $passwordResetKey The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -320,8 +364,17 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the active column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByActive(true); // WHERE active = true
+	 * $query->filterByActive('yes'); // WHERE active = true
+	 * </code>
+	 *
 	 * @param     boolean|string $active The value to use as filter.
-	 *            Accepts strings ('false', 'off', '-', 'no', 'n', and '0' are false, the rest is true)
+	 *              Non-boolean arguments are converted using the following rules:
+	 *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+	 *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+	 *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -337,8 +390,19 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the created_at column
 	 * 
-	 * @param     string|array $createdAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $createdAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -368,8 +432,19 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query on the updated_at column
 	 * 
-	 * @param     string|array $updatedAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $updatedAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
@@ -399,15 +474,25 @@ abstract class BaseUserQuery extends ModelCriteria
 	/**
 	 * Filter the query by a related ContactInformation object
 	 *
-	 * @param     ContactInformation $contactInformation  the related object to use as filter
+	 * @param     ContactInformation|PropelCollection $contactInformation The related object(s) to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    UserQuery The current query, for fluid interface
 	 */
 	public function filterByContactInformation($contactInformation, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(UserPeer::CONTACT_INFORMATION_ID, $contactInformation->getId(), $comparison);
+		if ($contactInformation instanceof ContactInformation) {
+			return $this
+				->addUsingAlias(UserPeer::CONTACT_INFORMATION_ID, $contactInformation->getId(), $comparison);
+		} elseif ($contactInformation instanceof PropelCollection) {
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+			return $this
+				->addUsingAlias(UserPeer::CONTACT_INFORMATION_ID, $contactInformation->toKeyValue('PrimaryKey', 'Id'), $comparison);
+		} else {
+			throw new PropelException('filterByContactInformation() only accepts arguments of type ContactInformation or PropelCollection');
+		}
 	}
 
 	/**
@@ -461,70 +546,6 @@ abstract class BaseUserQuery extends ModelCriteria
 	}
 
 	/**
-	 * Filter the query by a related Client object
-	 *
-	 * @param     Client $client  the related object to use as filter
-	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-	 *
-	 * @return    UserQuery The current query, for fluid interface
-	 */
-	public function filterByClient($client, $comparison = null)
-	{
-		return $this
-			->addUsingAlias(UserPeer::ID, $client->getUserId(), $comparison);
-	}
-
-	/**
-	 * Adds a JOIN clause to the query using the Client relation
-	 * 
-	 * @param     string $relationAlias optional alias for the relation
-	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-	 *
-	 * @return    UserQuery The current query, for fluid interface
-	 */
-	public function joinClient($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-	{
-		$tableMap = $this->getTableMap();
-		$relationMap = $tableMap->getRelation('Client');
-		
-		// create a ModelJoin object for this join
-		$join = new ModelJoin();
-		$join->setJoinType($joinType);
-		$join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-		if ($previousJoin = $this->getPreviousJoin()) {
-			$join->setPreviousJoin($previousJoin);
-		}
-		
-		// add the ModelJoin to the current object
-		if($relationAlias) {
-			$this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-			$this->addJoinObject($join, $relationAlias);
-		} else {
-			$this->addJoinObject($join, 'Client');
-		}
-		
-		return $this;
-	}
-
-	/**
-	 * Use the Client relation Client object
-	 *
-	 * @see       useQuery()
-	 * 
-	 * @param     string $relationAlias optional alias for the relation,
-	 *                                   to be used as main alias in the secondary query
-	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-	 *
-	 * @return    ClientQuery A secondary query class using the current class as primary query
-	 */
-	public function useClientQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-	{
-		return $this
-			->joinClient($relationAlias, $joinType)
-			->useQuery($relationAlias ? $relationAlias : 'Client', 'ClientQuery');
-	}
-
-	/**
 	 * Filter the query by a related Session object
 	 *
 	 * @param     Session $session  the related object to use as filter
@@ -534,8 +555,17 @@ abstract class BaseUserQuery extends ModelCriteria
 	 */
 	public function filterBySession($session, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(UserPeer::ID, $session->getUserId(), $comparison);
+		if ($session instanceof Session) {
+			return $this
+				->addUsingAlias(UserPeer::ID, $session->getUserId(), $comparison);
+		} elseif ($session instanceof PropelCollection) {
+			return $this
+				->useSessionQuery()
+					->filterByPrimaryKeys($session->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySession() only accepts arguments of type Session or PropelCollection');
+		}
 	}
 
 	/**
@@ -598,8 +628,17 @@ abstract class BaseUserQuery extends ModelCriteria
 	 */
 	public function filterBySystemEventSubscription($systemEventSubscription, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(UserPeer::ID, $systemEventSubscription->getUserId(), $comparison);
+		if ($systemEventSubscription instanceof SystemEventSubscription) {
+			return $this
+				->addUsingAlias(UserPeer::ID, $systemEventSubscription->getUserId(), $comparison);
+		} elseif ($systemEventSubscription instanceof PropelCollection) {
+			return $this
+				->useSystemEventSubscriptionQuery()
+					->filterByPrimaryKeys($systemEventSubscription->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySystemEventSubscription() only accepts arguments of type SystemEventSubscription or PropelCollection');
+		}
 	}
 
 	/**
@@ -662,8 +701,17 @@ abstract class BaseUserQuery extends ModelCriteria
 	 */
 	public function filterBySystemEventInstance($systemEventInstance, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(UserPeer::ID, $systemEventInstance->getUserId(), $comparison);
+		if ($systemEventInstance instanceof SystemEventInstance) {
+			return $this
+				->addUsingAlias(UserPeer::ID, $systemEventInstance->getUserId(), $comparison);
+		} elseif ($systemEventInstance instanceof PropelCollection) {
+			return $this
+				->useSystemEventInstanceQuery()
+					->filterByPrimaryKeys($systemEventInstance->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySystemEventInstance() only accepts arguments of type SystemEventInstance or PropelCollection');
+		}
 	}
 
 	/**
@@ -714,6 +762,79 @@ abstract class BaseUserQuery extends ModelCriteria
 		return $this
 			->joinSystemEventInstance($relationAlias, $joinType)
 			->useQuery($relationAlias ? $relationAlias : 'SystemEventInstance', 'SystemEventInstanceQuery');
+	}
+
+	/**
+	 * Filter the query by a related Client object
+	 *
+	 * @param     Client $client  the related object to use as filter
+	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+	 *
+	 * @return    UserQuery The current query, for fluid interface
+	 */
+	public function filterByClient($client, $comparison = null)
+	{
+		if ($client instanceof Client) {
+			return $this
+				->addUsingAlias(UserPeer::ID, $client->getUserId(), $comparison);
+		} elseif ($client instanceof PropelCollection) {
+			return $this
+				->useClientQuery()
+					->filterByPrimaryKeys($client->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterByClient() only accepts arguments of type Client or PropelCollection');
+		}
+	}
+
+	/**
+	 * Adds a JOIN clause to the query using the Client relation
+	 * 
+	 * @param     string $relationAlias optional alias for the relation
+	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+	 *
+	 * @return    UserQuery The current query, for fluid interface
+	 */
+	public function joinClient($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+	{
+		$tableMap = $this->getTableMap();
+		$relationMap = $tableMap->getRelation('Client');
+		
+		// create a ModelJoin object for this join
+		$join = new ModelJoin();
+		$join->setJoinType($joinType);
+		$join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+		if ($previousJoin = $this->getPreviousJoin()) {
+			$join->setPreviousJoin($previousJoin);
+		}
+		
+		// add the ModelJoin to the current object
+		if($relationAlias) {
+			$this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+			$this->addJoinObject($join, $relationAlias);
+		} else {
+			$this->addJoinObject($join, 'Client');
+		}
+		
+		return $this;
+	}
+
+	/**
+	 * Use the Client relation Client object
+	 *
+	 * @see       useQuery()
+	 * 
+	 * @param     string $relationAlias optional alias for the relation,
+	 *                                   to be used as main alias in the secondary query
+	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+	 *
+	 * @return    ClientQuery A secondary query class using the current class as primary query
+	 */
+	public function useClientQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+	{
+		return $this
+			->joinClient($relationAlias, $joinType)
+			->useQuery($relationAlias ? $relationAlias : 'Client', 'ClientQuery');
 	}
 
 	/**

@@ -14,7 +14,7 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	/**
 	 * Peer class name
 	 */
-  const PEER = 'UserPeer';
+	const PEER = 'UserPeer';
 
 	/**
 	 * The Peer class.
@@ -85,11 +85,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	protected $aContactInformation;
 
 	/**
-	 * @var        array Client[] Collection to store aggregation of Client objects.
-	 */
-	protected $collClients;
-
-	/**
 	 * @var        array Session[] Collection to store aggregation of Session objects.
 	 */
 	protected $collSessions;
@@ -103,6 +98,11 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	 * @var        array SystemEventInstance[] Collection to store aggregation of SystemEventInstance objects.
 	 */
 	protected $collSystemEventInstances;
+
+	/**
+	 * @var        array Client[] Collection to store aggregation of Client objects.
+	 */
+	protected $collClients;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -410,15 +410,23 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	} // setPasswordResetKey()
 
 	/**
-	 * Set the value of [active] column.
+	 * Sets the value of the [active] column. 
+	 * Non-boolean arguments are converted using the following rules:
+	 *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+	 *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+	 * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
 	 * 
-	 * @param      boolean $v new value
+	 * @param      boolean|integer|string $v The new value
 	 * @return     User The current object (for fluent API support)
 	 */
 	public function setActive($v)
 	{
 		if ($v !== null) {
-			$v = (boolean) $v;
+			if (is_string($v)) {
+				$v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0')) ? false : true;
+			} else {
+				$v = (boolean) $v;
+			}
 		}
 
 		if ($this->active !== $v || $this->isNew()) {
@@ -432,45 +440,18 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.
+	 *               Empty strings are treated as NULL.
 	 * @return     User The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->created_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+		$dt = PropelDateTime::newInstance($v, null, 'DateTime');
+		if ($this->created_at !== null || $dt !== null) {
+			$currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+			if ($currentDateAsString !== $newDateAsString) {
+				$this->created_at = $newDateAsString;
 				$this->modifiedColumns[] = UserPeer::CREATED_AT;
 			}
 		} // if either are not null
@@ -481,45 +462,18 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	/**
 	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.
+	 *               Empty strings are treated as NULL.
 	 * @return     User The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->updated_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+		$dt = PropelDateTime::newInstance($v, null, 'DateTime');
+		if ($this->updated_at !== null || $dt !== null) {
+			$currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+			if ($currentDateAsString !== $newDateAsString) {
+				$this->updated_at = $newDateAsString;
 				$this->modifiedColumns[] = UserPeer::UPDATED_AT;
 			}
 		} // if either are not null
@@ -580,7 +534,7 @@ abstract class BaseUser extends BaseObject  implements Persistent
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 9; // 9 = UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = UserPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating User object", $e);
@@ -646,13 +600,13 @@ abstract class BaseUser extends BaseObject  implements Persistent
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aContactInformation = null;
-			$this->collClients = null;
-
 			$this->collSessions = null;
 
 			$this->collSystemEventSubscriptions = null;
 
 			$this->collSystemEventInstances = null;
+
+			$this->collClients = null;
 
 		} // if (deep)
 	}
@@ -675,7 +629,7 @@ abstract class BaseUser extends BaseObject  implements Persistent
 		if ($con === null) {
 			$con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -733,7 +687,7 @@ abstract class BaseUser extends BaseObject  implements Persistent
 		if ($con === null) {
 			$con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -843,14 +797,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
 			}
 
-			if ($this->collClients !== null) {
-				foreach ($this->collClients as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
 			if ($this->collSessions !== null) {
 				foreach ($this->collSessions as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
@@ -869,6 +815,14 @@ abstract class BaseUser extends BaseObject  implements Persistent
 
 			if ($this->collSystemEventInstances !== null) {
 				foreach ($this->collSystemEventInstances as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collClients !== null) {
+				foreach ($this->collClients as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -958,14 +912,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			}
 
 
-				if ($this->collClients !== null) {
-					foreach ($this->collClients as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
-
 				if ($this->collSessions !== null) {
 					foreach ($this->collSessions as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
@@ -984,6 +930,14 @@ abstract class BaseUser extends BaseObject  implements Persistent
 
 				if ($this->collSystemEventInstances !== null) {
 					foreach ($this->collSystemEventInstances as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collClients !== null) {
+					foreach ($this->collClients as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -1063,15 +1017,20 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	 * type constants.
 	 *
 	 * @param     string  $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
-	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. 
+	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
 	 *                    Defaults to BasePeer::TYPE_PHPNAME.
 	 * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+	 * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
 	 * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
 	 *
 	 * @return    array an associative array containing the field names (as keys) and field values
 	 */
-	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false)
+	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
 	{
+		if (isset($alreadyDumpedObjects['User'][$this->getPrimaryKey()])) {
+			return '*RECURSION*';
+		}
+		$alreadyDumpedObjects['User'][$this->getPrimaryKey()] = true;
 		$keys = UserPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
@@ -1086,7 +1045,19 @@ abstract class BaseUser extends BaseObject  implements Persistent
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aContactInformation) {
-				$result['ContactInformation'] = $this->aContactInformation->toArray($keyType, $includeLazyLoadColumns, true);
+				$result['ContactInformation'] = $this->aContactInformation->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+			}
+			if (null !== $this->collSessions) {
+				$result['Sessions'] = $this->collSessions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collSystemEventSubscriptions) {
+				$result['SystemEventSubscriptions'] = $this->collSystemEventSubscriptions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collSystemEventInstances) {
+				$result['SystemEventInstances'] = $this->collSystemEventInstances->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collClients) {
+				$result['Clients'] = $this->collClients->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -1256,29 +1227,24 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	 *
 	 * @param      object $copyObj An object of User (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
 	 * @throws     PropelException
 	 */
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
 	{
-		$copyObj->setEmail($this->email);
-		$copyObj->setContactInformationId($this->contact_information_id);
-		$copyObj->setSalt($this->salt);
-		$copyObj->setPassword($this->password);
-		$copyObj->setPasswordResetKey($this->password_reset_key);
-		$copyObj->setActive($this->active);
-		$copyObj->setCreatedAt($this->created_at);
-		$copyObj->setUpdatedAt($this->updated_at);
+		$copyObj->setEmail($this->getEmail());
+		$copyObj->setContactInformationId($this->getContactInformationId());
+		$copyObj->setSalt($this->getSalt());
+		$copyObj->setPassword($this->getPassword());
+		$copyObj->setPasswordResetKey($this->getPasswordResetKey());
+		$copyObj->setActive($this->getActive());
+		$copyObj->setCreatedAt($this->getCreatedAt());
+		$copyObj->setUpdatedAt($this->getUpdatedAt());
 
 		if ($deepCopy) {
 			// important: temporarily setNew(false) because this affects the behavior of
 			// the getter/setter methods for fkey referrer objects.
 			$copyObj->setNew(false);
-
-			foreach ($this->getClients() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addClient($relObj->copy($deepCopy));
-				}
-			}
 
 			foreach ($this->getSessions() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1298,11 +1264,18 @@ abstract class BaseUser extends BaseObject  implements Persistent
 				}
 			}
 
+			foreach ($this->getClients() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addClient($relObj->copy($deepCopy));
+				}
+			}
+
 		} // if ($deepCopy)
 
-
-		$copyObj->setNew(true);
-		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		if ($makeNew) {
+			$copyObj->setNew(true);
+			$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		}
 	}
 
 	/**
@@ -1382,14 +1355,409 @@ abstract class BaseUser extends BaseObject  implements Persistent
 		if ($this->aContactInformation === null && ($this->contact_information_id !== null)) {
 			$this->aContactInformation = ContactInformationQuery::create()->findPk($this->contact_information_id, $con);
 			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aContactInformation->addUsers($this);
+				guarantee the related object contains a reference
+				to this object.  This level of coupling may, however, be
+				undesirable since it could result in an only partially populated collection
+				in the referenced object.
+				$this->aContactInformation->addUsers($this);
 			 */
 		}
 		return $this->aContactInformation;
+	}
+
+	/**
+	 * Clears out the collSessions collection
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addSessions()
+	 */
+	public function clearSessions()
+	{
+		$this->collSessions = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collSessions collection.
+	 *
+	 * By default this just sets the collSessions collection to an empty array (like clearcollSessions());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
+	 * @return     void
+	 */
+	public function initSessions($overrideExisting = true)
+	{
+		if (null !== $this->collSessions && !$overrideExisting) {
+			return;
+		}
+		$this->collSessions = new PropelObjectCollection();
+		$this->collSessions->setModel('Session');
+	}
+
+	/**
+	 * Gets an array of Session objects which contain a foreign key that references this object.
+	 *
+	 * If the $criteria is not null, it is used to always fetch the results from the database.
+	 * Otherwise the results are fetched from the database the first time, then cached.
+	 * Next time the same method is called without $criteria, the cached collection is returned.
+	 * If this User is new, it will return
+	 * an empty collection or the current collection; the criteria is ignored on a new object.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @return     PropelCollection|array Session[] List of Session objects
+	 * @throws     PropelException
+	 */
+	public function getSessions($criteria = null, PropelPDO $con = null)
+	{
+		if(null === $this->collSessions || null !== $criteria) {
+			if ($this->isNew() && null === $this->collSessions) {
+				// return empty collection
+				$this->initSessions();
+			} else {
+				$collSessions = SessionQuery::create(null, $criteria)
+					->filterByUser($this)
+					->find($con);
+				if (null !== $criteria) {
+					return $collSessions;
+				}
+				$this->collSessions = $collSessions;
+			}
+		}
+		return $this->collSessions;
+	}
+
+	/**
+	 * Returns the number of related Session objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related Session objects.
+	 * @throws     PropelException
+	 */
+	public function countSessions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if(null === $this->collSessions || null !== $criteria) {
+			if ($this->isNew() && null === $this->collSessions) {
+				return 0;
+			} else {
+				$query = SessionQuery::create(null, $criteria);
+				if($distinct) {
+					$query->distinct();
+				}
+				return $query
+					->filterByUser($this)
+					->count($con);
+			}
+		} else {
+			return count($this->collSessions);
+		}
+	}
+
+	/**
+	 * Method called to associate a Session object to this object
+	 * through the Session foreign key attribute.
+	 *
+	 * @param      Session $l Session
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addSession(Session $l)
+	{
+		if ($this->collSessions === null) {
+			$this->initSessions();
+		}
+		if (!$this->collSessions->contains($l)) { // only add it if the **same** object is not already associated
+			$this->collSessions[]= $l;
+			$l->setUser($this);
+		}
+	}
+
+	/**
+	 * Clears out the collSystemEventSubscriptions collection
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addSystemEventSubscriptions()
+	 */
+	public function clearSystemEventSubscriptions()
+	{
+		$this->collSystemEventSubscriptions = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collSystemEventSubscriptions collection.
+	 *
+	 * By default this just sets the collSystemEventSubscriptions collection to an empty array (like clearcollSystemEventSubscriptions());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
+	 * @return     void
+	 */
+	public function initSystemEventSubscriptions($overrideExisting = true)
+	{
+		if (null !== $this->collSystemEventSubscriptions && !$overrideExisting) {
+			return;
+		}
+		$this->collSystemEventSubscriptions = new PropelObjectCollection();
+		$this->collSystemEventSubscriptions->setModel('SystemEventSubscription');
+	}
+
+	/**
+	 * Gets an array of SystemEventSubscription objects which contain a foreign key that references this object.
+	 *
+	 * If the $criteria is not null, it is used to always fetch the results from the database.
+	 * Otherwise the results are fetched from the database the first time, then cached.
+	 * Next time the same method is called without $criteria, the cached collection is returned.
+	 * If this User is new, it will return
+	 * an empty collection or the current collection; the criteria is ignored on a new object.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @return     PropelCollection|array SystemEventSubscription[] List of SystemEventSubscription objects
+	 * @throws     PropelException
+	 */
+	public function getSystemEventSubscriptions($criteria = null, PropelPDO $con = null)
+	{
+		if(null === $this->collSystemEventSubscriptions || null !== $criteria) {
+			if ($this->isNew() && null === $this->collSystemEventSubscriptions) {
+				// return empty collection
+				$this->initSystemEventSubscriptions();
+			} else {
+				$collSystemEventSubscriptions = SystemEventSubscriptionQuery::create(null, $criteria)
+					->filterByUser($this)
+					->find($con);
+				if (null !== $criteria) {
+					return $collSystemEventSubscriptions;
+				}
+				$this->collSystemEventSubscriptions = $collSystemEventSubscriptions;
+			}
+		}
+		return $this->collSystemEventSubscriptions;
+	}
+
+	/**
+	 * Returns the number of related SystemEventSubscription objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related SystemEventSubscription objects.
+	 * @throws     PropelException
+	 */
+	public function countSystemEventSubscriptions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if(null === $this->collSystemEventSubscriptions || null !== $criteria) {
+			if ($this->isNew() && null === $this->collSystemEventSubscriptions) {
+				return 0;
+			} else {
+				$query = SystemEventSubscriptionQuery::create(null, $criteria);
+				if($distinct) {
+					$query->distinct();
+				}
+				return $query
+					->filterByUser($this)
+					->count($con);
+			}
+		} else {
+			return count($this->collSystemEventSubscriptions);
+		}
+	}
+
+	/**
+	 * Method called to associate a SystemEventSubscription object to this object
+	 * through the SystemEventSubscription foreign key attribute.
+	 *
+	 * @param      SystemEventSubscription $l SystemEventSubscription
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addSystemEventSubscription(SystemEventSubscription $l)
+	{
+		if ($this->collSystemEventSubscriptions === null) {
+			$this->initSystemEventSubscriptions();
+		}
+		if (!$this->collSystemEventSubscriptions->contains($l)) { // only add it if the **same** object is not already associated
+			$this->collSystemEventSubscriptions[]= $l;
+			$l->setUser($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this User is new, it will return
+	 * an empty collection; or if this User has previously
+	 * been saved, it will retrieve related SystemEventSubscriptions from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in User.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array SystemEventSubscription[] List of SystemEventSubscription objects
+	 */
+	public function getSystemEventSubscriptionsJoinSystemEvent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = SystemEventSubscriptionQuery::create(null, $criteria);
+		$query->joinWith('SystemEvent', $join_behavior);
+
+		return $this->getSystemEventSubscriptions($query, $con);
+	}
+
+	/**
+	 * Clears out the collSystemEventInstances collection
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addSystemEventInstances()
+	 */
+	public function clearSystemEventInstances()
+	{
+		$this->collSystemEventInstances = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collSystemEventInstances collection.
+	 *
+	 * By default this just sets the collSystemEventInstances collection to an empty array (like clearcollSystemEventInstances());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
+	 * @return     void
+	 */
+	public function initSystemEventInstances($overrideExisting = true)
+	{
+		if (null !== $this->collSystemEventInstances && !$overrideExisting) {
+			return;
+		}
+		$this->collSystemEventInstances = new PropelObjectCollection();
+		$this->collSystemEventInstances->setModel('SystemEventInstance');
+	}
+
+	/**
+	 * Gets an array of SystemEventInstance objects which contain a foreign key that references this object.
+	 *
+	 * If the $criteria is not null, it is used to always fetch the results from the database.
+	 * Otherwise the results are fetched from the database the first time, then cached.
+	 * Next time the same method is called without $criteria, the cached collection is returned.
+	 * If this User is new, it will return
+	 * an empty collection or the current collection; the criteria is ignored on a new object.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @return     PropelCollection|array SystemEventInstance[] List of SystemEventInstance objects
+	 * @throws     PropelException
+	 */
+	public function getSystemEventInstances($criteria = null, PropelPDO $con = null)
+	{
+		if(null === $this->collSystemEventInstances || null !== $criteria) {
+			if ($this->isNew() && null === $this->collSystemEventInstances) {
+				// return empty collection
+				$this->initSystemEventInstances();
+			} else {
+				$collSystemEventInstances = SystemEventInstanceQuery::create(null, $criteria)
+					->filterByUser($this)
+					->find($con);
+				if (null !== $criteria) {
+					return $collSystemEventInstances;
+				}
+				$this->collSystemEventInstances = $collSystemEventInstances;
+			}
+		}
+		return $this->collSystemEventInstances;
+	}
+
+	/**
+	 * Returns the number of related SystemEventInstance objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related SystemEventInstance objects.
+	 * @throws     PropelException
+	 */
+	public function countSystemEventInstances(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if(null === $this->collSystemEventInstances || null !== $criteria) {
+			if ($this->isNew() && null === $this->collSystemEventInstances) {
+				return 0;
+			} else {
+				$query = SystemEventInstanceQuery::create(null, $criteria);
+				if($distinct) {
+					$query->distinct();
+				}
+				return $query
+					->filterByUser($this)
+					->count($con);
+			}
+		} else {
+			return count($this->collSystemEventInstances);
+		}
+	}
+
+	/**
+	 * Method called to associate a SystemEventInstance object to this object
+	 * through the SystemEventInstance foreign key attribute.
+	 *
+	 * @param      SystemEventInstance $l SystemEventInstance
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addSystemEventInstance(SystemEventInstance $l)
+	{
+		if ($this->collSystemEventInstances === null) {
+			$this->initSystemEventInstances();
+		}
+		if (!$this->collSystemEventInstances->contains($l)) { // only add it if the **same** object is not already associated
+			$this->collSystemEventInstances[]= $l;
+			$l->setUser($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this User is new, it will return
+	 * an empty collection; or if this User has previously
+	 * been saved, it will retrieve related SystemEventInstances from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in User.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array SystemEventInstance[] List of SystemEventInstance objects
+	 */
+	public function getSystemEventInstancesJoinSystemEvent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = SystemEventInstanceQuery::create(null, $criteria);
+		$query->joinWith('SystemEvent', $join_behavior);
+
+		return $this->getSystemEventInstances($query, $con);
 	}
 
 	/**
@@ -1413,10 +1781,16 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
 	 * @return     void
 	 */
-	public function initClients()
+	public function initClients($overrideExisting = true)
 	{
+		if (null !== $this->collClients && !$overrideExisting) {
+			return;
+		}
 		$this->collClients = new PropelObjectCollection();
 		$this->collClients->setModel('Client');
 	}
@@ -1552,383 +1926,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	}
 
 	/**
-	 * Clears out the collSessions collection
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addSessions()
-	 */
-	public function clearSessions()
-	{
-		$this->collSessions = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collSessions collection.
-	 *
-	 * By default this just sets the collSessions collection to an empty array (like clearcollSessions());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initSessions()
-	{
-		$this->collSessions = new PropelObjectCollection();
-		$this->collSessions->setModel('Session');
-	}
-
-	/**
-	 * Gets an array of Session objects which contain a foreign key that references this object.
-	 *
-	 * If the $criteria is not null, it is used to always fetch the results from the database.
-	 * Otherwise the results are fetched from the database the first time, then cached.
-	 * Next time the same method is called without $criteria, the cached collection is returned.
-	 * If this User is new, it will return
-	 * an empty collection or the current collection; the criteria is ignored on a new object.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @return     PropelCollection|array Session[] List of Session objects
-	 * @throws     PropelException
-	 */
-	public function getSessions($criteria = null, PropelPDO $con = null)
-	{
-		if(null === $this->collSessions || null !== $criteria) {
-			if ($this->isNew() && null === $this->collSessions) {
-				// return empty collection
-				$this->initSessions();
-			} else {
-				$collSessions = SessionQuery::create(null, $criteria)
-					->filterByUser($this)
-					->find($con);
-				if (null !== $criteria) {
-					return $collSessions;
-				}
-				$this->collSessions = $collSessions;
-			}
-		}
-		return $this->collSessions;
-	}
-
-	/**
-	 * Returns the number of related Session objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related Session objects.
-	 * @throws     PropelException
-	 */
-	public function countSessions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if(null === $this->collSessions || null !== $criteria) {
-			if ($this->isNew() && null === $this->collSessions) {
-				return 0;
-			} else {
-				$query = SessionQuery::create(null, $criteria);
-				if($distinct) {
-					$query->distinct();
-				}
-				return $query
-					->filterByUser($this)
-					->count($con);
-			}
-		} else {
-			return count($this->collSessions);
-		}
-	}
-
-	/**
-	 * Method called to associate a Session object to this object
-	 * through the Session foreign key attribute.
-	 *
-	 * @param      Session $l Session
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addSession(Session $l)
-	{
-		if ($this->collSessions === null) {
-			$this->initSessions();
-		}
-		if (!$this->collSessions->contains($l)) { // only add it if the **same** object is not already associated
-			$this->collSessions[]= $l;
-			$l->setUser($this);
-		}
-	}
-
-	/**
-	 * Clears out the collSystemEventSubscriptions collection
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addSystemEventSubscriptions()
-	 */
-	public function clearSystemEventSubscriptions()
-	{
-		$this->collSystemEventSubscriptions = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collSystemEventSubscriptions collection.
-	 *
-	 * By default this just sets the collSystemEventSubscriptions collection to an empty array (like clearcollSystemEventSubscriptions());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initSystemEventSubscriptions()
-	{
-		$this->collSystemEventSubscriptions = new PropelObjectCollection();
-		$this->collSystemEventSubscriptions->setModel('SystemEventSubscription');
-	}
-
-	/**
-	 * Gets an array of SystemEventSubscription objects which contain a foreign key that references this object.
-	 *
-	 * If the $criteria is not null, it is used to always fetch the results from the database.
-	 * Otherwise the results are fetched from the database the first time, then cached.
-	 * Next time the same method is called without $criteria, the cached collection is returned.
-	 * If this User is new, it will return
-	 * an empty collection or the current collection; the criteria is ignored on a new object.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @return     PropelCollection|array SystemEventSubscription[] List of SystemEventSubscription objects
-	 * @throws     PropelException
-	 */
-	public function getSystemEventSubscriptions($criteria = null, PropelPDO $con = null)
-	{
-		if(null === $this->collSystemEventSubscriptions || null !== $criteria) {
-			if ($this->isNew() && null === $this->collSystemEventSubscriptions) {
-				// return empty collection
-				$this->initSystemEventSubscriptions();
-			} else {
-				$collSystemEventSubscriptions = SystemEventSubscriptionQuery::create(null, $criteria)
-					->filterByUser($this)
-					->find($con);
-				if (null !== $criteria) {
-					return $collSystemEventSubscriptions;
-				}
-				$this->collSystemEventSubscriptions = $collSystemEventSubscriptions;
-			}
-		}
-		return $this->collSystemEventSubscriptions;
-	}
-
-	/**
-	 * Returns the number of related SystemEventSubscription objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related SystemEventSubscription objects.
-	 * @throws     PropelException
-	 */
-	public function countSystemEventSubscriptions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if(null === $this->collSystemEventSubscriptions || null !== $criteria) {
-			if ($this->isNew() && null === $this->collSystemEventSubscriptions) {
-				return 0;
-			} else {
-				$query = SystemEventSubscriptionQuery::create(null, $criteria);
-				if($distinct) {
-					$query->distinct();
-				}
-				return $query
-					->filterByUser($this)
-					->count($con);
-			}
-		} else {
-			return count($this->collSystemEventSubscriptions);
-		}
-	}
-
-	/**
-	 * Method called to associate a SystemEventSubscription object to this object
-	 * through the SystemEventSubscription foreign key attribute.
-	 *
-	 * @param      SystemEventSubscription $l SystemEventSubscription
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addSystemEventSubscription(SystemEventSubscription $l)
-	{
-		if ($this->collSystemEventSubscriptions === null) {
-			$this->initSystemEventSubscriptions();
-		}
-		if (!$this->collSystemEventSubscriptions->contains($l)) { // only add it if the **same** object is not already associated
-			$this->collSystemEventSubscriptions[]= $l;
-			$l->setUser($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this User is new, it will return
-	 * an empty collection; or if this User has previously
-	 * been saved, it will retrieve related SystemEventSubscriptions from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in User.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-	 * @return     PropelCollection|array SystemEventSubscription[] List of SystemEventSubscription objects
-	 */
-	public function getSystemEventSubscriptionsJoinSystemEvent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$query = SystemEventSubscriptionQuery::create(null, $criteria);
-		$query->joinWith('SystemEvent', $join_behavior);
-
-		return $this->getSystemEventSubscriptions($query, $con);
-	}
-
-	/**
-	 * Clears out the collSystemEventInstances collection
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addSystemEventInstances()
-	 */
-	public function clearSystemEventInstances()
-	{
-		$this->collSystemEventInstances = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collSystemEventInstances collection.
-	 *
-	 * By default this just sets the collSystemEventInstances collection to an empty array (like clearcollSystemEventInstances());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initSystemEventInstances()
-	{
-		$this->collSystemEventInstances = new PropelObjectCollection();
-		$this->collSystemEventInstances->setModel('SystemEventInstance');
-	}
-
-	/**
-	 * Gets an array of SystemEventInstance objects which contain a foreign key that references this object.
-	 *
-	 * If the $criteria is not null, it is used to always fetch the results from the database.
-	 * Otherwise the results are fetched from the database the first time, then cached.
-	 * Next time the same method is called without $criteria, the cached collection is returned.
-	 * If this User is new, it will return
-	 * an empty collection or the current collection; the criteria is ignored on a new object.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @return     PropelCollection|array SystemEventInstance[] List of SystemEventInstance objects
-	 * @throws     PropelException
-	 */
-	public function getSystemEventInstances($criteria = null, PropelPDO $con = null)
-	{
-		if(null === $this->collSystemEventInstances || null !== $criteria) {
-			if ($this->isNew() && null === $this->collSystemEventInstances) {
-				// return empty collection
-				$this->initSystemEventInstances();
-			} else {
-				$collSystemEventInstances = SystemEventInstanceQuery::create(null, $criteria)
-					->filterByUser($this)
-					->find($con);
-				if (null !== $criteria) {
-					return $collSystemEventInstances;
-				}
-				$this->collSystemEventInstances = $collSystemEventInstances;
-			}
-		}
-		return $this->collSystemEventInstances;
-	}
-
-	/**
-	 * Returns the number of related SystemEventInstance objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related SystemEventInstance objects.
-	 * @throws     PropelException
-	 */
-	public function countSystemEventInstances(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if(null === $this->collSystemEventInstances || null !== $criteria) {
-			if ($this->isNew() && null === $this->collSystemEventInstances) {
-				return 0;
-			} else {
-				$query = SystemEventInstanceQuery::create(null, $criteria);
-				if($distinct) {
-					$query->distinct();
-				}
-				return $query
-					->filterByUser($this)
-					->count($con);
-			}
-		} else {
-			return count($this->collSystemEventInstances);
-		}
-	}
-
-	/**
-	 * Method called to associate a SystemEventInstance object to this object
-	 * through the SystemEventInstance foreign key attribute.
-	 *
-	 * @param      SystemEventInstance $l SystemEventInstance
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addSystemEventInstance(SystemEventInstance $l)
-	{
-		if ($this->collSystemEventInstances === null) {
-			$this->initSystemEventInstances();
-		}
-		if (!$this->collSystemEventInstances->contains($l)) { // only add it if the **same** object is not already associated
-			$this->collSystemEventInstances[]= $l;
-			$l->setUser($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this User is new, it will return
-	 * an empty collection; or if this User has previously
-	 * been saved, it will retrieve related SystemEventInstances from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in User.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-	 * @return     PropelCollection|array SystemEventInstance[] List of SystemEventInstance objects
-	 */
-	public function getSystemEventInstancesJoinSystemEvent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$query = SystemEventInstanceQuery::create(null, $criteria);
-		$query->joinWith('SystemEvent', $join_behavior);
-
-		return $this->getSystemEventInstances($query, $con);
-	}
-
-	/**
 	 * Clears the current object and sets all attributes to their default values
 	 */
 	public function clear()
@@ -1952,44 +1949,66 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	}
 
 	/**
-	 * Resets all collections of referencing foreign keys.
+	 * Resets all references to other model objects or collections of model objects.
 	 *
-	 * This method is a user-space workaround for PHP's inability to garbage collect objects
-	 * with circular references.  This is currently necessary when using Propel in certain
-	 * daemon or large-volumne/high-memory operations.
+	 * This method is a user-space workaround for PHP's inability to garbage collect
+	 * objects with circular references (even in PHP 5.3). This is currently necessary
+	 * when using Propel in certain daemon or large-volumne/high-memory operations.
 	 *
-	 * @param      boolean $deep Whether to also clear the references on all associated objects.
+	 * @param      boolean $deep Whether to also clear the references on all referrer objects.
 	 */
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->collClients) {
-				foreach ((array) $this->collClients as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 			if ($this->collSessions) {
-				foreach ((array) $this->collSessions as $o) {
+				foreach ($this->collSessions as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 			if ($this->collSystemEventSubscriptions) {
-				foreach ((array) $this->collSystemEventSubscriptions as $o) {
+				foreach ($this->collSystemEventSubscriptions as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 			if ($this->collSystemEventInstances) {
-				foreach ((array) $this->collSystemEventInstances as $o) {
+				foreach ($this->collSystemEventInstances as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
+			if ($this->collClients) {
+				foreach ($this->collClients as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 		} // if ($deep)
 
-		$this->collClients = null;
+		if ($this->collSessions instanceof PropelCollection) {
+			$this->collSessions->clearIterator();
+		}
 		$this->collSessions = null;
+		if ($this->collSystemEventSubscriptions instanceof PropelCollection) {
+			$this->collSystemEventSubscriptions->clearIterator();
+		}
 		$this->collSystemEventSubscriptions = null;
+		if ($this->collSystemEventInstances instanceof PropelCollection) {
+			$this->collSystemEventInstances->clearIterator();
+		}
 		$this->collSystemEventInstances = null;
+		if ($this->collClients instanceof PropelCollection) {
+			$this->collClients->clearIterator();
+		}
+		$this->collClients = null;
 		$this->aContactInformation = null;
+	}
+
+	/**
+	 * Return the string representation of this object
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return (string) $this->exportTo(UserPeer::DEFAULT_STRING_FORMAT);
 	}
 
 	/**

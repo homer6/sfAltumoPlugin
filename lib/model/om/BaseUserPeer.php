@@ -31,6 +31,9 @@ abstract class BaseUserPeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 9;
+
 	/** the column name for the ID field */
 	const ID = 'user.ID';
 
@@ -58,6 +61,9 @@ abstract class BaseUserPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'user.UPDATED_AT';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of User objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -80,7 +86,7 @@ abstract class BaseUserPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'Email', 'ContactInformationId', 'Salt', 'Password', 'PasswordResetKey', 'Active', 'CreatedAt', 'UpdatedAt', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'email', 'contactInformationId', 'salt', 'password', 'passwordResetKey', 'active', 'createdAt', 'updatedAt', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::EMAIL, self::CONTACT_INFORMATION_ID, self::SALT, self::PASSWORD, self::PASSWORD_RESET_KEY, self::ACTIVE, self::CREATED_AT, self::UPDATED_AT, ),
@@ -95,7 +101,7 @@ abstract class BaseUserPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Email' => 1, 'ContactInformationId' => 2, 'Salt' => 3, 'Password' => 4, 'PasswordResetKey' => 5, 'Active' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'email' => 1, 'contactInformationId' => 2, 'salt' => 3, 'password' => 4, 'passwordResetKey' => 5, 'active' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EMAIL => 1, self::CONTACT_INFORMATION_ID => 2, self::SALT => 3, self::PASSWORD => 4, self::PASSWORD_RESET_KEY => 5, self::ACTIVE => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, ),
@@ -324,7 +330,7 @@ abstract class BaseUserPeer {
 	 * @param      User $value A User object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(User $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -397,9 +403,6 @@ abstract class BaseUserPeer {
 	 */
 	public static function clearRelatedInstancePool()
 	{
-		// Invalidate objects in ClientPeer instance pool, 
-		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-		ClientPeer::clearInstancePool();
 		// Invalidate objects in SessionPeer instance pool, 
 		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
 		SessionPeer::clearInstancePool();
@@ -409,6 +412,9 @@ abstract class BaseUserPeer {
 		// Invalidate objects in SystemEventInstancePeer instance pool, 
 		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
 		SystemEventInstancePeer::clearInstancePool();
+		// Invalidate objects in ClientPeer instance pool, 
+		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+		ClientPeer::clearInstancePool();
 	}
 
 	/**
@@ -491,7 +497,7 @@ abstract class BaseUserPeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + UserPeer::NUM_COLUMNS;
+			$col = $startcol + UserPeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = UserPeer::OM_CLASS;
 			$obj = new $cls();
@@ -576,7 +582,7 @@ abstract class BaseUserPeer {
 		}
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol = (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = UserPeer::NUM_HYDRATE_COLUMNS;
 		ContactInformationPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(UserPeer::CONTACT_INFORMATION_ID, ContactInformationPeer::ID, $join_behavior);
@@ -704,10 +710,10 @@ abstract class BaseUserPeer {
 		}
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol2 = (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = UserPeer::NUM_HYDRATE_COLUMNS;
 
 		ContactInformationPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (ContactInformationPeer::NUM_COLUMNS - ContactInformationPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + ContactInformationPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(UserPeer::CONTACT_INFORMATION_ID, ContactInformationPeer::ID, $join_behavior);
 
@@ -998,12 +1004,6 @@ abstract class BaseUserPeer {
 		foreach ($objects as $obj) {
 
 
-			// delete related Client objects
-			$criteria = new Criteria(ClientPeer::DATABASE_NAME);
-			
-			$criteria->add(ClientPeer::USER_ID, $obj->getId());
-			$affectedRows += ClientPeer::doDelete($criteria, $con);
-
 			// delete related Session objects
 			$criteria = new Criteria(SessionPeer::DATABASE_NAME);
 			
@@ -1021,6 +1021,12 @@ abstract class BaseUserPeer {
 			
 			$criteria->add(SystemEventInstancePeer::USER_ID, $obj->getId());
 			$affectedRows += SystemEventInstancePeer::doDelete($criteria, $con);
+
+			// delete related Client objects
+			$criteria = new Criteria(ClientPeer::DATABASE_NAME);
+			
+			$criteria->add(ClientPeer::USER_ID, $obj->getId());
+			$affectedRows += ClientPeer::doDelete($criteria, $con);
 		}
 		return $affectedRows;
 	}
@@ -1037,7 +1043,7 @@ abstract class BaseUserPeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(User $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

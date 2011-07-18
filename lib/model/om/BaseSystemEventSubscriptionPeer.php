@@ -31,6 +31,9 @@ abstract class BaseSystemEventSubscriptionPeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 7;
+
 	/** the column name for the ID field */
 	const ID = 'system_event_subscription.ID';
 
@@ -52,6 +55,9 @@ abstract class BaseSystemEventSubscriptionPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'system_event_subscription.UPDATED_AT';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of SystemEventSubscription objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -74,7 +80,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'SystemEventId', 'UserId', 'RemoteUrl', 'Enabled', 'CreatedAt', 'UpdatedAt', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'systemEventId', 'userId', 'remoteUrl', 'enabled', 'createdAt', 'updatedAt', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::SYSTEM_EVENT_ID, self::USER_ID, self::REMOTE_URL, self::ENABLED, self::CREATED_AT, self::UPDATED_AT, ),
@@ -89,7 +95,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'SystemEventId' => 1, 'UserId' => 2, 'RemoteUrl' => 3, 'Enabled' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'systemEventId' => 1, 'userId' => 2, 'remoteUrl' => 3, 'enabled' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SYSTEM_EVENT_ID => 1, self::USER_ID => 2, self::REMOTE_URL => 3, self::ENABLED => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, ),
@@ -314,7 +320,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 	 * @param      SystemEventSubscription $value A SystemEventSubscription object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(SystemEventSubscription $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -472,7 +478,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + SystemEventSubscriptionPeer::NUM_COLUMNS;
+			$col = $startcol + SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = SystemEventSubscriptionPeer::OM_CLASS;
 			$obj = new $cls();
@@ -613,7 +619,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 		}
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol = (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 		SystemEventPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SystemEventSubscriptionPeer::SYSTEM_EVENT_ID, SystemEventPeer::ID, $join_behavior);
@@ -685,7 +691,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 		}
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol = (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 		UserPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SystemEventSubscriptionPeer::USER_ID, UserPeer::ID, $join_behavior);
@@ -815,13 +821,13 @@ abstract class BaseSystemEventSubscriptionPeer {
 		}
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventPeer::NUM_COLUMNS - SystemEventPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventPeer::NUM_HYDRATE_COLUMNS;
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol4 = $startcol3 + UserPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventSubscriptionPeer::SYSTEM_EVENT_ID, SystemEventPeer::ID, $join_behavior);
 
@@ -1027,10 +1033,10 @@ abstract class BaseSystemEventSubscriptionPeer {
 		}
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventSubscriptionPeer::USER_ID, UserPeer::ID, $join_behavior);
 
@@ -1106,10 +1112,10 @@ abstract class BaseSystemEventSubscriptionPeer {
 		}
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventPeer::NUM_COLUMNS - SystemEventPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventSubscriptionPeer::SYSTEM_EVENT_ID, SystemEventPeer::ID, $join_behavior);
 
@@ -1423,7 +1429,7 @@ abstract class BaseSystemEventSubscriptionPeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(SystemEventSubscription $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

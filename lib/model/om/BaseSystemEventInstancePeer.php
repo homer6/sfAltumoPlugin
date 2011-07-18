@@ -31,6 +31,9 @@ abstract class BaseSystemEventInstancePeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 6;
+
 	/** the column name for the ID field */
 	const ID = 'system_event_instance.ID';
 
@@ -49,6 +52,9 @@ abstract class BaseSystemEventInstancePeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'system_event_instance.UPDATED_AT';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of SystemEventInstance objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -71,7 +77,7 @@ abstract class BaseSystemEventInstancePeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'SystemEventId', 'UserId', 'Message', 'CreatedAt', 'UpdatedAt', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'systemEventId', 'userId', 'message', 'createdAt', 'updatedAt', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::SYSTEM_EVENT_ID, self::USER_ID, self::MESSAGE, self::CREATED_AT, self::UPDATED_AT, ),
@@ -86,7 +92,7 @@ abstract class BaseSystemEventInstancePeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'SystemEventId' => 1, 'UserId' => 2, 'Message' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'systemEventId' => 1, 'userId' => 2, 'message' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SYSTEM_EVENT_ID => 1, self::USER_ID => 2, self::MESSAGE => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, ),
@@ -309,7 +315,7 @@ abstract class BaseSystemEventInstancePeer {
 	 * @param      SystemEventInstance $value A SystemEventInstance object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(SystemEventInstance $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -467,7 +473,7 @@ abstract class BaseSystemEventInstancePeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + SystemEventInstancePeer::NUM_COLUMNS;
+			$col = $startcol + SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = SystemEventInstancePeer::OM_CLASS;
 			$obj = new $cls();
@@ -608,7 +614,7 @@ abstract class BaseSystemEventInstancePeer {
 		}
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol = (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 		SystemEventPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SystemEventInstancePeer::SYSTEM_EVENT_ID, SystemEventPeer::ID, $join_behavior);
@@ -680,7 +686,7 @@ abstract class BaseSystemEventInstancePeer {
 		}
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol = (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 		UserPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SystemEventInstancePeer::USER_ID, UserPeer::ID, $join_behavior);
@@ -810,13 +816,13 @@ abstract class BaseSystemEventInstancePeer {
 		}
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventPeer::NUM_COLUMNS - SystemEventPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventPeer::NUM_HYDRATE_COLUMNS;
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol4 = $startcol3 + UserPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventInstancePeer::SYSTEM_EVENT_ID, SystemEventPeer::ID, $join_behavior);
 
@@ -1022,10 +1028,10 @@ abstract class BaseSystemEventInstancePeer {
 		}
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventInstancePeer::USER_ID, UserPeer::ID, $join_behavior);
 
@@ -1101,10 +1107,10 @@ abstract class BaseSystemEventInstancePeer {
 		}
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventPeer::NUM_COLUMNS - SystemEventPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventInstancePeer::SYSTEM_EVENT_ID, SystemEventPeer::ID, $join_behavior);
 
@@ -1418,7 +1424,7 @@ abstract class BaseSystemEventInstancePeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(SystemEventInstance $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

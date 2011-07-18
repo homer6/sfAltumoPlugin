@@ -14,7 +14,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	/**
 	 * Peer class name
 	 */
-  const PEER = 'ContactInformationPeer';
+	const PEER = 'ContactInformationPeer';
 
 	/**
 	 * The Peer class.
@@ -102,6 +102,11 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	protected $aState;
 
 	/**
+	 * @var        array User[] Collection to store aggregation of User objects.
+	 */
+	protected $collUsers;
+
+	/**
 	 * @var        array Client[] Collection to store aggregation of Client objects.
 	 */
 	protected $collClientsRelatedByDefaultBillingContactInformationId;
@@ -110,11 +115,6 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	 * @var        array Client[] Collection to store aggregation of Client objects.
 	 */
 	protected $collClientsRelatedByDefaultShippingContactInformationId;
-
-	/**
-	 * @var        array User[] Collection to store aggregation of User objects.
-	 */
-	protected $collUsers;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -513,45 +513,18 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.
+	 *               Empty strings are treated as NULL.
 	 * @return     ContactInformation The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->created_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+		$dt = PropelDateTime::newInstance($v, null, 'DateTime');
+		if ($this->created_at !== null || $dt !== null) {
+			$currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+			if ($currentDateAsString !== $newDateAsString) {
+				$this->created_at = $newDateAsString;
 				$this->modifiedColumns[] = ContactInformationPeer::CREATED_AT;
 			}
 		} // if either are not null
@@ -562,45 +535,18 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	/**
 	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.
+	 *               Empty strings are treated as NULL.
 	 * @return     ContactInformation The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->updated_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+		$dt = PropelDateTime::newInstance($v, null, 'DateTime');
+		if ($this->updated_at !== null || $dt !== null) {
+			$currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+			if ($currentDateAsString !== $newDateAsString) {
+				$this->updated_at = $newDateAsString;
 				$this->modifiedColumns[] = ContactInformationPeer::UPDATED_AT;
 			}
 		} // if either are not null
@@ -660,7 +606,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 12; // 12 = ContactInformationPeer::NUM_COLUMNS - ContactInformationPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = ContactInformationPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ContactInformation object", $e);
@@ -726,11 +672,11 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aState = null;
+			$this->collUsers = null;
+
 			$this->collClientsRelatedByDefaultBillingContactInformationId = null;
 
 			$this->collClientsRelatedByDefaultShippingContactInformationId = null;
-
-			$this->collUsers = null;
 
 		} // if (deep)
 	}
@@ -753,7 +699,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		if ($con === null) {
 			$con = Propel::getConnection(ContactInformationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -811,7 +757,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		if ($con === null) {
 			$con = Propel::getConnection(ContactInformationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -921,6 +867,14 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
 			}
 
+			if ($this->collUsers !== null) {
+				foreach ($this->collUsers as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
 			if ($this->collClientsRelatedByDefaultBillingContactInformationId !== null) {
 				foreach ($this->collClientsRelatedByDefaultBillingContactInformationId as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
@@ -931,14 +885,6 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 
 			if ($this->collClientsRelatedByDefaultShippingContactInformationId !== null) {
 				foreach ($this->collClientsRelatedByDefaultShippingContactInformationId as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
-			if ($this->collUsers !== null) {
-				foreach ($this->collUsers as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -1028,6 +974,14 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 			}
 
 
+				if ($this->collUsers !== null) {
+					foreach ($this->collUsers as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
 				if ($this->collClientsRelatedByDefaultBillingContactInformationId !== null) {
 					foreach ($this->collClientsRelatedByDefaultBillingContactInformationId as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
@@ -1038,14 +992,6 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 
 				if ($this->collClientsRelatedByDefaultShippingContactInformationId !== null) {
 					foreach ($this->collClientsRelatedByDefaultShippingContactInformationId as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
-
-				if ($this->collUsers !== null) {
-					foreach ($this->collUsers as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -1134,15 +1080,20 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	 * type constants.
 	 *
 	 * @param     string  $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
-	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. 
+	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
 	 *                    Defaults to BasePeer::TYPE_PHPNAME.
 	 * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+	 * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
 	 * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
 	 *
 	 * @return    array an associative array containing the field names (as keys) and field values
 	 */
-	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false)
+	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
 	{
+		if (isset($alreadyDumpedObjects['ContactInformation'][$this->getPrimaryKey()])) {
+			return '*RECURSION*';
+		}
+		$alreadyDumpedObjects['ContactInformation'][$this->getPrimaryKey()] = true;
 		$keys = ContactInformationPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
@@ -1160,7 +1111,16 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aState) {
-				$result['State'] = $this->aState->toArray($keyType, $includeLazyLoadColumns, true);
+				$result['State'] = $this->aState->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+			}
+			if (null !== $this->collUsers) {
+				$result['Users'] = $this->collUsers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collClientsRelatedByDefaultBillingContactInformationId) {
+				$result['ClientsRelatedByDefaultBillingContactInformationId'] = $this->collClientsRelatedByDefaultBillingContactInformationId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collClientsRelatedByDefaultShippingContactInformationId) {
+				$result['ClientsRelatedByDefaultShippingContactInformationId'] = $this->collClientsRelatedByDefaultShippingContactInformationId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -1345,26 +1305,33 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	 *
 	 * @param      object $copyObj An object of ContactInformation (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
 	 * @throws     PropelException
 	 */
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
 	{
-		$copyObj->setFirstName($this->first_name);
-		$copyObj->setLastName($this->last_name);
-		$copyObj->setEmailAddress($this->email_address);
-		$copyObj->setPhoneMainNumber($this->phone_main_number);
-		$copyObj->setPhoneOtherNumber($this->phone_other_number);
-		$copyObj->setMailingAddress($this->mailing_address);
-		$copyObj->setCity($this->city);
-		$copyObj->setStateId($this->state_id);
-		$copyObj->setZipCode($this->zip_code);
-		$copyObj->setCreatedAt($this->created_at);
-		$copyObj->setUpdatedAt($this->updated_at);
+		$copyObj->setFirstName($this->getFirstName());
+		$copyObj->setLastName($this->getLastName());
+		$copyObj->setEmailAddress($this->getEmailAddress());
+		$copyObj->setPhoneMainNumber($this->getPhoneMainNumber());
+		$copyObj->setPhoneOtherNumber($this->getPhoneOtherNumber());
+		$copyObj->setMailingAddress($this->getMailingAddress());
+		$copyObj->setCity($this->getCity());
+		$copyObj->setStateId($this->getStateId());
+		$copyObj->setZipCode($this->getZipCode());
+		$copyObj->setCreatedAt($this->getCreatedAt());
+		$copyObj->setUpdatedAt($this->getUpdatedAt());
 
 		if ($deepCopy) {
 			// important: temporarily setNew(false) because this affects the behavior of
 			// the getter/setter methods for fkey referrer objects.
 			$copyObj->setNew(false);
+
+			foreach ($this->getUsers() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addUser($relObj->copy($deepCopy));
+				}
+			}
 
 			foreach ($this->getClientsRelatedByDefaultBillingContactInformationId() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1378,17 +1345,12 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				}
 			}
 
-			foreach ($this->getUsers() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addUser($relObj->copy($deepCopy));
-				}
-			}
-
 		} // if ($deepCopy)
 
-
-		$copyObj->setNew(true);
-		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		if ($makeNew) {
+			$copyObj->setNew(true);
+			$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		}
 	}
 
 	/**
@@ -1468,14 +1430,129 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		if ($this->aState === null && ($this->state_id !== null)) {
 			$this->aState = StateQuery::create()->findPk($this->state_id, $con);
 			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aState->addContactInformations($this);
+				guarantee the related object contains a reference
+				to this object.  This level of coupling may, however, be
+				undesirable since it could result in an only partially populated collection
+				in the referenced object.
+				$this->aState->addContactInformations($this);
 			 */
 		}
 		return $this->aState;
+	}
+
+	/**
+	 * Clears out the collUsers collection
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addUsers()
+	 */
+	public function clearUsers()
+	{
+		$this->collUsers = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collUsers collection.
+	 *
+	 * By default this just sets the collUsers collection to an empty array (like clearcollUsers());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
+	 * @return     void
+	 */
+	public function initUsers($overrideExisting = true)
+	{
+		if (null !== $this->collUsers && !$overrideExisting) {
+			return;
+		}
+		$this->collUsers = new PropelObjectCollection();
+		$this->collUsers->setModel('User');
+	}
+
+	/**
+	 * Gets an array of User objects which contain a foreign key that references this object.
+	 *
+	 * If the $criteria is not null, it is used to always fetch the results from the database.
+	 * Otherwise the results are fetched from the database the first time, then cached.
+	 * Next time the same method is called without $criteria, the cached collection is returned.
+	 * If this ContactInformation is new, it will return
+	 * an empty collection or the current collection; the criteria is ignored on a new object.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @return     PropelCollection|array User[] List of User objects
+	 * @throws     PropelException
+	 */
+	public function getUsers($criteria = null, PropelPDO $con = null)
+	{
+		if(null === $this->collUsers || null !== $criteria) {
+			if ($this->isNew() && null === $this->collUsers) {
+				// return empty collection
+				$this->initUsers();
+			} else {
+				$collUsers = UserQuery::create(null, $criteria)
+					->filterByContactInformation($this)
+					->find($con);
+				if (null !== $criteria) {
+					return $collUsers;
+				}
+				$this->collUsers = $collUsers;
+			}
+		}
+		return $this->collUsers;
+	}
+
+	/**
+	 * Returns the number of related User objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related User objects.
+	 * @throws     PropelException
+	 */
+	public function countUsers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if(null === $this->collUsers || null !== $criteria) {
+			if ($this->isNew() && null === $this->collUsers) {
+				return 0;
+			} else {
+				$query = UserQuery::create(null, $criteria);
+				if($distinct) {
+					$query->distinct();
+				}
+				return $query
+					->filterByContactInformation($this)
+					->count($con);
+			}
+		} else {
+			return count($this->collUsers);
+		}
+	}
+
+	/**
+	 * Method called to associate a User object to this object
+	 * through the User foreign key attribute.
+	 *
+	 * @param      User $l User
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addUser(User $l)
+	{
+		if ($this->collUsers === null) {
+			$this->initUsers();
+		}
+		if (!$this->collUsers->contains($l)) { // only add it if the **same** object is not already associated
+			$this->collUsers[]= $l;
+			$l->setContactInformation($this);
+		}
 	}
 
 	/**
@@ -1499,10 +1576,16 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
 	 * @return     void
 	 */
-	public function initClientsRelatedByDefaultBillingContactInformationId()
+	public function initClientsRelatedByDefaultBillingContactInformationId($overrideExisting = true)
 	{
+		if (null !== $this->collClientsRelatedByDefaultBillingContactInformationId && !$overrideExisting) {
+			return;
+		}
 		$this->collClientsRelatedByDefaultBillingContactInformationId = new PropelObjectCollection();
 		$this->collClientsRelatedByDefaultBillingContactInformationId->setModel('Client');
 	}
@@ -1633,10 +1716,16 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
 	 * @return     void
 	 */
-	public function initClientsRelatedByDefaultShippingContactInformationId()
+	public function initClientsRelatedByDefaultShippingContactInformationId($overrideExisting = true)
 	{
+		if (null !== $this->collClientsRelatedByDefaultShippingContactInformationId && !$overrideExisting) {
+			return;
+		}
 		$this->collClientsRelatedByDefaultShippingContactInformationId = new PropelObjectCollection();
 		$this->collClientsRelatedByDefaultShippingContactInformationId->setModel('Client');
 	}
@@ -1747,115 +1836,6 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	}
 
 	/**
-	 * Clears out the collUsers collection
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addUsers()
-	 */
-	public function clearUsers()
-	{
-		$this->collUsers = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collUsers collection.
-	 *
-	 * By default this just sets the collUsers collection to an empty array (like clearcollUsers());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initUsers()
-	{
-		$this->collUsers = new PropelObjectCollection();
-		$this->collUsers->setModel('User');
-	}
-
-	/**
-	 * Gets an array of User objects which contain a foreign key that references this object.
-	 *
-	 * If the $criteria is not null, it is used to always fetch the results from the database.
-	 * Otherwise the results are fetched from the database the first time, then cached.
-	 * Next time the same method is called without $criteria, the cached collection is returned.
-	 * If this ContactInformation is new, it will return
-	 * an empty collection or the current collection; the criteria is ignored on a new object.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @return     PropelCollection|array User[] List of User objects
-	 * @throws     PropelException
-	 */
-	public function getUsers($criteria = null, PropelPDO $con = null)
-	{
-		if(null === $this->collUsers || null !== $criteria) {
-			if ($this->isNew() && null === $this->collUsers) {
-				// return empty collection
-				$this->initUsers();
-			} else {
-				$collUsers = UserQuery::create(null, $criteria)
-					->filterByContactInformation($this)
-					->find($con);
-				if (null !== $criteria) {
-					return $collUsers;
-				}
-				$this->collUsers = $collUsers;
-			}
-		}
-		return $this->collUsers;
-	}
-
-	/**
-	 * Returns the number of related User objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related User objects.
-	 * @throws     PropelException
-	 */
-	public function countUsers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if(null === $this->collUsers || null !== $criteria) {
-			if ($this->isNew() && null === $this->collUsers) {
-				return 0;
-			} else {
-				$query = UserQuery::create(null, $criteria);
-				if($distinct) {
-					$query->distinct();
-				}
-				return $query
-					->filterByContactInformation($this)
-					->count($con);
-			}
-		} else {
-			return count($this->collUsers);
-		}
-	}
-
-	/**
-	 * Method called to associate a User object to this object
-	 * through the User foreign key attribute.
-	 *
-	 * @param      User $l User
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addUser(User $l)
-	{
-		if ($this->collUsers === null) {
-			$this->initUsers();
-		}
-		if (!$this->collUsers->contains($l)) { // only add it if the **same** object is not already associated
-			$this->collUsers[]= $l;
-			$l->setContactInformation($this);
-		}
-	}
-
-	/**
 	 * Clears the current object and sets all attributes to their default values
 	 */
 	public function clear()
@@ -1881,38 +1861,57 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	}
 
 	/**
-	 * Resets all collections of referencing foreign keys.
+	 * Resets all references to other model objects or collections of model objects.
 	 *
-	 * This method is a user-space workaround for PHP's inability to garbage collect objects
-	 * with circular references.  This is currently necessary when using Propel in certain
-	 * daemon or large-volumne/high-memory operations.
+	 * This method is a user-space workaround for PHP's inability to garbage collect
+	 * objects with circular references (even in PHP 5.3). This is currently necessary
+	 * when using Propel in certain daemon or large-volumne/high-memory operations.
 	 *
-	 * @param      boolean $deep Whether to also clear the references on all associated objects.
+	 * @param      boolean $deep Whether to also clear the references on all referrer objects.
 	 */
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
+			if ($this->collUsers) {
+				foreach ($this->collUsers as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 			if ($this->collClientsRelatedByDefaultBillingContactInformationId) {
-				foreach ((array) $this->collClientsRelatedByDefaultBillingContactInformationId as $o) {
+				foreach ($this->collClientsRelatedByDefaultBillingContactInformationId as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 			if ($this->collClientsRelatedByDefaultShippingContactInformationId) {
-				foreach ((array) $this->collClientsRelatedByDefaultShippingContactInformationId as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
-			if ($this->collUsers) {
-				foreach ((array) $this->collUsers as $o) {
+				foreach ($this->collClientsRelatedByDefaultShippingContactInformationId as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 		} // if ($deep)
 
-		$this->collClientsRelatedByDefaultBillingContactInformationId = null;
-		$this->collClientsRelatedByDefaultShippingContactInformationId = null;
+		if ($this->collUsers instanceof PropelCollection) {
+			$this->collUsers->clearIterator();
+		}
 		$this->collUsers = null;
+		if ($this->collClientsRelatedByDefaultBillingContactInformationId instanceof PropelCollection) {
+			$this->collClientsRelatedByDefaultBillingContactInformationId->clearIterator();
+		}
+		$this->collClientsRelatedByDefaultBillingContactInformationId = null;
+		if ($this->collClientsRelatedByDefaultShippingContactInformationId instanceof PropelCollection) {
+			$this->collClientsRelatedByDefaultShippingContactInformationId->clearIterator();
+		}
+		$this->collClientsRelatedByDefaultShippingContactInformationId = null;
 		$this->aState = null;
+	}
+
+	/**
+	 * Return the string representation of this object
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return (string) $this->exportTo(ContactInformationPeer::DEFAULT_STRING_FORMAT);
 	}
 
 	/**
