@@ -238,6 +238,8 @@ class PropelSchemaCompiler{
                         false
                     );
                     
+                    $column_already_exists = false;
+                    
                     if( !empty( $existing_column ) ){
 
                         // A column exists. Ensure it's a foreign key to the parent table.
@@ -246,25 +248,32 @@ class PropelSchemaCompiler{
                                 \Altumo\Xml\XmlElement::RETURN_TYPE_XML_ELEMENT,
                                 false
                             );
-                        
-                        if( empty( $existing_fk ) ){
                             
-                            throw new \Exception( "A column \"{$foreign_key_name}\" already exists in table \"{$parent_table_name}\". 
-                                                    However this column is not a foreign key to {$child_table_name}. 
-                                                    Either remove/rename this colum or make it a foreign key for Concrete Inheritance." 
-                            );
-                            
-                        }
+                            $column_already_exists = true;
                         
+                        // If the foreign-key does not exist, throw an exception
+                            if( empty( $existing_fk ) ){
+                                
+                                throw new \Exception( "A column \"{$foreign_key_name}\" already exists in table \"{$parent_table_name}\". 
+                                                        However this column is not a foreign key to {$child_table_name}. 
+                                                        Either remove/rename this colum or make it a foreign key for Concrete Inheritance." 
+                                );
+                            
+                        // Skip this entry if a correct foreign key already exists.
+                            } else {
+                                continue;
+                            }
                     }
                     
                 
                 // Add foreign key
                 
-                    $column_element = $parent_table_element->addChild( 'column' );
-                        $column_element->addAttribute( 'name', $foreign_key_name );
-                        $column_element->addAttribute( 'required', 'false' );
-                        $column_element->addAttribute( 'type', 'integer' );
+                    if( !$column_already_exists ){
+                        $column_element = $parent_table_element->addChild( 'column' );
+                            $column_element->addAttribute( 'name', $foreign_key_name );
+                            $column_element->addAttribute( 'required', 'false' );
+                            $column_element->addAttribute( 'type', 'integer' );
+                    }
 
                     $foreign_key_element = $parent_table_element->addChild( 'foreign-key' );
                         $foreign_key_element->addAttribute( 'foreignTable', $child_table_name );
