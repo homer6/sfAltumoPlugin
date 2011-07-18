@@ -80,6 +80,9 @@ EOF;
         
         $compiled_schema = $schema_compiler->getCompiledDatabaseElement();
         
-        \Altumo\Utils\Debug::dump( $compiled_schema->getXmlAsString(true) );
+        file_put_contents( 
+            __DIR__ . '/../../../../config/schema.xml',
+            $compiled_schema->getXmlAsString( true )
+        );
     }
 }
