@@ -11,6 +11,7 @@
 /**
  * Tests the dependencies for this environment.
  * 
+ * @package sfAltumoPlugin
  * @author Steve Sperandeo <steve.sperandeo@altumo.com>
  */
 class sfAltumoTestDependenciesTask extends sfAltumoBaseTask {

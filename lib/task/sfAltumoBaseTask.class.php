@@ -11,6 +11,8 @@
 /**
 * Base class for Altumo tasks
 * 
+* @package sfAltumoPlugin
+* 
 * @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
 abstract class sfAltumoBaseTask extends sfBaseTask {

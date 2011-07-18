@@ -14,7 +14,7 @@
  * 
  * See http://code.google.com/closure/library/docs/depswriter.html
  * 
- * @package    altumo
+ * @package    sfAltumoPlugin
  * @subpackage task
  * @author Juan Jaramillo <juan.jaramillo@altumo.com>
  */
