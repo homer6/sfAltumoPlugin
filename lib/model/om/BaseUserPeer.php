@@ -403,9 +403,6 @@ abstract class BaseUserPeer {
 	 */
 	public static function clearRelatedInstancePool()
 	{
-		// Invalidate objects in ClientPeer instance pool, 
-		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-		ClientPeer::clearInstancePool();
 		// Invalidate objects in SessionPeer instance pool, 
 		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
 		SessionPeer::clearInstancePool();
@@ -415,6 +412,9 @@ abstract class BaseUserPeer {
 		// Invalidate objects in SystemEventInstancePeer instance pool, 
 		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
 		SystemEventInstancePeer::clearInstancePool();
+		// Invalidate objects in ClientPeer instance pool, 
+		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+		ClientPeer::clearInstancePool();
 	}
 
 	/**
@@ -1004,12 +1004,6 @@ abstract class BaseUserPeer {
 		foreach ($objects as $obj) {
 
 
-			// delete related Client objects
-			$criteria = new Criteria(ClientPeer::DATABASE_NAME);
-			
-			$criteria->add(ClientPeer::USER_ID, $obj->getId());
-			$affectedRows += ClientPeer::doDelete($criteria, $con);
-
 			// delete related Session objects
 			$criteria = new Criteria(SessionPeer::DATABASE_NAME);
 			
@@ -1027,6 +1021,12 @@ abstract class BaseUserPeer {
 			
 			$criteria->add(SystemEventInstancePeer::USER_ID, $obj->getId());
 			$affectedRows += SystemEventInstancePeer::doDelete($criteria, $con);
+
+			// delete related Client objects
+			$criteria = new Criteria(ClientPeer::DATABASE_NAME);
+			
+			$criteria->add(ClientPeer::USER_ID, $obj->getId());
+			$affectedRows += ClientPeer::doDelete($criteria, $con);
 		}
 		return $affectedRows;
 	}

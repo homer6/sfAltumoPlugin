@@ -55,10 +55,10 @@ class UserTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('ContactInformation', 'ContactInformation', RelationMap::MANY_TO_ONE, array('contact_information_id' => 'id', ), 'RESTRICT', null);
-    $this->addRelation('Client', 'Client', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', null);
     $this->addRelation('Session', 'Session', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', null);
     $this->addRelation('SystemEventSubscription', 'SystemEventSubscription', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', 'CASCADE');
     $this->addRelation('SystemEventInstance', 'SystemEventInstance', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', 'CASCADE');
+    $this->addRelation('Client', 'Client', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', null);
 	} // buildRelations()
 
 	/**

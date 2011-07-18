@@ -13,54 +13,16 @@ namespace sfAltumoPlugin\Schema;
 
 
 /**
-* This class can take multiple Propel XML schema files, perform some processing
-* (see below) on them, and output the files intended for Propel to build the
+* This class can take multiple Propel XML schema files, perform some analysis
+* on them, and output the files intended for Propel to build the
 * database.
-* 
-* sfAltumoPlugin provides some based models that can be extended by the application
-* by means of concrete table inheritance; however, propel requres for a foreign key
-* to be added to the object being extended which would require modifying the plugin's
-* schema.
-* 
-* In order to get around that, the PropelSchemaCompiler class can automatically append
-* these foreign keys and output new schema files for propel to process.
-* 
-* Known Issues / Notes:
-* 
-*   -   Assumes primary keys are named "id"
-*   -   Results are unexpected if getCompiledDatabaseElement is called more than once
-* 
 * 
 * 
 * @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
-class PropelSchemaCompiler{
+class PropelSchemaAnalyzer{
     
     protected $table_elements = array();
-    protected $is_compiled = false;
-
-    
-    /**
-    * Setter for the $is_compiled attribute
-    * of this PropelSchemaCompiler
-    * 
-    * @param bool $is_compiled
-    */
-    protected function setCompiled( ){
-        $this->is_compiled = true;
-    }
-        
-        
-    /**
-    * Getter for the $is_compiled attribute
-    * of this PropelSchemaCompiler
-    * 
-    * @return bool
-    */
-    protected function isCompiled( ){
-        return (bool)$this->is_compiled;
-    }
-    
     
     
     /**
@@ -207,6 +169,12 @@ class PropelSchemaCompiler{
     
     
     /**
+    * DEPRECATED.
+    * 
+    * The functionallity provided by this method is now irrelevant due to the
+    * way Concrete Inheritance works.
+    * 
+    * 
     * Finds tables with missing concrete_inheritance foreign keys
     * (on the table being extended) and adds them.
     * 
@@ -219,7 +187,12 @@ class PropelSchemaCompiler{
     *                               //  defined in the schema.
     */
     protected function addConcreteInheritanceForeignKeys(){
-
+        
+        // turns out foreign keys are not required for the latest version of
+        // ConcreteInheritanceBehavior
+        return;
+        
+        
         $table_elements = &$this->getTableElements();
         
         $table_inheritance_map = $this->getTableConcreteInheritanceMap();
@@ -295,58 +268,4 @@ class PropelSchemaCompiler{
             }
         }
     }
-    
-    
-    
-    /**
-    * Executes all of the compilation procedures
-    * 
-    * Does not execute if this schema has already been compiled.
-    * 
-    * @return void
-    */
-    protected function compileSchema(){
-        
-        if( $this->isCompiled() ){
-            return;
-        }
-        
-        $this->addConcreteInheritanceForeignKeys();
-        
-        $this->setCompiled();
-        
-    }
-    
-    
-    /**
-    * Returns a <database> element containing all the tables after processing them.
-    * 
-    * @return \Altumo\Xml\XmlElement
-    */
-    public function getCompiledDatabaseElement(){
-    
-        $this->compileSchema();
-        
-        $table_elements = &$this->getTableElements();
-        
-        
-        // TODO: Refactor \Altumo\Xml\XmlElement so that it allows for creating
-        // a new element and adding children from existing \Altumo\Xml\XmlElement
-        
-        $xml_schema_output = '<database name="propel" defaultIdMethod="native" noXsd="true" package="lib.model">';
-        
-        foreach( $table_elements as $table_element ){
-           
-            $xml_schema_output .= "\n" . $table_element->getXmlAsString();
-            
-        }
-        
-        $xml_schema_output .= '</database>';
-        
-        $database_element = new \Altumo\Xml\XmlElement( $xml_schema_output );
-        
-        return $database_element;
-        
-    }
-    
 }

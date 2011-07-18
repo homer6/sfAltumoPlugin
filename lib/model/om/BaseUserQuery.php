@@ -34,10 +34,6 @@
  * @method     UserQuery rightJoinContactInformation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContactInformation relation
  * @method     UserQuery innerJoinContactInformation($relationAlias = null) Adds a INNER JOIN clause to the query using the ContactInformation relation
  *
- * @method     UserQuery leftJoinClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the Client relation
- * @method     UserQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
- * @method     UserQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
- *
  * @method     UserQuery leftJoinSession($relationAlias = null) Adds a LEFT JOIN clause to the query using the Session relation
  * @method     UserQuery rightJoinSession($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Session relation
  * @method     UserQuery innerJoinSession($relationAlias = null) Adds a INNER JOIN clause to the query using the Session relation
@@ -49,6 +45,10 @@
  * @method     UserQuery leftJoinSystemEventInstance($relationAlias = null) Adds a LEFT JOIN clause to the query using the SystemEventInstance relation
  * @method     UserQuery rightJoinSystemEventInstance($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SystemEventInstance relation
  * @method     UserQuery innerJoinSystemEventInstance($relationAlias = null) Adds a INNER JOIN clause to the query using the SystemEventInstance relation
+ *
+ * @method     UserQuery leftJoinClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the Client relation
+ * @method     UserQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
+ * @method     UserQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
  *
  * @method     User findOne(PropelPDO $con = null) Return the first User matching the query
  * @method     User findOneOrCreate(PropelPDO $con = null) Return the first User matching the query, or a new User object populated from the query conditions when no match is found
@@ -546,79 +546,6 @@ abstract class BaseUserQuery extends ModelCriteria
 	}
 
 	/**
-	 * Filter the query by a related Client object
-	 *
-	 * @param     Client $client  the related object to use as filter
-	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-	 *
-	 * @return    UserQuery The current query, for fluid interface
-	 */
-	public function filterByClient($client, $comparison = null)
-	{
-		if ($client instanceof Client) {
-			return $this
-				->addUsingAlias(UserPeer::ID, $client->getUserId(), $comparison);
-		} elseif ($client instanceof PropelCollection) {
-			return $this
-				->useClientQuery()
-					->filterByPrimaryKeys($client->getPrimaryKeys())
-				->endUse();
-		} else {
-			throw new PropelException('filterByClient() only accepts arguments of type Client or PropelCollection');
-		}
-	}
-
-	/**
-	 * Adds a JOIN clause to the query using the Client relation
-	 * 
-	 * @param     string $relationAlias optional alias for the relation
-	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-	 *
-	 * @return    UserQuery The current query, for fluid interface
-	 */
-	public function joinClient($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-	{
-		$tableMap = $this->getTableMap();
-		$relationMap = $tableMap->getRelation('Client');
-		
-		// create a ModelJoin object for this join
-		$join = new ModelJoin();
-		$join->setJoinType($joinType);
-		$join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-		if ($previousJoin = $this->getPreviousJoin()) {
-			$join->setPreviousJoin($previousJoin);
-		}
-		
-		// add the ModelJoin to the current object
-		if($relationAlias) {
-			$this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-			$this->addJoinObject($join, $relationAlias);
-		} else {
-			$this->addJoinObject($join, 'Client');
-		}
-		
-		return $this;
-	}
-
-	/**
-	 * Use the Client relation Client object
-	 *
-	 * @see       useQuery()
-	 * 
-	 * @param     string $relationAlias optional alias for the relation,
-	 *                                   to be used as main alias in the secondary query
-	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-	 *
-	 * @return    ClientQuery A secondary query class using the current class as primary query
-	 */
-	public function useClientQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-	{
-		return $this
-			->joinClient($relationAlias, $joinType)
-			->useQuery($relationAlias ? $relationAlias : 'Client', 'ClientQuery');
-	}
-
-	/**
 	 * Filter the query by a related Session object
 	 *
 	 * @param     Session $session  the related object to use as filter
@@ -835,6 +762,79 @@ abstract class BaseUserQuery extends ModelCriteria
 		return $this
 			->joinSystemEventInstance($relationAlias, $joinType)
 			->useQuery($relationAlias ? $relationAlias : 'SystemEventInstance', 'SystemEventInstanceQuery');
+	}
+
+	/**
+	 * Filter the query by a related Client object
+	 *
+	 * @param     Client $client  the related object to use as filter
+	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+	 *
+	 * @return    UserQuery The current query, for fluid interface
+	 */
+	public function filterByClient($client, $comparison = null)
+	{
+		if ($client instanceof Client) {
+			return $this
+				->addUsingAlias(UserPeer::ID, $client->getUserId(), $comparison);
+		} elseif ($client instanceof PropelCollection) {
+			return $this
+				->useClientQuery()
+					->filterByPrimaryKeys($client->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterByClient() only accepts arguments of type Client or PropelCollection');
+		}
+	}
+
+	/**
+	 * Adds a JOIN clause to the query using the Client relation
+	 * 
+	 * @param     string $relationAlias optional alias for the relation
+	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+	 *
+	 * @return    UserQuery The current query, for fluid interface
+	 */
+	public function joinClient($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+	{
+		$tableMap = $this->getTableMap();
+		$relationMap = $tableMap->getRelation('Client');
+		
+		// create a ModelJoin object for this join
+		$join = new ModelJoin();
+		$join->setJoinType($joinType);
+		$join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+		if ($previousJoin = $this->getPreviousJoin()) {
+			$join->setPreviousJoin($previousJoin);
+		}
+		
+		// add the ModelJoin to the current object
+		if($relationAlias) {
+			$this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+			$this->addJoinObject($join, $relationAlias);
+		} else {
+			$this->addJoinObject($join, 'Client');
+		}
+		
+		return $this;
+	}
+
+	/**
+	 * Use the Client relation Client object
+	 *
+	 * @see       useQuery()
+	 * 
+	 * @param     string $relationAlias optional alias for the relation,
+	 *                                   to be used as main alias in the secondary query
+	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+	 *
+	 * @return    ClientQuery A secondary query class using the current class as primary query
+	 */
+	public function useClientQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+	{
+		return $this
+			->joinClient($relationAlias, $joinType)
+			->useQuery($relationAlias ? $relationAlias : 'Client', 'ClientQuery');
 	}
 
 	/**

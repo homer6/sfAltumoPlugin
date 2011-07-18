@@ -85,11 +85,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	protected $aContactInformation;
 
 	/**
-	 * @var        array Client[] Collection to store aggregation of Client objects.
-	 */
-	protected $collClients;
-
-	/**
 	 * @var        array Session[] Collection to store aggregation of Session objects.
 	 */
 	protected $collSessions;
@@ -103,6 +98,11 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	 * @var        array SystemEventInstance[] Collection to store aggregation of SystemEventInstance objects.
 	 */
 	protected $collSystemEventInstances;
+
+	/**
+	 * @var        array Client[] Collection to store aggregation of Client objects.
+	 */
+	protected $collClients;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -600,13 +600,13 @@ abstract class BaseUser extends BaseObject  implements Persistent
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aContactInformation = null;
-			$this->collClients = null;
-
 			$this->collSessions = null;
 
 			$this->collSystemEventSubscriptions = null;
 
 			$this->collSystemEventInstances = null;
+
+			$this->collClients = null;
 
 		} // if (deep)
 	}
@@ -797,14 +797,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
 			}
 
-			if ($this->collClients !== null) {
-				foreach ($this->collClients as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
 			if ($this->collSessions !== null) {
 				foreach ($this->collSessions as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
@@ -823,6 +815,14 @@ abstract class BaseUser extends BaseObject  implements Persistent
 
 			if ($this->collSystemEventInstances !== null) {
 				foreach ($this->collSystemEventInstances as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collClients !== null) {
+				foreach ($this->collClients as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -912,14 +912,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			}
 
 
-				if ($this->collClients !== null) {
-					foreach ($this->collClients as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
-
 				if ($this->collSessions !== null) {
 					foreach ($this->collSessions as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
@@ -938,6 +930,14 @@ abstract class BaseUser extends BaseObject  implements Persistent
 
 				if ($this->collSystemEventInstances !== null) {
 					foreach ($this->collSystemEventInstances as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collClients !== null) {
+					foreach ($this->collClients as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -1047,9 +1047,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			if (null !== $this->aContactInformation) {
 				$result['ContactInformation'] = $this->aContactInformation->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
 			}
-			if (null !== $this->collClients) {
-				$result['Clients'] = $this->collClients->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-			}
 			if (null !== $this->collSessions) {
 				$result['Sessions'] = $this->collSessions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
@@ -1058,6 +1055,9 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			}
 			if (null !== $this->collSystemEventInstances) {
 				$result['SystemEventInstances'] = $this->collSystemEventInstances->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collClients) {
+				$result['Clients'] = $this->collClients->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -1246,12 +1246,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			// the getter/setter methods for fkey referrer objects.
 			$copyObj->setNew(false);
 
-			foreach ($this->getClients() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addClient($relObj->copy($deepCopy));
-				}
-			}
-
 			foreach ($this->getSessions() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addSession($relObj->copy($deepCopy));
@@ -1267,6 +1261,12 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			foreach ($this->getSystemEventInstances() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addSystemEventInstance($relObj->copy($deepCopy));
+				}
+			}
+
+			foreach ($this->getClients() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addClient($relObj->copy($deepCopy));
 				}
 			}
 
@@ -1363,171 +1363,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			 */
 		}
 		return $this->aContactInformation;
-	}
-
-	/**
-	 * Clears out the collClients collection
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addClients()
-	 */
-	public function clearClients()
-	{
-		$this->collClients = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collClients collection.
-	 *
-	 * By default this just sets the collClients collection to an empty array (like clearcollClients());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @param      boolean $overrideExisting If set to true, the method call initializes
-	 *                                        the collection even if it is not empty
-	 *
-	 * @return     void
-	 */
-	public function initClients($overrideExisting = true)
-	{
-		if (null !== $this->collClients && !$overrideExisting) {
-			return;
-		}
-		$this->collClients = new PropelObjectCollection();
-		$this->collClients->setModel('Client');
-	}
-
-	/**
-	 * Gets an array of Client objects which contain a foreign key that references this object.
-	 *
-	 * If the $criteria is not null, it is used to always fetch the results from the database.
-	 * Otherwise the results are fetched from the database the first time, then cached.
-	 * Next time the same method is called without $criteria, the cached collection is returned.
-	 * If this User is new, it will return
-	 * an empty collection or the current collection; the criteria is ignored on a new object.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @return     PropelCollection|array Client[] List of Client objects
-	 * @throws     PropelException
-	 */
-	public function getClients($criteria = null, PropelPDO $con = null)
-	{
-		if(null === $this->collClients || null !== $criteria) {
-			if ($this->isNew() && null === $this->collClients) {
-				// return empty collection
-				$this->initClients();
-			} else {
-				$collClients = ClientQuery::create(null, $criteria)
-					->filterByUser($this)
-					->find($con);
-				if (null !== $criteria) {
-					return $collClients;
-				}
-				$this->collClients = $collClients;
-			}
-		}
-		return $this->collClients;
-	}
-
-	/**
-	 * Returns the number of related Client objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related Client objects.
-	 * @throws     PropelException
-	 */
-	public function countClients(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if(null === $this->collClients || null !== $criteria) {
-			if ($this->isNew() && null === $this->collClients) {
-				return 0;
-			} else {
-				$query = ClientQuery::create(null, $criteria);
-				if($distinct) {
-					$query->distinct();
-				}
-				return $query
-					->filterByUser($this)
-					->count($con);
-			}
-		} else {
-			return count($this->collClients);
-		}
-	}
-
-	/**
-	 * Method called to associate a Client object to this object
-	 * through the Client foreign key attribute.
-	 *
-	 * @param      Client $l Client
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addClient(Client $l)
-	{
-		if ($this->collClients === null) {
-			$this->initClients();
-		}
-		if (!$this->collClients->contains($l)) { // only add it if the **same** object is not already associated
-			$this->collClients[]= $l;
-			$l->setUser($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this User is new, it will return
-	 * an empty collection; or if this User has previously
-	 * been saved, it will retrieve related Clients from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in User.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-	 * @return     PropelCollection|array Client[] List of Client objects
-	 */
-	public function getClientsJoinContactInformationRelatedByDefaultBillingContactInformationId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$query = ClientQuery::create(null, $criteria);
-		$query->joinWith('ContactInformationRelatedByDefaultBillingContactInformationId', $join_behavior);
-
-		return $this->getClients($query, $con);
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this User is new, it will return
-	 * an empty collection; or if this User has previously
-	 * been saved, it will retrieve related Clients from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in User.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-	 * @return     PropelCollection|array Client[] List of Client objects
-	 */
-	public function getClientsJoinContactInformationRelatedByDefaultShippingContactInformationId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$query = ClientQuery::create(null, $criteria);
-		$query->joinWith('ContactInformationRelatedByDefaultShippingContactInformationId', $join_behavior);
-
-		return $this->getClients($query, $con);
 	}
 
 	/**
@@ -1926,6 +1761,171 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	}
 
 	/**
+	 * Clears out the collClients collection
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addClients()
+	 */
+	public function clearClients()
+	{
+		$this->collClients = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collClients collection.
+	 *
+	 * By default this just sets the collClients collection to an empty array (like clearcollClients());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
+	 * @return     void
+	 */
+	public function initClients($overrideExisting = true)
+	{
+		if (null !== $this->collClients && !$overrideExisting) {
+			return;
+		}
+		$this->collClients = new PropelObjectCollection();
+		$this->collClients->setModel('Client');
+	}
+
+	/**
+	 * Gets an array of Client objects which contain a foreign key that references this object.
+	 *
+	 * If the $criteria is not null, it is used to always fetch the results from the database.
+	 * Otherwise the results are fetched from the database the first time, then cached.
+	 * Next time the same method is called without $criteria, the cached collection is returned.
+	 * If this User is new, it will return
+	 * an empty collection or the current collection; the criteria is ignored on a new object.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 * @throws     PropelException
+	 */
+	public function getClients($criteria = null, PropelPDO $con = null)
+	{
+		if(null === $this->collClients || null !== $criteria) {
+			if ($this->isNew() && null === $this->collClients) {
+				// return empty collection
+				$this->initClients();
+			} else {
+				$collClients = ClientQuery::create(null, $criteria)
+					->filterByUser($this)
+					->find($con);
+				if (null !== $criteria) {
+					return $collClients;
+				}
+				$this->collClients = $collClients;
+			}
+		}
+		return $this->collClients;
+	}
+
+	/**
+	 * Returns the number of related Client objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related Client objects.
+	 * @throws     PropelException
+	 */
+	public function countClients(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if(null === $this->collClients || null !== $criteria) {
+			if ($this->isNew() && null === $this->collClients) {
+				return 0;
+			} else {
+				$query = ClientQuery::create(null, $criteria);
+				if($distinct) {
+					$query->distinct();
+				}
+				return $query
+					->filterByUser($this)
+					->count($con);
+			}
+		} else {
+			return count($this->collClients);
+		}
+	}
+
+	/**
+	 * Method called to associate a Client object to this object
+	 * through the Client foreign key attribute.
+	 *
+	 * @param      Client $l Client
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addClient(Client $l)
+	{
+		if ($this->collClients === null) {
+			$this->initClients();
+		}
+		if (!$this->collClients->contains($l)) { // only add it if the **same** object is not already associated
+			$this->collClients[]= $l;
+			$l->setUser($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this User is new, it will return
+	 * an empty collection; or if this User has previously
+	 * been saved, it will retrieve related Clients from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in User.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 */
+	public function getClientsJoinContactInformationRelatedByDefaultBillingContactInformationId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = ClientQuery::create(null, $criteria);
+		$query->joinWith('ContactInformationRelatedByDefaultBillingContactInformationId', $join_behavior);
+
+		return $this->getClients($query, $con);
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this User is new, it will return
+	 * an empty collection; or if this User has previously
+	 * been saved, it will retrieve related Clients from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in User.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 */
+	public function getClientsJoinContactInformationRelatedByDefaultShippingContactInformationId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = ClientQuery::create(null, $criteria);
+		$query->joinWith('ContactInformationRelatedByDefaultShippingContactInformationId', $join_behavior);
+
+		return $this->getClients($query, $con);
+	}
+
+	/**
 	 * Clears the current object and sets all attributes to their default values
 	 */
 	public function clear()
@@ -1960,11 +1960,6 @@ abstract class BaseUser extends BaseObject  implements Persistent
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->collClients) {
-				foreach ($this->collClients as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 			if ($this->collSessions) {
 				foreach ($this->collSessions as $o) {
 					$o->clearAllReferences($deep);
@@ -1980,12 +1975,13 @@ abstract class BaseUser extends BaseObject  implements Persistent
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collClients) {
+				foreach ($this->collClients as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
-		if ($this->collClients instanceof PropelCollection) {
-			$this->collClients->clearIterator();
-		}
-		$this->collClients = null;
 		if ($this->collSessions instanceof PropelCollection) {
 			$this->collSessions->clearIterator();
 		}
@@ -1998,6 +1994,10 @@ abstract class BaseUser extends BaseObject  implements Persistent
 			$this->collSystemEventInstances->clearIterator();
 		}
 		$this->collSystemEventInstances = null;
+		if ($this->collClients instanceof PropelCollection) {
+			$this->collClients->clearIterator();
+		}
+		$this->collClients = null;
 		$this->aContactInformation = null;
 	}
 

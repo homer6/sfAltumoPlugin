@@ -50,19 +50,33 @@ EOF;
     }
 
 
-
-
+    /**
+    * Returns an array of paths to schema.base.xml paths to be processed.
+    * 
+    * //TODO: Use sfFinder to automate this.
+    * 
+    * @returns array           // of string (paths)
+    */
+    static public function getSchemaFilePaths(){
+        return array(
+            // app's schema
+                __DIR__ . '/../../../../config/schema.xml',   
+                
+            // sfAltumoPlugin's schema
+                __DIR__ . '/../../config/schema.xml'
+        );
+    }
 
   /**
    * @see sfTask
    */
     protected function execute( $arguments = array(), $options = array() ) {
 
-        $schema_compiler = new \sfAltumoPlugin\Schema\PropelSchemaCompiler( 
-            sfAltumoCompileSchemaTask::getSchemaFilePaths()
+        $schema_analyzer = new \sfAltumoPlugin\Schema\PropelSchemaAnalyzer( 
+            self::getSchemaFilePaths()
         );
         
-        $inheritance_map = $schema_compiler->getTableConcreteInheritanceMap();
+        $inheritance_map = $schema_analyzer->getTableConcreteInheritanceMap();
         
         foreach( $inheritance_map as $parent_table => $children ){
             
