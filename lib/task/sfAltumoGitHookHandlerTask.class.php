@@ -35,7 +35,7 @@ class sfAltumoGitHookHandlerTask extends sfAltumoBaseTask {
 
         $this->name = 'git-hook-handler';
 
-        $this->briefDescription = 'Calls the altumo git hook handler.';
+        $this->briefDescription = 'Calls the altumo git hook handler or installs the git hooks.';
 
         $this->detailedDescription = <<<EOF
 Calls the altumo git hook handler. Alternatively, installs the git hooks within git if hook-name is "install".
@@ -54,7 +54,7 @@ EOF;
         
         if( $hook_name == 'install' ){
             
-            $target_path = realpath( sfConfig::get( 'sf_root_dir' ) . '/../../.git' ) . '/';
+            $target_path = realpath( sfConfig::get( 'sf_root_dir' ) . '/../../.git/hooks' ) . '/';
             
             $targets = array(
                 'post-commit'
@@ -65,22 +65,22 @@ EOF;
                     
                     $target_filename = $target_path . $target;
                     if( file_exists($target_filename) ){
-                        sfCommandException( sprintf('Hook "%s" is already installed. Please remove it first.', $target_filename) );
-                    }                    
+                        throw new sfCommandException( sprintf('Hook "%s" is already installed. Please remove it first.', $target_filename) );
+                    }
                        
                 }
                 if( !is_writable($target_path) ){
-                    sfCommandException( sprintf('"%s" is not writable. Please ensure this user can write to that directory.', $target_path) );
+                    throw new sfCommandException( sprintf('"%s" is not writable. Please ensure this user can write to that directory.', $target_path) );
                 }
                 
-            
-            foreach( $targets as $target ){
-                
-                $target_filename = $target_path . $target;
-                copy( $general_hook_template_file, $target_filename );
-                chmod( $target_filename, 0755 );                
-                                   
-            }
+            //install the hooks
+                foreach( $targets as $target ){
+                    
+                    $target_filename = $target_path . $target;
+                    copy( $general_hook_template_file, $target_filename );
+                    chmod( $target_filename, 0755 );
+                                       
+                }
             
         }else{
             
