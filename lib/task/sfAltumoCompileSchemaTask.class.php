@@ -33,7 +33,7 @@ class sfAltumoCompileSchemaTask extends sfAltumoBaseTask {
         ));
 
         $this->addOptions(array(
-            new sfCommandOption( 'output_file', null, sfCommandOption::PARAMETER_OPTIONAL, 'The path of the target Javascript file', null ),
+            //new sfCommandOption( 'output_file', null, sfCommandOption::PARAMETER_OPTIONAL, 'The path of the target Javascript file', null ),
         ));
 
 
@@ -62,27 +62,42 @@ EOF;
     }
 
 
-
-
-
-  /**
-   * @see sfTask
-   */
-    protected function execute( $arguments = array(), $options = array() ) {
-
-        $schema_compiler = new \sfAltumoPlugin\Schema\PropelSchemaCompiler( 
+    /**
+    * Returns an array of paths to schema.base.xml paths to be processed.
+    * 
+    * //TODO: Use sfFinder to automate this.
+    * 
+    * @returns array           // of string (paths)
+    */
+    static public function getSchemaFilePaths(){
+        return array(
             // app's schema
                 __DIR__ . '/../../../../config/schema.base.xml',   
                 
             // sfAltumoPlugin's schema
                 __DIR__ . '/../../config/schema.base.xml'
         );
+    }
+
+
+  /**
+   * @see sfTask
+   */
+    protected function execute( $arguments = array(), $options = array() ) {
+        
+        $schema_compiler = new \sfAltumoPlugin\Schema\PropelSchemaCompiler( 
+            self::getSchemaFilePaths()
+        );
+        
+        $output_schema = __DIR__ . '/../../../../config/schema.xml';
         
         $compiled_schema = $schema_compiler->getCompiledDatabaseElement();
         
         file_put_contents( 
-            __DIR__ . '/../../../../config/schema.xml',
+            $output_schema,
             $compiled_schema->getXmlAsString( true )
         );
+        
+        $this->logSection( '+', realpath( $output_schema ) , 'INFO' );
     }
 }

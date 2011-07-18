@@ -66,7 +66,10 @@ class PropelSchemaCompiler{
     /**
     * Initialize a new PropelSchemaCompiler
     * 
-    * @params string schema_xml_path[,...]      // One or more schema.xml paths
+    * If the first parameter is an array, the list of paths will be taken from it 
+    * and all other arguments ignored.
+    * 
+    * @params Array | (string schema_xml_path[,...])      // One or more schema.xml paths
     */
     public function __construct( ) {
 
@@ -76,8 +79,14 @@ class PropelSchemaCompiler{
             throw new \Exception( 'At least one Propel XML schema file path must be provided.' );
         } 
         
+        if( is_array( $arguments[0] ) ){
+            $schema_paths = $arguments[0];
+        } else {
+            $schema_paths = $arguments;
+        }
+        
         // Merge all schema files into a single one
-            foreach( $arguments as $xml_schema_path ){
+            foreach( $schema_paths as $xml_schema_path ){
                 
                 $this->loadPropelXmlSchemaFile( $xml_schema_path );
                 
@@ -164,7 +173,7 @@ class PropelSchemaCompiler{
     * 
     * @return Array
     */
-    protected function getTableConcreteInheritanceMap(){
+    public function getTableConcreteInheritanceMap(){
         
         $table_elements = &$this->getTableElements();
         
