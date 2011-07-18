@@ -31,6 +31,9 @@ abstract class BaseSystemEventInstanceMessagePeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 8;
+
 	/** the column name for the ID field */
 	const ID = 'system_event_instance_message.ID';
 
@@ -55,6 +58,9 @@ abstract class BaseSystemEventInstanceMessagePeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'system_event_instance_message.UPDATED_AT';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of SystemEventInstanceMessage objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -77,7 +83,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'SystemEventInstanceId', 'SystemEventSubscriptionId', 'Received', 'ReceivedAt', 'StatusMessage', 'CreatedAt', 'UpdatedAt', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'systemEventInstanceId', 'systemEventSubscriptionId', 'received', 'receivedAt', 'statusMessage', 'createdAt', 'updatedAt', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::SYSTEM_EVENT_INSTANCE_ID, self::SYSTEM_EVENT_SUBSCRIPTION_ID, self::RECEIVED, self::RECEIVED_AT, self::STATUS_MESSAGE, self::CREATED_AT, self::UPDATED_AT, ),
@@ -92,7 +98,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'SystemEventInstanceId' => 1, 'SystemEventSubscriptionId' => 2, 'Received' => 3, 'ReceivedAt' => 4, 'StatusMessage' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'systemEventInstanceId' => 1, 'systemEventSubscriptionId' => 2, 'received' => 3, 'receivedAt' => 4, 'statusMessage' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SYSTEM_EVENT_INSTANCE_ID => 1, self::SYSTEM_EVENT_SUBSCRIPTION_ID => 2, self::RECEIVED => 3, self::RECEIVED_AT => 4, self::STATUS_MESSAGE => 5, self::CREATED_AT => 6, self::UPDATED_AT => 7, ),
@@ -319,7 +325,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 	 * @param      SystemEventInstanceMessage $value A SystemEventInstanceMessage object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(SystemEventInstanceMessage $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -474,7 +480,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + SystemEventInstanceMessagePeer::NUM_COLUMNS;
+			$col = $startcol + SystemEventInstanceMessagePeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = SystemEventInstanceMessagePeer::OM_CLASS;
 			$obj = new $cls();
@@ -615,7 +621,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 		}
 
 		SystemEventInstanceMessagePeer::addSelectColumns($criteria);
-		$startcol = (SystemEventInstanceMessagePeer::NUM_COLUMNS - SystemEventInstanceMessagePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SystemEventInstanceMessagePeer::NUM_HYDRATE_COLUMNS;
 		SystemEventInstancePeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SystemEventInstanceMessagePeer::SYSTEM_EVENT_INSTANCE_ID, SystemEventInstancePeer::ID, $join_behavior);
@@ -687,7 +693,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 		}
 
 		SystemEventInstanceMessagePeer::addSelectColumns($criteria);
-		$startcol = (SystemEventInstanceMessagePeer::NUM_COLUMNS - SystemEventInstanceMessagePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SystemEventInstanceMessagePeer::NUM_HYDRATE_COLUMNS;
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SystemEventInstanceMessagePeer::SYSTEM_EVENT_SUBSCRIPTION_ID, SystemEventSubscriptionPeer::ID, $join_behavior);
@@ -817,13 +823,13 @@ abstract class BaseSystemEventInstanceMessagePeer {
 		}
 
 		SystemEventInstanceMessagePeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventInstanceMessagePeer::NUM_COLUMNS - SystemEventInstanceMessagePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventInstanceMessagePeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol4 = $startcol3 + SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventInstanceMessagePeer::SYSTEM_EVENT_INSTANCE_ID, SystemEventInstancePeer::ID, $join_behavior);
 
@@ -1029,10 +1035,10 @@ abstract class BaseSystemEventInstanceMessagePeer {
 		}
 
 		SystemEventInstanceMessagePeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventInstanceMessagePeer::NUM_COLUMNS - SystemEventInstanceMessagePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventInstanceMessagePeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventSubscriptionPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventInstanceMessagePeer::SYSTEM_EVENT_SUBSCRIPTION_ID, SystemEventSubscriptionPeer::ID, $join_behavior);
 
@@ -1108,10 +1114,10 @@ abstract class BaseSystemEventInstanceMessagePeer {
 		}
 
 		SystemEventInstanceMessagePeer::addSelectColumns($criteria);
-		$startcol2 = (SystemEventInstanceMessagePeer::NUM_COLUMNS - SystemEventInstanceMessagePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SystemEventInstanceMessagePeer::NUM_HYDRATE_COLUMNS;
 
 		SystemEventInstancePeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (SystemEventInstancePeer::NUM_COLUMNS - SystemEventInstancePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + SystemEventInstancePeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SystemEventInstanceMessagePeer::SYSTEM_EVENT_INSTANCE_ID, SystemEventInstancePeer::ID, $join_behavior);
 
@@ -1385,7 +1391,7 @@ abstract class BaseSystemEventInstanceMessagePeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(SystemEventInstanceMessage $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

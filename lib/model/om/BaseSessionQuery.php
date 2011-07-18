@@ -130,7 +130,7 @@ abstract class BaseSessionQuery extends ModelCriteria
 	 * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
 	 */
 	public function findPks($keys, $con = null)
-	{	
+	{
 		$criteria = $this->isKeepQuery() ? clone $this : $this;
 		return $this
 			->filterByPrimaryKeys($keys)
@@ -164,8 +164,17 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query on the id column
 	 * 
-	 * @param     int|array $id The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterById(1234); // WHERE id = 1234
+	 * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+	 * $query->filterById(array('min' => 12)); // WHERE id > 12
+	 * </code>
+	 *
+	 * @param     mixed $id The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
@@ -181,8 +190,14 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query on the session_key column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterBySessionKey('fooValue');   // WHERE session_key = 'fooValue'
+	 * $query->filterBySessionKey('%fooValue%'); // WHERE session_key LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $sessionKey The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
@@ -216,8 +231,14 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query on the client_ip_address column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByClientIpAddress('fooValue');   // WHERE client_ip_address = 'fooValue'
+	 * $query->filterByClientIpAddress('%fooValue%'); // WHERE client_ip_address LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $clientIpAddress The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
@@ -238,8 +259,14 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query on the session_type column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterBySessionType('fooValue');   // WHERE session_type = 'fooValue'
+	 * $query->filterBySessionType('%fooValue%'); // WHERE session_type LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $sessionType The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
@@ -260,8 +287,17 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query on the time column
 	 * 
-	 * @param     int|array $time The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByTime(1234); // WHERE time = 1234
+	 * $query->filterByTime(array(12, 34)); // WHERE time IN (12, 34)
+	 * $query->filterByTime(array('min' => 12)); // WHERE time > 12
+	 * </code>
+	 *
+	 * @param     mixed $time The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
@@ -291,8 +327,19 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query on the user_id column
 	 * 
-	 * @param     int|array $userId The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUserId(1234); // WHERE user_id = 1234
+	 * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
+	 * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+	 * </code>
+	 *
+	 * @see       filterByUser()
+	 *
+	 * @param     mixed $userId The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
@@ -322,15 +369,25 @@ abstract class BaseSessionQuery extends ModelCriteria
 	/**
 	 * Filter the query by a related User object
 	 *
-	 * @param     User $user  the related object to use as filter
+	 * @param     User|PropelCollection $user The related object(s) to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SessionQuery The current query, for fluid interface
 	 */
 	public function filterByUser($user, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SessionPeer::USER_ID, $user->getId(), $comparison);
+		if ($user instanceof User) {
+			return $this
+				->addUsingAlias(SessionPeer::USER_ID, $user->getId(), $comparison);
+		} elseif ($user instanceof PropelCollection) {
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+			return $this
+				->addUsingAlias(SessionPeer::USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
+		} else {
+			throw new PropelException('filterByUser() only accepts arguments of type User or PropelCollection');
+		}
 	}
 
 	/**
@@ -393,8 +450,17 @@ abstract class BaseSessionQuery extends ModelCriteria
 	 */
 	public function filterBySingleSignOnKey($singleSignOnKey, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SessionPeer::ID, $singleSignOnKey->getSessionId(), $comparison);
+		if ($singleSignOnKey instanceof SingleSignOnKey) {
+			return $this
+				->addUsingAlias(SessionPeer::ID, $singleSignOnKey->getSessionId(), $comparison);
+		} elseif ($singleSignOnKey instanceof PropelCollection) {
+			return $this
+				->useSingleSignOnKeyQuery()
+					->filterByPrimaryKeys($singleSignOnKey->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySingleSignOnKey() only accepts arguments of type SingleSignOnKey or PropelCollection');
+		}
 	}
 
 	/**

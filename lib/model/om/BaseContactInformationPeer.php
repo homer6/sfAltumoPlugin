@@ -31,6 +31,9 @@ abstract class BaseContactInformationPeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 12;
+
 	/** the column name for the ID field */
 	const ID = 'contact_information.ID';
 
@@ -67,6 +70,9 @@ abstract class BaseContactInformationPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'contact_information.UPDATED_AT';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of ContactInformation objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -89,7 +95,7 @@ abstract class BaseContactInformationPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'FirstName', 'LastName', 'EmailAddress', 'PhoneMainNumber', 'PhoneOtherNumber', 'MailingAddress', 'City', 'StateId', 'ZipCode', 'CreatedAt', 'UpdatedAt', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'firstName', 'lastName', 'emailAddress', 'phoneMainNumber', 'phoneOtherNumber', 'mailingAddress', 'city', 'stateId', 'zipCode', 'createdAt', 'updatedAt', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::FIRST_NAME, self::LAST_NAME, self::EMAIL_ADDRESS, self::PHONE_MAIN_NUMBER, self::PHONE_OTHER_NUMBER, self::MAILING_ADDRESS, self::CITY, self::STATE_ID, self::ZIP_CODE, self::CREATED_AT, self::UPDATED_AT, ),
@@ -104,7 +110,7 @@ abstract class BaseContactInformationPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FirstName' => 1, 'LastName' => 2, 'EmailAddress' => 3, 'PhoneMainNumber' => 4, 'PhoneOtherNumber' => 5, 'MailingAddress' => 6, 'City' => 7, 'StateId' => 8, 'ZipCode' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'firstName' => 1, 'lastName' => 2, 'emailAddress' => 3, 'phoneMainNumber' => 4, 'phoneOtherNumber' => 5, 'mailingAddress' => 6, 'city' => 7, 'stateId' => 8, 'zipCode' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FIRST_NAME => 1, self::LAST_NAME => 2, self::EMAIL_ADDRESS => 3, self::PHONE_MAIN_NUMBER => 4, self::PHONE_OTHER_NUMBER => 5, self::MAILING_ADDRESS => 6, self::CITY => 7, self::STATE_ID => 8, self::ZIP_CODE => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, ),
@@ -339,7 +345,7 @@ abstract class BaseContactInformationPeer {
 	 * @param      ContactInformation $value A ContactInformation object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(ContactInformation $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -500,7 +506,7 @@ abstract class BaseContactInformationPeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + ContactInformationPeer::NUM_COLUMNS;
+			$col = $startcol + ContactInformationPeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = ContactInformationPeer::OM_CLASS;
 			$obj = new $cls();
@@ -585,7 +591,7 @@ abstract class BaseContactInformationPeer {
 		}
 
 		ContactInformationPeer::addSelectColumns($criteria);
-		$startcol = (ContactInformationPeer::NUM_COLUMNS - ContactInformationPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = ContactInformationPeer::NUM_HYDRATE_COLUMNS;
 		StatePeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(ContactInformationPeer::STATE_ID, StatePeer::ID, $join_behavior);
@@ -713,10 +719,10 @@ abstract class BaseContactInformationPeer {
 		}
 
 		ContactInformationPeer::addSelectColumns($criteria);
-		$startcol2 = (ContactInformationPeer::NUM_COLUMNS - ContactInformationPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = ContactInformationPeer::NUM_HYDRATE_COLUMNS;
 
 		StatePeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (StatePeer::NUM_COLUMNS - StatePeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + StatePeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(ContactInformationPeer::STATE_ID, StatePeer::ID, $join_behavior);
 
@@ -1034,7 +1040,7 @@ abstract class BaseContactInformationPeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(ContactInformation $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

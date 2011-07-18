@@ -130,7 +130,7 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	 * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
 	 */
 	public function findPks($keys, $con = null)
-	{	
+	{
 		$criteria = $this->isKeepQuery() ? clone $this : $this;
 		return $this
 			->filterByPrimaryKeys($keys)
@@ -164,8 +164,17 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query on the id column
 	 * 
-	 * @param     int|array $id The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterById(1234); // WHERE id = 1234
+	 * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+	 * $query->filterById(array('min' => 12)); // WHERE id > 12
+	 * </code>
+	 *
+	 * @param     mixed $id The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
@@ -181,8 +190,19 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query on the system_event_id column
 	 * 
-	 * @param     int|array $systemEventId The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterBySystemEventId(1234); // WHERE system_event_id = 1234
+	 * $query->filterBySystemEventId(array(12, 34)); // WHERE system_event_id IN (12, 34)
+	 * $query->filterBySystemEventId(array('min' => 12)); // WHERE system_event_id > 12
+	 * </code>
+	 *
+	 * @see       filterBySystemEvent()
+	 *
+	 * @param     mixed $systemEventId The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
@@ -212,8 +232,19 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query on the user_id column
 	 * 
-	 * @param     int|array $userId The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUserId(1234); // WHERE user_id = 1234
+	 * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
+	 * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+	 * </code>
+	 *
+	 * @see       filterByUser()
+	 *
+	 * @param     mixed $userId The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
@@ -243,8 +274,14 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query on the message column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByMessage('fooValue');   // WHERE message = 'fooValue'
+	 * $query->filterByMessage('%fooValue%'); // WHERE message LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $message The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
@@ -265,8 +302,19 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query on the created_at column
 	 * 
-	 * @param     string|array $createdAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $createdAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
@@ -296,8 +344,19 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query on the updated_at column
 	 * 
-	 * @param     string|array $updatedAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $updatedAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
@@ -327,15 +386,25 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query by a related SystemEvent object
 	 *
-	 * @param     SystemEvent $systemEvent  the related object to use as filter
+	 * @param     SystemEvent|PropelCollection $systemEvent The related object(s) to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
 	 */
 	public function filterBySystemEvent($systemEvent, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SystemEventInstancePeer::SYSTEM_EVENT_ID, $systemEvent->getId(), $comparison);
+		if ($systemEvent instanceof SystemEvent) {
+			return $this
+				->addUsingAlias(SystemEventInstancePeer::SYSTEM_EVENT_ID, $systemEvent->getId(), $comparison);
+		} elseif ($systemEvent instanceof PropelCollection) {
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+			return $this
+				->addUsingAlias(SystemEventInstancePeer::SYSTEM_EVENT_ID, $systemEvent->toKeyValue('PrimaryKey', 'Id'), $comparison);
+		} else {
+			throw new PropelException('filterBySystemEvent() only accepts arguments of type SystemEvent or PropelCollection');
+		}
 	}
 
 	/**
@@ -391,15 +460,25 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	/**
 	 * Filter the query by a related User object
 	 *
-	 * @param     User $user  the related object to use as filter
+	 * @param     User|PropelCollection $user The related object(s) to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventInstanceQuery The current query, for fluid interface
 	 */
 	public function filterByUser($user, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SystemEventInstancePeer::USER_ID, $user->getId(), $comparison);
+		if ($user instanceof User) {
+			return $this
+				->addUsingAlias(SystemEventInstancePeer::USER_ID, $user->getId(), $comparison);
+		} elseif ($user instanceof PropelCollection) {
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+			return $this
+				->addUsingAlias(SystemEventInstancePeer::USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
+		} else {
+			throw new PropelException('filterByUser() only accepts arguments of type User or PropelCollection');
+		}
 	}
 
 	/**
@@ -462,8 +541,17 @@ abstract class BaseSystemEventInstanceQuery extends ModelCriteria
 	 */
 	public function filterBySystemEventInstanceMessage($systemEventInstanceMessage, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SystemEventInstancePeer::ID, $systemEventInstanceMessage->getSystemEventInstanceId(), $comparison);
+		if ($systemEventInstanceMessage instanceof SystemEventInstanceMessage) {
+			return $this
+				->addUsingAlias(SystemEventInstancePeer::ID, $systemEventInstanceMessage->getSystemEventInstanceId(), $comparison);
+		} elseif ($systemEventInstanceMessage instanceof PropelCollection) {
+			return $this
+				->useSystemEventInstanceMessageQuery()
+					->filterByPrimaryKeys($systemEventInstanceMessage->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySystemEventInstanceMessage() only accepts arguments of type SystemEventInstanceMessage or PropelCollection');
+		}
 	}
 
 	/**

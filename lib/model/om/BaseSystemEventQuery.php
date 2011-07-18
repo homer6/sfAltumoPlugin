@@ -130,7 +130,7 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	 * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
 	 */
 	public function findPks($keys, $con = null)
-	{	
+	{
 		$criteria = $this->isKeepQuery() ? clone $this : $this;
 		return $this
 			->filterByPrimaryKeys($keys)
@@ -164,8 +164,17 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the id column
 	 * 
-	 * @param     int|array $id The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterById(1234); // WHERE id = 1234
+	 * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+	 * $query->filterById(array('min' => 12)); // WHERE id > 12
+	 * </code>
+	 *
+	 * @param     mixed $id The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -181,8 +190,14 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the name column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
+	 * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $name The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -203,8 +218,14 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the unique_key column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUniqueKey('fooValue');   // WHERE unique_key = 'fooValue'
+	 * $query->filterByUniqueKey('%fooValue%'); // WHERE unique_key LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $uniqueKey The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -225,8 +246,14 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the slug column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterBySlug('fooValue');   // WHERE slug = 'fooValue'
+	 * $query->filterBySlug('%fooValue%'); // WHERE slug LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $slug The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -247,8 +274,17 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the enabled column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByEnabled(true); // WHERE enabled = true
+	 * $query->filterByEnabled('yes'); // WHERE enabled = true
+	 * </code>
+	 *
 	 * @param     boolean|string $enabled The value to use as filter.
-	 *            Accepts strings ('false', 'off', '-', 'no', 'n', and '0' are false, the rest is true)
+	 *              Non-boolean arguments are converted using the following rules:
+	 *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+	 *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+	 *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -264,8 +300,19 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the created_at column
 	 * 
-	 * @param     string|array $createdAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $createdAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -295,8 +342,19 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	/**
 	 * Filter the query on the updated_at column
 	 * 
-	 * @param     string|array $updatedAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $updatedAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    SystemEventQuery The current query, for fluid interface
@@ -333,8 +391,17 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	 */
 	public function filterBySystemEventSubscription($systemEventSubscription, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SystemEventPeer::ID, $systemEventSubscription->getSystemEventId(), $comparison);
+		if ($systemEventSubscription instanceof SystemEventSubscription) {
+			return $this
+				->addUsingAlias(SystemEventPeer::ID, $systemEventSubscription->getSystemEventId(), $comparison);
+		} elseif ($systemEventSubscription instanceof PropelCollection) {
+			return $this
+				->useSystemEventSubscriptionQuery()
+					->filterByPrimaryKeys($systemEventSubscription->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySystemEventSubscription() only accepts arguments of type SystemEventSubscription or PropelCollection');
+		}
 	}
 
 	/**
@@ -397,8 +464,17 @@ abstract class BaseSystemEventQuery extends ModelCriteria
 	 */
 	public function filterBySystemEventInstance($systemEventInstance, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(SystemEventPeer::ID, $systemEventInstance->getSystemEventId(), $comparison);
+		if ($systemEventInstance instanceof SystemEventInstance) {
+			return $this
+				->addUsingAlias(SystemEventPeer::ID, $systemEventInstance->getSystemEventId(), $comparison);
+		} elseif ($systemEventInstance instanceof PropelCollection) {
+			return $this
+				->useSystemEventInstanceQuery()
+					->filterByPrimaryKeys($systemEventInstance->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterBySystemEventInstance() only accepts arguments of type SystemEventInstance or PropelCollection');
+		}
 	}
 
 	/**

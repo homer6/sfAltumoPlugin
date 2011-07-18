@@ -158,7 +158,7 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
 	 */
 	public function findPks($keys, $con = null)
-	{	
+	{
 		$criteria = $this->isKeepQuery() ? clone $this : $this;
 		return $this
 			->filterByPrimaryKeys($keys)
@@ -192,8 +192,17 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the id column
 	 * 
-	 * @param     int|array $id The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterById(1234); // WHERE id = 1234
+	 * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+	 * $query->filterById(array('min' => 12)); // WHERE id > 12
+	 * </code>
+	 *
+	 * @param     mixed $id The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -209,8 +218,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the first_name column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByFirstName('fooValue');   // WHERE first_name = 'fooValue'
+	 * $query->filterByFirstName('%fooValue%'); // WHERE first_name LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $firstName The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -231,8 +246,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the last_name column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByLastName('fooValue');   // WHERE last_name = 'fooValue'
+	 * $query->filterByLastName('%fooValue%'); // WHERE last_name LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $lastName The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -253,8 +274,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the email_address column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByEmailAddress('fooValue');   // WHERE email_address = 'fooValue'
+	 * $query->filterByEmailAddress('%fooValue%'); // WHERE email_address LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $emailAddress The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -275,8 +302,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the phone_main_number column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByPhoneMainNumber('fooValue');   // WHERE phone_main_number = 'fooValue'
+	 * $query->filterByPhoneMainNumber('%fooValue%'); // WHERE phone_main_number LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $phoneMainNumber The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -297,8 +330,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the phone_other_number column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByPhoneOtherNumber('fooValue');   // WHERE phone_other_number = 'fooValue'
+	 * $query->filterByPhoneOtherNumber('%fooValue%'); // WHERE phone_other_number LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $phoneOtherNumber The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -319,8 +358,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the mailing_address column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByMailingAddress('fooValue');   // WHERE mailing_address = 'fooValue'
+	 * $query->filterByMailingAddress('%fooValue%'); // WHERE mailing_address LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $mailingAddress The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -341,8 +386,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the city column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCity('fooValue');   // WHERE city = 'fooValue'
+	 * $query->filterByCity('%fooValue%'); // WHERE city LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $city The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -363,8 +414,19 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the state_id column
 	 * 
-	 * @param     int|array $stateId The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByStateId(1234); // WHERE state_id = 1234
+	 * $query->filterByStateId(array(12, 34)); // WHERE state_id IN (12, 34)
+	 * $query->filterByStateId(array('min' => 12)); // WHERE state_id > 12
+	 * </code>
+	 *
+	 * @see       filterByState()
+	 *
+	 * @param     mixed $stateId The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -394,8 +456,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the zip_code column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByZipCode('fooValue');   // WHERE zip_code = 'fooValue'
+	 * $query->filterByZipCode('%fooValue%'); // WHERE zip_code LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $zipCode The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -416,8 +484,19 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the created_at column
 	 * 
-	 * @param     string|array $createdAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $createdAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -447,8 +526,19 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query on the updated_at column
 	 * 
-	 * @param     string|array $updatedAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $updatedAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
@@ -478,15 +568,25 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	/**
 	 * Filter the query by a related State object
 	 *
-	 * @param     State $state  the related object to use as filter
+	 * @param     State|PropelCollection $state The related object(s) to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
 	 */
 	public function filterByState($state, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(ContactInformationPeer::STATE_ID, $state->getId(), $comparison);
+		if ($state instanceof State) {
+			return $this
+				->addUsingAlias(ContactInformationPeer::STATE_ID, $state->getId(), $comparison);
+		} elseif ($state instanceof PropelCollection) {
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+			return $this
+				->addUsingAlias(ContactInformationPeer::STATE_ID, $state->toKeyValue('PrimaryKey', 'Id'), $comparison);
+		} else {
+			throw new PropelException('filterByState() only accepts arguments of type State or PropelCollection');
+		}
 	}
 
 	/**
@@ -549,8 +649,17 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 */
 	public function filterByClientRelatedByDefaultBillingContactInformationId($client, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(ContactInformationPeer::ID, $client->getDefaultBillingContactInformationId(), $comparison);
+		if ($client instanceof Client) {
+			return $this
+				->addUsingAlias(ContactInformationPeer::ID, $client->getDefaultBillingContactInformationId(), $comparison);
+		} elseif ($client instanceof PropelCollection) {
+			return $this
+				->useClientRelatedByDefaultBillingContactInformationIdQuery()
+					->filterByPrimaryKeys($client->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterByClientRelatedByDefaultBillingContactInformationId() only accepts arguments of type Client or PropelCollection');
+		}
 	}
 
 	/**
@@ -613,8 +722,17 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 */
 	public function filterByClientRelatedByDefaultShippingContactInformationId($client, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(ContactInformationPeer::ID, $client->getDefaultShippingContactInformationId(), $comparison);
+		if ($client instanceof Client) {
+			return $this
+				->addUsingAlias(ContactInformationPeer::ID, $client->getDefaultShippingContactInformationId(), $comparison);
+		} elseif ($client instanceof PropelCollection) {
+			return $this
+				->useClientRelatedByDefaultShippingContactInformationIdQuery()
+					->filterByPrimaryKeys($client->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterByClientRelatedByDefaultShippingContactInformationId() only accepts arguments of type Client or PropelCollection');
+		}
 	}
 
 	/**
@@ -677,8 +795,17 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 */
 	public function filterByUser($user, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(ContactInformationPeer::ID, $user->getContactInformationId(), $comparison);
+		if ($user instanceof User) {
+			return $this
+				->addUsingAlias(ContactInformationPeer::ID, $user->getContactInformationId(), $comparison);
+		} elseif ($user instanceof PropelCollection) {
+			return $this
+				->useUserQuery()
+					->filterByPrimaryKeys($user->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterByUser() only accepts arguments of type User or PropelCollection');
+		}
 	}
 
 	/**

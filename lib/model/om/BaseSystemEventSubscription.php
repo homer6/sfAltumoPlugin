@@ -14,7 +14,7 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	/**
 	 * Peer class name
 	 */
-  const PEER = 'SystemEventSubscriptionPeer';
+	const PEER = 'SystemEventSubscriptionPeer';
 
 	/**
 	 * The Peer class.
@@ -332,15 +332,23 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	} // setRemoteUrl()
 
 	/**
-	 * Set the value of [enabled] column.
+	 * Sets the value of the [enabled] column. 
+	 * Non-boolean arguments are converted using the following rules:
+	 *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+	 *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+	 * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
 	 * 
-	 * @param      boolean $v new value
+	 * @param      boolean|integer|string $v The new value
 	 * @return     SystemEventSubscription The current object (for fluent API support)
 	 */
 	public function setEnabled($v)
 	{
 		if ($v !== null) {
-			$v = (boolean) $v;
+			if (is_string($v)) {
+				$v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0')) ? false : true;
+			} else {
+				$v = (boolean) $v;
+			}
 		}
 
 		if ($this->enabled !== $v || $this->isNew()) {
@@ -354,45 +362,18 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.
+	 *               Empty strings are treated as NULL.
 	 * @return     SystemEventSubscription The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->created_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+		$dt = PropelDateTime::newInstance($v, null, 'DateTime');
+		if ($this->created_at !== null || $dt !== null) {
+			$currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+			if ($currentDateAsString !== $newDateAsString) {
+				$this->created_at = $newDateAsString;
 				$this->modifiedColumns[] = SystemEventSubscriptionPeer::CREATED_AT;
 			}
 		} // if either are not null
@@ -403,45 +384,18 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	/**
 	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.
+	 *               Empty strings are treated as NULL.
 	 * @return     SystemEventSubscription The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->updated_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+		$dt = PropelDateTime::newInstance($v, null, 'DateTime');
+		if ($this->updated_at !== null || $dt !== null) {
+			$currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+			if ($currentDateAsString !== $newDateAsString) {
+				$this->updated_at = $newDateAsString;
 				$this->modifiedColumns[] = SystemEventSubscriptionPeer::UPDATED_AT;
 			}
 		} // if either are not null
@@ -500,7 +454,7 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 7; // 7 = SystemEventSubscriptionPeer::NUM_COLUMNS - SystemEventSubscriptionPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating SystemEventSubscription object", $e);
@@ -593,7 +547,7 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		if ($con === null) {
 			$con = Propel::getConnection(SystemEventSubscriptionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -651,7 +605,7 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		if ($con === null) {
 			$con = Propel::getConnection(SystemEventSubscriptionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -940,15 +894,20 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	 * type constants.
 	 *
 	 * @param     string  $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
-	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. 
+	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
 	 *                    Defaults to BasePeer::TYPE_PHPNAME.
 	 * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+	 * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
 	 * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
 	 *
 	 * @return    array an associative array containing the field names (as keys) and field values
 	 */
-	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false)
+	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
 	{
+		if (isset($alreadyDumpedObjects['SystemEventSubscription'][$this->getPrimaryKey()])) {
+			return '*RECURSION*';
+		}
+		$alreadyDumpedObjects['SystemEventSubscription'][$this->getPrimaryKey()] = true;
 		$keys = SystemEventSubscriptionPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
@@ -961,10 +920,13 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aSystemEvent) {
-				$result['SystemEvent'] = $this->aSystemEvent->toArray($keyType, $includeLazyLoadColumns, true);
+				$result['SystemEvent'] = $this->aSystemEvent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
 			}
 			if (null !== $this->aUser) {
-				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns, true);
+				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+			}
+			if (null !== $this->collSystemEventInstanceMessages) {
+				$result['SystemEventInstanceMessages'] = $this->collSystemEventInstanceMessages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -1124,16 +1086,17 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	 *
 	 * @param      object $copyObj An object of SystemEventSubscription (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
 	 * @throws     PropelException
 	 */
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
 	{
-		$copyObj->setSystemEventId($this->system_event_id);
-		$copyObj->setUserId($this->user_id);
-		$copyObj->setRemoteUrl($this->remote_url);
-		$copyObj->setEnabled($this->enabled);
-		$copyObj->setCreatedAt($this->created_at);
-		$copyObj->setUpdatedAt($this->updated_at);
+		$copyObj->setSystemEventId($this->getSystemEventId());
+		$copyObj->setUserId($this->getUserId());
+		$copyObj->setRemoteUrl($this->getRemoteUrl());
+		$copyObj->setEnabled($this->getEnabled());
+		$copyObj->setCreatedAt($this->getCreatedAt());
+		$copyObj->setUpdatedAt($this->getUpdatedAt());
 
 		if ($deepCopy) {
 			// important: temporarily setNew(false) because this affects the behavior of
@@ -1148,9 +1111,10 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 
 		} // if ($deepCopy)
 
-
-		$copyObj->setNew(true);
-		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		if ($makeNew) {
+			$copyObj->setNew(true);
+			$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		}
 	}
 
 	/**
@@ -1230,11 +1194,11 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		if ($this->aSystemEvent === null && ($this->system_event_id !== null)) {
 			$this->aSystemEvent = SystemEventQuery::create()->findPk($this->system_event_id, $con);
 			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aSystemEvent->addSystemEventSubscriptions($this);
+				guarantee the related object contains a reference
+				to this object.  This level of coupling may, however, be
+				undesirable since it could result in an only partially populated collection
+				in the referenced object.
+				$this->aSystemEvent->addSystemEventSubscriptions($this);
 			 */
 		}
 		return $this->aSystemEvent;
@@ -1279,11 +1243,11 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		if ($this->aUser === null && ($this->user_id !== null)) {
 			$this->aUser = UserQuery::create()->findPk($this->user_id, $con);
 			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aUser->addSystemEventSubscriptions($this);
+				guarantee the related object contains a reference
+				to this object.  This level of coupling may, however, be
+				undesirable since it could result in an only partially populated collection
+				in the referenced object.
+				$this->aUser->addSystemEventSubscriptions($this);
 			 */
 		}
 		return $this->aUser;
@@ -1310,10 +1274,16 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
 	 * @return     void
 	 */
-	public function initSystemEventInstanceMessages()
+	public function initSystemEventInstanceMessages($overrideExisting = true)
 	{
+		if (null !== $this->collSystemEventInstanceMessages && !$overrideExisting) {
+			return;
+		}
 		$this->collSystemEventInstanceMessages = new PropelObjectCollection();
 		$this->collSystemEventInstanceMessages->setModel('SystemEventInstanceMessage');
 	}
@@ -1445,27 +1415,40 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	}
 
 	/**
-	 * Resets all collections of referencing foreign keys.
+	 * Resets all references to other model objects or collections of model objects.
 	 *
-	 * This method is a user-space workaround for PHP's inability to garbage collect objects
-	 * with circular references.  This is currently necessary when using Propel in certain
-	 * daemon or large-volumne/high-memory operations.
+	 * This method is a user-space workaround for PHP's inability to garbage collect
+	 * objects with circular references (even in PHP 5.3). This is currently necessary
+	 * when using Propel in certain daemon or large-volumne/high-memory operations.
 	 *
-	 * @param      boolean $deep Whether to also clear the references on all associated objects.
+	 * @param      boolean $deep Whether to also clear the references on all referrer objects.
 	 */
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
 			if ($this->collSystemEventInstanceMessages) {
-				foreach ((array) $this->collSystemEventInstanceMessages as $o) {
+				foreach ($this->collSystemEventInstanceMessages as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 		} // if ($deep)
 
+		if ($this->collSystemEventInstanceMessages instanceof PropelCollection) {
+			$this->collSystemEventInstanceMessages->clearIterator();
+		}
 		$this->collSystemEventInstanceMessages = null;
 		$this->aSystemEvent = null;
 		$this->aUser = null;
+	}
+
+	/**
+	 * Return the string representation of this object
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return (string) $this->exportTo(SystemEventSubscriptionPeer::DEFAULT_STRING_FORMAT);
 	}
 
 	/**

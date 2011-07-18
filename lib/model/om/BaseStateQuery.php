@@ -130,7 +130,7 @@ abstract class BaseStateQuery extends ModelCriteria
 	 * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
 	 */
 	public function findPks($keys, $con = null)
-	{	
+	{
 		$criteria = $this->isKeepQuery() ? clone $this : $this;
 		return $this
 			->filterByPrimaryKeys($keys)
@@ -164,8 +164,17 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the id column
 	 * 
-	 * @param     int|array $id The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterById(1234); // WHERE id = 1234
+	 * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+	 * $query->filterById(array('min' => 12)); // WHERE id > 12
+	 * </code>
+	 *
+	 * @param     mixed $id The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -181,8 +190,14 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the name column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
+	 * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $name The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -203,8 +218,14 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the iso_code column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByIsoCode('fooValue');   // WHERE iso_code = 'fooValue'
+	 * $query->filterByIsoCode('%fooValue%'); // WHERE iso_code LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $isoCode The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -225,8 +246,14 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the iso_short_code column
 	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByIsoShortCode('fooValue');   // WHERE iso_short_code = 'fooValue'
+	 * $query->filterByIsoShortCode('%fooValue%'); // WHERE iso_short_code LIKE '%fooValue%'
+	 * </code>
+	 *
 	 * @param     string $isoShortCode The value to use as filter.
-	 *            Accepts wildcards (* and % trigger a LIKE)
+	 *              Accepts wildcards (* and % trigger a LIKE)
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -247,8 +274,19 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the country_id column
 	 * 
-	 * @param     int|array $countryId The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCountryId(1234); // WHERE country_id = 1234
+	 * $query->filterByCountryId(array(12, 34)); // WHERE country_id IN (12, 34)
+	 * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
+	 * </code>
+	 *
+	 * @see       filterByCountry()
+	 *
+	 * @param     mixed $countryId The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -278,8 +316,19 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the created_at column
 	 * 
-	 * @param     string|array $createdAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+	 * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $createdAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -309,8 +358,19 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query on the updated_at column
 	 * 
-	 * @param     string|array $updatedAt The value to use as filter.
-	 *            Accepts an associative array('min' => $minValue, 'max' => $maxValue)
+	 * Example usage:
+	 * <code>
+	 * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+	 * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+	 * </code>
+	 *
+	 * @param     mixed $updatedAt The value to use as filter.
+	 *              Values can be integers (unix timestamps), DateTime objects, or strings.
+	 *              Empty strings are treated as NULL.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
@@ -340,15 +400,25 @@ abstract class BaseStateQuery extends ModelCriteria
 	/**
 	 * Filter the query by a related Country object
 	 *
-	 * @param     Country $country  the related object to use as filter
+	 * @param     Country|PropelCollection $country The related object(s) to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    StateQuery The current query, for fluid interface
 	 */
 	public function filterByCountry($country, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(StatePeer::COUNTRY_ID, $country->getId(), $comparison);
+		if ($country instanceof Country) {
+			return $this
+				->addUsingAlias(StatePeer::COUNTRY_ID, $country->getId(), $comparison);
+		} elseif ($country instanceof PropelCollection) {
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+			return $this
+				->addUsingAlias(StatePeer::COUNTRY_ID, $country->toKeyValue('PrimaryKey', 'Id'), $comparison);
+		} else {
+			throw new PropelException('filterByCountry() only accepts arguments of type Country or PropelCollection');
+		}
 	}
 
 	/**
@@ -411,8 +481,17 @@ abstract class BaseStateQuery extends ModelCriteria
 	 */
 	public function filterByContactInformation($contactInformation, $comparison = null)
 	{
-		return $this
-			->addUsingAlias(StatePeer::ID, $contactInformation->getStateId(), $comparison);
+		if ($contactInformation instanceof ContactInformation) {
+			return $this
+				->addUsingAlias(StatePeer::ID, $contactInformation->getStateId(), $comparison);
+		} elseif ($contactInformation instanceof PropelCollection) {
+			return $this
+				->useContactInformationQuery()
+					->filterByPrimaryKeys($contactInformation->getPrimaryKeys())
+				->endUse();
+		} else {
+			throw new PropelException('filterByContactInformation() only accepts arguments of type ContactInformation or PropelCollection');
+		}
 	}
 
 	/**

@@ -31,6 +31,9 @@ abstract class BaseSessionPeer {
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
+	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
+	const NUM_HYDRATE_COLUMNS = 7;
+
 	/** the column name for the ID field */
 	const ID = 'session.ID';
 
@@ -52,6 +55,9 @@ abstract class BaseSessionPeer {
 	/** the column name for the USER_ID field */
 	const USER_ID = 'session.USER_ID';
 
+	/** The default string format for model objects of the related table **/
+	const DEFAULT_STRING_FORMAT = 'YAML';
+	
 	/**
 	 * An identiy map to hold any loaded instances of Session objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -74,7 +80,7 @@ abstract class BaseSessionPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
-	private static $fieldNames = array (
+	protected static $fieldNames = array (
 		BasePeer::TYPE_PHPNAME => array ('Id', 'SessionKey', 'Data', 'ClientIpAddress', 'SessionType', 'Time', 'UserId', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'sessionKey', 'data', 'clientIpAddress', 'sessionType', 'time', 'userId', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::SESSION_KEY, self::DATA, self::CLIENT_IP_ADDRESS, self::SESSION_TYPE, self::TIME, self::USER_ID, ),
@@ -89,7 +95,7 @@ abstract class BaseSessionPeer {
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
-	private static $fieldKeys = array (
+	protected static $fieldKeys = array (
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'SessionKey' => 1, 'Data' => 2, 'ClientIpAddress' => 3, 'SessionType' => 4, 'Time' => 5, 'UserId' => 6, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'sessionKey' => 1, 'data' => 2, 'clientIpAddress' => 3, 'sessionType' => 4, 'time' => 5, 'userId' => 6, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SESSION_KEY => 1, self::DATA => 2, self::CLIENT_IP_ADDRESS => 3, self::SESSION_TYPE => 4, self::TIME => 5, self::USER_ID => 6, ),
@@ -314,7 +320,7 @@ abstract class BaseSessionPeer {
 	 * @param      Session $value A Session object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(Session $obj, $key = null)
+	public static function addInstanceToPool($obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -472,7 +478,7 @@ abstract class BaseSessionPeer {
 			// We no longer rehydrate the object, since this can cause data loss.
 			// See http://www.propelorm.org/ticket/509
 			// $obj->hydrate($row, $startcol, true); // rehydrate
-			$col = $startcol + SessionPeer::NUM_COLUMNS;
+			$col = $startcol + SessionPeer::NUM_HYDRATE_COLUMNS;
 		} else {
 			$cls = SessionPeer::OM_CLASS;
 			$obj = new $cls();
@@ -557,7 +563,7 @@ abstract class BaseSessionPeer {
 		}
 
 		SessionPeer::addSelectColumns($criteria);
-		$startcol = (SessionPeer::NUM_COLUMNS - SessionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol = SessionPeer::NUM_HYDRATE_COLUMNS;
 		UserPeer::addSelectColumns($criteria);
 
 		$criteria->addJoin(SessionPeer::USER_ID, UserPeer::ID, $join_behavior);
@@ -685,10 +691,10 @@ abstract class BaseSessionPeer {
 		}
 
 		SessionPeer::addSelectColumns($criteria);
-		$startcol2 = (SessionPeer::NUM_COLUMNS - SessionPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol2 = SessionPeer::NUM_HYDRATE_COLUMNS;
 
 		UserPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (UserPeer::NUM_COLUMNS - UserPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
 
 		$criteria->addJoin(SessionPeer::USER_ID, UserPeer::ID, $join_behavior);
 
@@ -1000,7 +1006,7 @@ abstract class BaseSessionPeer {
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(Session $obj, $cols = null)
+	public static function doValidate($obj, $cols = null)
 	{
 		$columns = array();
 

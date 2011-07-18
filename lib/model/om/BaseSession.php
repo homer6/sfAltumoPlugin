@@ -14,7 +14,7 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	/**
 	 * Peer class name
 	 */
-  const PEER = 'SessionPeer';
+	const PEER = 'SessionPeer';
 
 	/**
 	 * The Peer class.
@@ -360,7 +360,7 @@ abstract class BaseSession extends BaseObject  implements Persistent
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 7; // 7 = SessionPeer::NUM_COLUMNS - SessionPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = SessionPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Session object", $e);
@@ -449,7 +449,7 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		if ($con === null) {
 			$con = Propel::getConnection(SessionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -507,7 +507,7 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		if ($con === null) {
 			$con = Propel::getConnection(SessionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -776,15 +776,20 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	 * type constants.
 	 *
 	 * @param     string  $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
-	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. 
+	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
 	 *                    Defaults to BasePeer::TYPE_PHPNAME.
 	 * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+	 * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
 	 * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
 	 *
 	 * @return    array an associative array containing the field names (as keys) and field values
 	 */
-	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $includeForeignObjects = false)
+	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
 	{
+		if (isset($alreadyDumpedObjects['Session'][$this->getPrimaryKey()])) {
+			return '*RECURSION*';
+		}
+		$alreadyDumpedObjects['Session'][$this->getPrimaryKey()] = true;
 		$keys = SessionPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
@@ -797,7 +802,10 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aUser) {
-				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns, true);
+				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+			}
+			if (null !== $this->collSingleSignOnKeys) {
+				$result['SingleSignOnKeys'] = $this->collSingleSignOnKeys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -957,16 +965,17 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	 *
 	 * @param      object $copyObj An object of Session (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
 	 * @throws     PropelException
 	 */
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
 	{
-		$copyObj->setSessionKey($this->session_key);
-		$copyObj->setData($this->data);
-		$copyObj->setClientIpAddress($this->client_ip_address);
-		$copyObj->setSessionType($this->session_type);
-		$copyObj->setTime($this->time);
-		$copyObj->setUserId($this->user_id);
+		$copyObj->setSessionKey($this->getSessionKey());
+		$copyObj->setData($this->getData());
+		$copyObj->setClientIpAddress($this->getClientIpAddress());
+		$copyObj->setSessionType($this->getSessionType());
+		$copyObj->setTime($this->getTime());
+		$copyObj->setUserId($this->getUserId());
 
 		if ($deepCopy) {
 			// important: temporarily setNew(false) because this affects the behavior of
@@ -981,9 +990,10 @@ abstract class BaseSession extends BaseObject  implements Persistent
 
 		} // if ($deepCopy)
 
-
-		$copyObj->setNew(true);
-		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		if ($makeNew) {
+			$copyObj->setNew(true);
+			$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		}
 	}
 
 	/**
@@ -1063,11 +1073,11 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		if ($this->aUser === null && ($this->user_id !== null)) {
 			$this->aUser = UserQuery::create()->findPk($this->user_id, $con);
 			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aUser->addSessions($this);
+				guarantee the related object contains a reference
+				to this object.  This level of coupling may, however, be
+				undesirable since it could result in an only partially populated collection
+				in the referenced object.
+				$this->aUser->addSessions($this);
 			 */
 		}
 		return $this->aUser;
@@ -1094,10 +1104,16 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
 	 * @return     void
 	 */
-	public function initSingleSignOnKeys()
+	public function initSingleSignOnKeys($overrideExisting = true)
 	{
+		if (null !== $this->collSingleSignOnKeys && !$overrideExisting) {
+			return;
+		}
 		$this->collSingleSignOnKeys = new PropelObjectCollection();
 		$this->collSingleSignOnKeys->setModel('SingleSignOnKey');
 	}
@@ -1203,26 +1219,39 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	}
 
 	/**
-	 * Resets all collections of referencing foreign keys.
+	 * Resets all references to other model objects or collections of model objects.
 	 *
-	 * This method is a user-space workaround for PHP's inability to garbage collect objects
-	 * with circular references.  This is currently necessary when using Propel in certain
-	 * daemon or large-volumne/high-memory operations.
+	 * This method is a user-space workaround for PHP's inability to garbage collect
+	 * objects with circular references (even in PHP 5.3). This is currently necessary
+	 * when using Propel in certain daemon or large-volumne/high-memory operations.
 	 *
-	 * @param      boolean $deep Whether to also clear the references on all associated objects.
+	 * @param      boolean $deep Whether to also clear the references on all referrer objects.
 	 */
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
 			if ($this->collSingleSignOnKeys) {
-				foreach ((array) $this->collSingleSignOnKeys as $o) {
+				foreach ($this->collSingleSignOnKeys as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
 		} // if ($deep)
 
+		if ($this->collSingleSignOnKeys instanceof PropelCollection) {
+			$this->collSingleSignOnKeys->clearIterator();
+		}
 		$this->collSingleSignOnKeys = null;
 		$this->aUser = null;
+	}
+
+	/**
+	 * Return the string representation of this object
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return (string) $this->exportTo(SessionPeer::DEFAULT_STRING_FORMAT);
 	}
 
 	/**
