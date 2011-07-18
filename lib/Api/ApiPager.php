@@ -36,7 +36,7 @@ class ApiPager{
     * 
     * @return \sfAltumoPlugin\Api\ApiPager
     */
-    public function __construct( $paged = false, $request = null ){     
+    public function __construct( $paged = false, $request = null ){
     
         
         if( is_null($request) ){

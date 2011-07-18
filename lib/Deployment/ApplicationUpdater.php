@@ -78,8 +78,12 @@ class ApplicationUpdater{
     */
     public function update(){
         
+        throw new \Exception( 'Build database task not implemented.' );
+        
         $commands = array(
             'git pull',
+            'git submodule sync',
+            'git submodule update --init --recursive',
             $this->getProjectRoot() . '/htdocs/project/symfony cc',
             $this->getProjectRoot() . '/htdocs/project/cli/build-database.php build'
         );
