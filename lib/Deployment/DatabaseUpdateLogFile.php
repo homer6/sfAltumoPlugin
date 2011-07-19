@@ -47,7 +47,7 @@ class DatabaseUpdateLogFile extends \Altumo\Xml\XmlFile{
     */
     protected function getDefaultEmptyFile(){
         
-        return '<BuildLog/>';
+        return '<UpdateLog/>';
         
     }
     

@@ -37,7 +37,7 @@ class sfAltumoUpdateEnvironmentTask extends sfAltumoBaseTask {
         $this->name = 'update-environment';
         $this->aliases = array( $this->namespace. ':update' );
 
-        $this->briefDescription = 'Updates the application evironment.';
+        $this->briefDescription = 'Updates the application environment.';
 
     $this->detailedDescription = <<<EOF
 Updating existing separate environments (production, staging, dev) requires many

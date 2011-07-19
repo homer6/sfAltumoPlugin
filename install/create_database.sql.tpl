@@ -1,0 +1,20 @@
+
+CREATE DATABASE [[DATABASE]]
+    CHARACTER SET utf8;
+
+CREATE USER 
+    '[[DATABASE_USER]]'@'%' 
+    IDENTIFIED BY '[[DATABASE_PASSWORD]]';
+
+CREATE USER 
+    '[[DATABASE_USER]]'@'localhost' 
+    IDENTIFIED BY '[[DATABASE_PASSWORD]]';
+
+GRANT
+    ALL ON [[DATABASE]].* 
+    TO '[[DATABASE_USER]]'@'%';
+
+GRANT
+    ALL ON [[DATABASE]].* 
+    TO '[[DATABASE_USER]]'@'localhost';
+        
