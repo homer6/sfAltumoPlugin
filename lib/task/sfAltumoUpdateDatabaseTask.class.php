@@ -26,14 +26,15 @@ class sfAltumoUpdateDatabaseTask extends sfAltumoBaseTask {
         parent::configure();
         
         $this->addArguments(array(
-            new sfCommandArgument( 'command', sfCommandArgument::REQUIRED, 'The subcommand.' ),
+            new sfCommandArgument( 'command', sfCommandArgument::REQUIRED, 'update, drop or init' )
         ));
 
+        /*
         $this->addOptions(array(
             new sfCommandOption( 'build', null, sfCommandOption::PARAMETER_OPTIONAL, 'Modifies an existing database according to available build files.', null ),
             new sfCommandOption( 'drop', null, sfCommandOption::PARAMETER_OPTIONAL, 'Drops all of the tables in the database.', null ),
-            new sfCommandOption( 'init', null, sfCommandOption::PARAMETER_OPTIONAL, 'Create an empty database configuration file.', null ),
-        ));
+            new sfCommandOption( 'init', null, sfCommandOption::PARAMETER_OPTIONAL, 'Create an empty database configuration file.', null )
+        ));*/
 
         $this->name = 'update-database';
 
@@ -58,24 +59,24 @@ EOF;
         $command = $arguments['command'];
         
         //initialize updater, if there is meaningful work to do
-            if( in_array( $command, array('build', 'drop') ) ){
+            if( in_array( $command, array('update', 'drop') ) ){
                 $xml_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $default_build_sequence_file );
                 $xml_update_log = new \sfAltumoPlugin\Deployment\DatabaseUpdateLogFile( $default_update_log_file, false );
                 $xml_updater_configuration = new \sfAltumoPlugin\Deployment\DatabaseUpdaterConfigurationFile( $default_updater_configuration_file );
                 $xml_updater_configuration->setDatabaseDirectory( $database_dir );
                 
-                $database_builder = new \Altumo\Build\DatabaseBuilder( $xml_updater_configuration, $xml_build_sequence, $xml_update_log );
+                $database_updater = new \sfAltumoPlugin\Deployment\DatabaseUpdater( $xml_updater_configuration, $xml_build_sequence, $xml_update_log );
             }
                 
         switch( $command ){
             
-            case 'build':
-                    $number_of_scripts_executed = $database_builder->build( $arguments );
+            case 'update':
+                    $number_of_scripts_executed = $database_updater->build( $arguments );
                     
                 break;
                 
             case 'drop':
-                    $number_of_scripts_executed = $database_builder->drop( $arguments );   
+                    $number_of_scripts_executed = $database_updater->drop( $arguments );
             
                 break;
                 

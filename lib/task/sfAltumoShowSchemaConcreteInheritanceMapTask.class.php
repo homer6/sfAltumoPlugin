@@ -13,8 +13,6 @@
  * 
  * @see \sfAltumoPlugin\Schema\PropelSchemaCompiler
  * 
- * @package    sfAltumoPlugin
- * @subpackage task
  * @author Juan Jaramillo <juan.jaramillo@altumo.com>
  */
 class sfAltumoShowSchemaConcreteInheritanceMapTask extends sfAltumoBaseTask {

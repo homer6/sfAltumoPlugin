@@ -14,11 +14,9 @@
  * 
  * See http://code.google.com/closure/library/docs/depswriter.html
  * 
- * @package    sfAltumoPlugin
- * @subpackage task
  * @author Juan Jaramillo <juan.jaramillo@altumo.com>
  */
-class sfAltumoGenerateJavascriptDependenciesFileTask extends sfAltumoBaseTask {
+class sfAltumoBuildJavascriptDependenciesTask extends sfAltumoBaseTask {
 
     /**
     * @see sfTask
@@ -36,7 +34,7 @@ class sfAltumoGenerateJavascriptDependenciesFileTask extends sfAltumoBaseTask {
         ));
 
 
-        $this->name = 'generate-javascript-dependencies-file';
+        $this->name = 'build-javascript-dependencies';
         $this->aliases = array( $this->namespace. ':jsdeps' );
 
         $this->briefDescription = 'Generates a Javascript dependencies file for the entire application';

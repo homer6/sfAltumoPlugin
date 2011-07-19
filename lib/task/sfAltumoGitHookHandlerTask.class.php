@@ -49,8 +49,7 @@ EOF;
     protected function execute( $arguments = array(), $options = array() ) {
 
         $hook_name = $arguments['hook-name'];
-        $general_hook_template_file = sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/lib/Build/git_hook_handler.sh';
-        //$general_hook_template_file_contents = file_get_contents($general_hook_template_file);
+        $general_hook_template_file = sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/install/git_hook_handler.sh';
         
         if( $hook_name == 'install' ){
             
