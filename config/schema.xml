@@ -115,42 +115,9 @@
         </index>
 
     </table>
-
     
-
-    <table name="user" package="plugins.sfAltumoPlugin.lib.model">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-        <column name="email" type="varchar" required="true" size="128" />
-        <column name="contact_information_id" type="INTEGER" required="false" />
-        <column name="salt" type="varchar" required="true" size="128" />
-        <column name="password" type="varchar" required="true" size="128" />
-        <column name="password_reset_key" type="varchar" required="false" size="16" />
-        <column name="active" type="boolean" required="true" default="1" />
-        <column name="created_at" type="timestamp" />
-        <column name="updated_at" type="timestamp" />
-        
-
-        <foreign-key foreignTable="contact_information" onDelete="restrict">
-            <reference local="contact_information_id" foreign="id" />
-        </foreign-key>
-
-
-        <index>
-            <index-column name="active" />
-        </index>
-        
-        
-        <unique>
-            <unique-column name="password_reset_key" />
-        </unique>
-        
-        <unique>
-            <unique-column name="email" />
-        </unique>
-
-    </table>
-
-
+    
+    
     <table name="session" package="plugins.sfAltumoPlugin.lib.model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="session_key" type="varchar" required="true" size="32" />

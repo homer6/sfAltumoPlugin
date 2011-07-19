@@ -38,6 +38,7 @@ class UserTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addForeignKey('USER_ID', 'UserId', 'INTEGER', 'sf_guard_user', 'ID', true, null, null);
 		$this->addColumn('EMAIL', 'Email', 'VARCHAR', true, 128, null);
 		$this->addForeignKey('CONTACT_INFORMATION_ID', 'ContactInformationId', 'INTEGER', 'contact_information', 'ID', false, null, null);
 		$this->addColumn('SALT', 'Salt', 'VARCHAR', true, 128, null);
@@ -55,6 +56,7 @@ class UserTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('ContactInformation', 'ContactInformation', RelationMap::MANY_TO_ONE, array('contact_information_id' => 'id', ), 'RESTRICT', null);
+    $this->addRelation('sfGuardUser', 'sfGuardUser', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), 'CASCADE', null);
     $this->addRelation('Session', 'Session', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', null);
     $this->addRelation('SystemEventSubscription', 'SystemEventSubscription', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', 'CASCADE');
     $this->addRelation('SystemEventInstance', 'SystemEventInstance', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', 'CASCADE');
