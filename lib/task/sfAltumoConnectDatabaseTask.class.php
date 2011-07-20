@@ -56,10 +56,8 @@ EOF;
 
         $database_dir = sfConfig::get( 'sf_data_dir' );
         $default_updater_configuration_file = $database_dir . '/updater-configuration.xml';
-        
-        $shell_file = $database_dir . '/connect-database.sh';
 
-        //always write the shell file before executing: parameters may have changed
+        //create the mysql connection command
             $xml_updater_configuration = new \sfAltumoPlugin\Deployment\DatabaseUpdaterConfigurationFile( $default_updater_configuration_file );
             
             $command = "mysql -u" . $xml_updater_configuration->getDatabaseUsername() .
@@ -67,11 +65,23 @@ EOF;
                         " -h" . $xml_updater_configuration->getDatabaseHostname() .
                         " " . $xml_updater_configuration->getDatabaseName() . "\n";
             
-            umask(0022);            
-            file_put_contents( $shell_file, $command );
-            chmod( $shell_file, 0755 );
             
-            `$command`;
+        //Thanks to Wrikken and Fabio
+        //See: http://stackoverflow.com/questions/6769313/how-can-i-invoke-the-mysql-interactive-client-from-php
+            $descriptorspec = array(
+               0 => STDIN,
+               1 => STDOUT,
+               2 => STDERR
+            );            
+            $cwd = '/tmp';            
+            $process = proc_open( $command, $descriptorspec, $pipes, $cwd );
+            stream_set_blocking( STDIN, 0 );
+            stream_set_blocking( STDOUT, 0 );
+            stream_set_blocking( STDERR, 0 );
+            do{
+               while($in = fgets(STDIN)) fwrite($pipes[0],$in);
+            }while(0);
+                       
         
     }
     
