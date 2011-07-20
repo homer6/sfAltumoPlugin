@@ -117,6 +117,11 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	protected $collClientsRelatedByDefaultShippingContactInformationId;
 
 	/**
+	 * @var        array Client[] Collection to store aggregation of Client objects.
+	 */
+	protected $collClientsRelatedByContactInformationId;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -678,6 +683,8 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 
 			$this->collClientsRelatedByDefaultShippingContactInformationId = null;
 
+			$this->collClientsRelatedByContactInformationId = null;
+
 		} // if (deep)
 	}
 
@@ -891,6 +898,14 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				}
 			}
 
+			if ($this->collClientsRelatedByContactInformationId !== null) {
+				foreach ($this->collClientsRelatedByContactInformationId as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
 			$this->alreadyInSave = false;
 
 		}
@@ -992,6 +1007,14 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 
 				if ($this->collClientsRelatedByDefaultShippingContactInformationId !== null) {
 					foreach ($this->collClientsRelatedByDefaultShippingContactInformationId as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collClientsRelatedByContactInformationId !== null) {
+					foreach ($this->collClientsRelatedByContactInformationId as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -1121,6 +1144,9 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 			}
 			if (null !== $this->collClientsRelatedByDefaultShippingContactInformationId) {
 				$result['ClientsRelatedByDefaultShippingContactInformationId'] = $this->collClientsRelatedByDefaultShippingContactInformationId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+			}
+			if (null !== $this->collClientsRelatedByContactInformationId) {
+				$result['ClientsRelatedByContactInformationId'] = $this->collClientsRelatedByContactInformationId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -1345,6 +1371,12 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				}
 			}
 
+			foreach ($this->getClientsRelatedByContactInformationId() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addClientRelatedByContactInformationId($relObj->copy($deepCopy));
+				}
+			}
+
 		} // if ($deepCopy)
 
 		if ($makeNew) {
@@ -1555,6 +1587,31 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		}
 	}
 
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this ContactInformation is new, it will return
+	 * an empty collection; or if this ContactInformation has previously
+	 * been saved, it will retrieve related Users from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in ContactInformation.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array User[] List of User objects
+	 */
+	public function getUsersJoinsfGuardUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = UserQuery::create(null, $criteria);
+		$query->joinWith('sfGuardUser', $join_behavior);
+
+		return $this->getUsers($query, $con);
+	}
+
 	/**
 	 * Clears out the collClientsRelatedByDefaultBillingContactInformationId collection
 	 *
@@ -1691,6 +1748,31 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	{
 		$query = ClientQuery::create(null, $criteria);
 		$query->joinWith('User', $join_behavior);
+
+		return $this->getClientsRelatedByDefaultBillingContactInformationId($query, $con);
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this ContactInformation is new, it will return
+	 * an empty collection; or if this ContactInformation has previously
+	 * been saved, it will retrieve related ClientsRelatedByDefaultBillingContactInformationId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in ContactInformation.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 */
+	public function getClientsRelatedByDefaultBillingContactInformationIdJoinsfGuardUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = ClientQuery::create(null, $criteria);
+		$query->joinWith('sfGuardUser', $join_behavior);
 
 		return $this->getClientsRelatedByDefaultBillingContactInformationId($query, $con);
 	}
@@ -1835,6 +1917,196 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		return $this->getClientsRelatedByDefaultShippingContactInformationId($query, $con);
 	}
 
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this ContactInformation is new, it will return
+	 * an empty collection; or if this ContactInformation has previously
+	 * been saved, it will retrieve related ClientsRelatedByDefaultShippingContactInformationId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in ContactInformation.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 */
+	public function getClientsRelatedByDefaultShippingContactInformationIdJoinsfGuardUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = ClientQuery::create(null, $criteria);
+		$query->joinWith('sfGuardUser', $join_behavior);
+
+		return $this->getClientsRelatedByDefaultShippingContactInformationId($query, $con);
+	}
+
+	/**
+	 * Clears out the collClientsRelatedByContactInformationId collection
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addClientsRelatedByContactInformationId()
+	 */
+	public function clearClientsRelatedByContactInformationId()
+	{
+		$this->collClientsRelatedByContactInformationId = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collClientsRelatedByContactInformationId collection.
+	 *
+	 * By default this just sets the collClientsRelatedByContactInformationId collection to an empty array (like clearcollClientsRelatedByContactInformationId());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @param      boolean $overrideExisting If set to true, the method call initializes
+	 *                                        the collection even if it is not empty
+	 *
+	 * @return     void
+	 */
+	public function initClientsRelatedByContactInformationId($overrideExisting = true)
+	{
+		if (null !== $this->collClientsRelatedByContactInformationId && !$overrideExisting) {
+			return;
+		}
+		$this->collClientsRelatedByContactInformationId = new PropelObjectCollection();
+		$this->collClientsRelatedByContactInformationId->setModel('Client');
+	}
+
+	/**
+	 * Gets an array of Client objects which contain a foreign key that references this object.
+	 *
+	 * If the $criteria is not null, it is used to always fetch the results from the database.
+	 * Otherwise the results are fetched from the database the first time, then cached.
+	 * Next time the same method is called without $criteria, the cached collection is returned.
+	 * If this ContactInformation is new, it will return
+	 * an empty collection or the current collection; the criteria is ignored on a new object.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 * @throws     PropelException
+	 */
+	public function getClientsRelatedByContactInformationId($criteria = null, PropelPDO $con = null)
+	{
+		if(null === $this->collClientsRelatedByContactInformationId || null !== $criteria) {
+			if ($this->isNew() && null === $this->collClientsRelatedByContactInformationId) {
+				// return empty collection
+				$this->initClientsRelatedByContactInformationId();
+			} else {
+				$collClientsRelatedByContactInformationId = ClientQuery::create(null, $criteria)
+					->filterByContactInformationRelatedByContactInformationId($this)
+					->find($con);
+				if (null !== $criteria) {
+					return $collClientsRelatedByContactInformationId;
+				}
+				$this->collClientsRelatedByContactInformationId = $collClientsRelatedByContactInformationId;
+			}
+		}
+		return $this->collClientsRelatedByContactInformationId;
+	}
+
+	/**
+	 * Returns the number of related Client objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related Client objects.
+	 * @throws     PropelException
+	 */
+	public function countClientsRelatedByContactInformationId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if(null === $this->collClientsRelatedByContactInformationId || null !== $criteria) {
+			if ($this->isNew() && null === $this->collClientsRelatedByContactInformationId) {
+				return 0;
+			} else {
+				$query = ClientQuery::create(null, $criteria);
+				if($distinct) {
+					$query->distinct();
+				}
+				return $query
+					->filterByContactInformationRelatedByContactInformationId($this)
+					->count($con);
+			}
+		} else {
+			return count($this->collClientsRelatedByContactInformationId);
+		}
+	}
+
+	/**
+	 * Method called to associate a Client object to this object
+	 * through the Client foreign key attribute.
+	 *
+	 * @param      Client $l Client
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addClientRelatedByContactInformationId(Client $l)
+	{
+		if ($this->collClientsRelatedByContactInformationId === null) {
+			$this->initClientsRelatedByContactInformationId();
+		}
+		if (!$this->collClientsRelatedByContactInformationId->contains($l)) { // only add it if the **same** object is not already associated
+			$this->collClientsRelatedByContactInformationId[]= $l;
+			$l->setContactInformationRelatedByContactInformationId($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this ContactInformation is new, it will return
+	 * an empty collection; or if this ContactInformation has previously
+	 * been saved, it will retrieve related ClientsRelatedByContactInformationId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in ContactInformation.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 */
+	public function getClientsRelatedByContactInformationIdJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = ClientQuery::create(null, $criteria);
+		$query->joinWith('User', $join_behavior);
+
+		return $this->getClientsRelatedByContactInformationId($query, $con);
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this ContactInformation is new, it will return
+	 * an empty collection; or if this ContactInformation has previously
+	 * been saved, it will retrieve related ClientsRelatedByContactInformationId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in ContactInformation.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array Client[] List of Client objects
+	 */
+	public function getClientsRelatedByContactInformationIdJoinsfGuardUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = ClientQuery::create(null, $criteria);
+		$query->joinWith('sfGuardUser', $join_behavior);
+
+		return $this->getClientsRelatedByContactInformationId($query, $con);
+	}
+
 	/**
 	 * Clears the current object and sets all attributes to their default values
 	 */
@@ -1887,6 +2159,11 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collClientsRelatedByContactInformationId) {
+				foreach ($this->collClientsRelatedByContactInformationId as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
 		if ($this->collUsers instanceof PropelCollection) {
@@ -1901,6 +2178,10 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 			$this->collClientsRelatedByDefaultShippingContactInformationId->clearIterator();
 		}
 		$this->collClientsRelatedByDefaultShippingContactInformationId = null;
+		if ($this->collClientsRelatedByContactInformationId instanceof PropelCollection) {
+			$this->collClientsRelatedByContactInformationId->clearIterator();
+		}
+		$this->collClientsRelatedByContactInformationId = null;
 		$this->aState = null;
 	}
 
