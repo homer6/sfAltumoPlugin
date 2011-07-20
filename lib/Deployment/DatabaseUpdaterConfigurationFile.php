@@ -53,10 +53,10 @@ class DatabaseUpdaterConfigurationFile extends \Altumo\Xml\XmlFile{
             $settings = $xml_template->addChild('Settings');
                 $settings->addChild( 'DropOnNewSnapshot', 'false' );
             $database = $xml_template->addChild('Database');
-                $database->addChild( 'DatabaseName', 'changeme' );
-                $database->addChild( 'Hostname', 'changeme' );
-                $database->addChild( 'Username', 'changeme' );
-                $database->addChild( 'Password', 'changeme' );
+                $database->addChild( 'DatabaseName', '[[DATABASE]]' );
+                $database->addChild( 'Hostname', '[[DATABASE_HOST]]' );
+                $database->addChild( 'Username', '[[DATABASE_USER]]' );
+                $database->addChild( 'Password', '[[DATABASE_PASSWORD]]' );
                 
         return $xml_template->getXmlAsString(true);
         

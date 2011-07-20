@@ -92,35 +92,43 @@ EOF;
             //make apache logs folder writable
             chmod( $project_root . '/htdocs/logs', 0777 );
             $this->log( 'Apache log file permissions set.' );
+            
+        //setup the database builder
+            `./symfony altumo:update-database init`;
+            $this->log( 'Database updater initialized.' );
 
         //untemplates the templated files
             $template_path = $project_root . '/htdocs/project/plugins/sfAltumoPlugin/install';
             $templated_files = array(
                 array(
-                    'source' => 'databases.yml.tpl',
+                    'source' => $template_path . '/' . 'databases.yml.tpl',
                     'destination' => sfConfig::get('sf_config_dir') . '/databases.yml'
                 ),
                 array(
-                    'source' => 'propel.ini.tpl',
+                    'source' => $template_path . '/' . 'propel.ini.tpl',
                     'destination' => sfConfig::get('sf_config_dir') . '/propel.ini'
                 ),
                 array(
-                    'source' => 'index.php.tpl',
+                    'source' => $template_path . '/' . 'index.php.tpl',
                     'destination' => sfConfig::get('sf_web_dir') . '/index.php'
                 ),
                 array(
-                    'source' => 'vhost.tpl',
+                    'source' => $template_path . '/' . 'vhost.tpl',
                     'destination' => sfConfig::get('sf_root_dir') . '/' . $domain_name
                 ),
                 array(
-                    'source' => 'create_database.sql.tpl',
+                    'source' => $template_path . '/' . 'create_database.sql.tpl',
                     'destination' => $create_database_temp_file
+                ),
+                array(
+                    'source' => sfConfig::get('sf_data_dir') . '/' . 'updater-configuration.xml',
+                    'destination' => sfConfig::get('sf_data_dir') . '/' . 'updater-configuration.xml'
                 )
             );
                         
             foreach( $templated_files as $templated_file ){
                 
-                $template_file_contents = file_get_contents( $template_path . '/' . $templated_file['source'] );
+                $template_file_contents = file_get_contents( $templated_file['source'] );
                 
                 foreach( $template_variables as $variable_name => $value ){
                     $template_file_contents = str_replace( '[[' . $variable_name . ']]', $value, $template_file_contents );
@@ -131,10 +139,6 @@ EOF;
             }
             $this->log( 'Template files installed.' );
             
-         
-        //setup the database builder
-            `./symfony altumo:update-database init`;
-            $this->log( 'Database updater initialized.' );
             
         //install git hooks
             `./symfony altumo:git-hook-handler install`;
