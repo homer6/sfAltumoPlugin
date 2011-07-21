@@ -73,8 +73,8 @@ class GitHookHandler{
     */
     static public function onPostCommit(){
         
-        $project_root = realpath( sfConfig::get( 'sf_root_dir' ) . '/../../' );
-        $database_dir = sfConfig::get( 'sf_data_dir' );
+        $project_root = realpath( \sfConfig::get( 'sf_root_dir' ) . '/../../' );
+        $database_dir = \sfConfig::get( 'sf_data_dir' );
 
         //get the last commit hash        
             $last_commit_hash = \Altumo\Git\History::getLastCommitHash();
