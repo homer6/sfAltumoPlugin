@@ -79,10 +79,11 @@ EOF;
             stream_set_blocking( STDOUT, 0 );
             stream_set_blocking( STDERR, 0 );
             do{
-               while($in = fgets(STDIN)) fwrite($pipes[0],$in);
+                while( $in = fgets(STDIN) ){
+                    fwrite( $pipes[0], $in );
+                }
             }while(0);
-                       
-        
+
     }
     
 }
