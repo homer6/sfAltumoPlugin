@@ -66,7 +66,7 @@ EOF;
                         " " . $xml_updater_configuration->getDatabaseName() . "\n";
             
             
-        //Thanks to Wrikken and Fabio
+        //Thanks to Wrikken
         //See: http://stackoverflow.com/questions/6769313/how-can-i-invoke-the-mysql-interactive-client-from-php
             $descriptorspec = array(
                0 => STDIN,
@@ -75,14 +75,6 @@ EOF;
             );            
             $cwd = '/tmp';            
             $process = proc_open( $command, $descriptorspec, $pipes, $cwd );
-            stream_set_blocking( STDIN, 0 );
-            stream_set_blocking( STDOUT, 0 );
-            stream_set_blocking( STDERR, 0 );
-            do{
-                while( $in = fgets(STDIN) ){
-                    fwrite( $pipes[0], $in );
-                }
-            }while(0);
 
     }
     
