@@ -87,7 +87,7 @@ EOF;
                 break;
             
             default:
-                throw new sfCommandException(sprintf('Command "%s" does not exist.', $arguments['command']));
+                throw new sfCommandException( sprintf('Command "%s" does not exist.', $arguments['command']) );
             
         }
         
