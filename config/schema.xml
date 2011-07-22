@@ -125,6 +125,8 @@
         <column name="client_ip_address" type="varchar" size="39" />
         <column name="session_type" type="varchar" size="32" />
         <column name="time" type="integer" required="true" />
+        
+        <!-- this reference will have to change to whatever user class ends up being Altumo's -->
         <column name="user_id" required="false" type="INTEGER" />
         
 

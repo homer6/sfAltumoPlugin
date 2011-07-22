@@ -15,4 +15,18 @@
  */
 class CountryPeer extends BaseCountryPeer {
 
+    /**
+    * Get All Countries
+    * 
+    * @return PropelCollection
+    */
+    public static function getCountries(){
+        
+        return CountryQuery::create()
+        ->find();
+        
+    }
+    
+    
+    
 } // CountryPeer
