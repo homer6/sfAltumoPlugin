@@ -52,9 +52,9 @@
  * @method     ContactInformationQuery rightJoinClientRelatedByDefaultShippingContactInformationId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ClientRelatedByDefaultShippingContactInformationId relation
  * @method     ContactInformationQuery innerJoinClientRelatedByDefaultShippingContactInformationId($relationAlias = null) Adds a INNER JOIN clause to the query using the ClientRelatedByDefaultShippingContactInformationId relation
  *
- * @method     ContactInformationQuery leftJoinClientRelatedByContactInformationId($relationAlias = null) Adds a LEFT JOIN clause to the query using the ClientRelatedByContactInformationId relation
- * @method     ContactInformationQuery rightJoinClientRelatedByContactInformationId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ClientRelatedByContactInformationId relation
- * @method     ContactInformationQuery innerJoinClientRelatedByContactInformationId($relationAlias = null) Adds a INNER JOIN clause to the query using the ClientRelatedByContactInformationId relation
+ * @method     ContactInformationQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
+ * @method     ContactInformationQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
+ * @method     ContactInformationQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
  *
  * @method     ContactInformation findOne(PropelPDO $con = null) Return the first ContactInformation matching the query
  * @method     ContactInformation findOneOrCreate(PropelPDO $con = null) Return the first ContactInformation matching the query, or a new ContactInformation object populated from the query conditions when no match is found
@@ -863,40 +863,40 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	}
 
 	/**
-	 * Filter the query by a related Client object
+	 * Filter the query by a related Order object
 	 *
-	 * @param     Client $client  the related object to use as filter
+	 * @param     Order $order  the related object to use as filter
 	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
 	 */
-	public function filterByClientRelatedByContactInformationId($client, $comparison = null)
+	public function filterByOrder($order, $comparison = null)
 	{
-		if ($client instanceof Client) {
+		if ($order instanceof Order) {
 			return $this
-				->addUsingAlias(ContactInformationPeer::ID, $client->getContactInformationId(), $comparison);
-		} elseif ($client instanceof PropelCollection) {
+				->addUsingAlias(ContactInformationPeer::ID, $order->getBillingContactInformationId(), $comparison);
+		} elseif ($order instanceof PropelCollection) {
 			return $this
-				->useClientRelatedByContactInformationIdQuery()
-					->filterByPrimaryKeys($client->getPrimaryKeys())
+				->useOrderQuery()
+					->filterByPrimaryKeys($order->getPrimaryKeys())
 				->endUse();
 		} else {
-			throw new PropelException('filterByClientRelatedByContactInformationId() only accepts arguments of type Client or PropelCollection');
+			throw new PropelException('filterByOrder() only accepts arguments of type Order or PropelCollection');
 		}
 	}
 
 	/**
-	 * Adds a JOIN clause to the query using the ClientRelatedByContactInformationId relation
+	 * Adds a JOIN clause to the query using the Order relation
 	 * 
 	 * @param     string $relationAlias optional alias for the relation
 	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
 	 */
-	public function joinClientRelatedByContactInformationId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+	public function joinOrder($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
 	{
 		$tableMap = $this->getTableMap();
-		$relationMap = $tableMap->getRelation('ClientRelatedByContactInformationId');
+		$relationMap = $tableMap->getRelation('Order');
 		
 		// create a ModelJoin object for this join
 		$join = new ModelJoin();
@@ -911,14 +911,14 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 			$this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
 			$this->addJoinObject($join, $relationAlias);
 		} else {
-			$this->addJoinObject($join, 'ClientRelatedByContactInformationId');
+			$this->addJoinObject($join, 'Order');
 		}
 		
 		return $this;
 	}
 
 	/**
-	 * Use the ClientRelatedByContactInformationId relation Client object
+	 * Use the Order relation Order object
 	 *
 	 * @see       useQuery()
 	 * 
@@ -926,13 +926,13 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 *                                   to be used as main alias in the secondary query
 	 * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
 	 *
-	 * @return    ClientQuery A secondary query class using the current class as primary query
+	 * @return    OrderQuery A secondary query class using the current class as primary query
 	 */
-	public function useClientRelatedByContactInformationIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+	public function useOrderQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
 	{
 		return $this
-			->joinClientRelatedByContactInformationId($relationAlias, $joinType)
-			->useQuery($relationAlias ? $relationAlias : 'ClientRelatedByContactInformationId', 'ClientQuery');
+			->joinOrder($relationAlias, $joinType)
+			->useQuery($relationAlias ? $relationAlias : 'Order', 'OrderQuery');
 	}
 
 	/**

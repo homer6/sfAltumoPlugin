@@ -14,5 +14,17 @@
  * @package    propel.generator.plugins.sfAltumoPlugin.lib.model
  */
 class SessionPeer extends BaseSessionPeer {
-
+    /**
+    * Retrieves a single Session by the provided session key
+    * 
+    * @param string $session_key
+    * @return Session
+    */
+    public static function retrieveBySessionKey( $session_key ){
+        
+        return SessionQuery::create()
+            ->filterBySessionKey( $session_key )
+        ->findOne();
+        
+    }
 } // SessionPeer

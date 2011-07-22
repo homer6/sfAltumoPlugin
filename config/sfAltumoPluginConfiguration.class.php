@@ -88,7 +88,7 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
                     }
                     
                 // Include Altumo core
-                    $javascripts[] = '/altumo/js/src/core/base.js';
+                    $javascripts[] = '/altumo/js/src/core/Altumo.js';
                 
                 
                 // Add javascripts to the response

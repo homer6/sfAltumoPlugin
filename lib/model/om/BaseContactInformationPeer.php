@@ -424,6 +424,9 @@ abstract class BaseContactInformationPeer {
 		// Invalidate objects in ClientPeer instance pool, 
 		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
 		ClientPeer::clearInstancePool();
+		// Invalidate objects in OrderPeer instance pool, 
+		// since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+		OrderPeer::clearInstancePool();
 	}
 
 	/**
@@ -1024,6 +1027,12 @@ abstract class BaseContactInformationPeer {
 			
 			$criteria->add(ClientPeer::DEFAULT_SHIPPING_CONTACT_INFORMATION_ID, $obj->getId());
 			$affectedRows += ClientPeer::doDelete($criteria, $con);
+
+			// delete related Order objects
+			$criteria = new Criteria(OrderPeer::DATABASE_NAME);
+			
+			$criteria->add(OrderPeer::BILLING_CONTACT_INFORMATION_ID, $obj->getId());
+			$affectedRows += OrderPeer::doDelete($criteria, $con);
 		}
 		return $affectedRows;
 	}
