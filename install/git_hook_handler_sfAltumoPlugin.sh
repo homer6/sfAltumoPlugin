@@ -4,14 +4,14 @@
 # use "./symfony altumo:git-hook-handler install" to install all of the hooks
 
 SCRIPT=$(readlink -f $0)
-PROJECT_PATH=`dirname $SCRIPT`/../../htdocs/project
+PROJECT_PATH=`dirname $SCRIPT`/../../../..
 HOOK_NAME=$(basename $SCRIPT)
 
 # unset the $GIT_DIR because git hooks are setting it to ".git"
 # see: http://debuggable.com/posts/git-tip-auto-update-working-tree-via-post-receive-hook:49551efe-6414-4e86-aec6-544f4834cda3
 unset GIT_DIR
-export GIT_ROOT_DIRECTORY=$PROJECT_PATH
-export IMPORT_FROM_SF_ALTUMO=1
+export GIT_ROOT_DIRECTORY=dirname $SCRIPT`/../..
+export IMPORT_FROM_SF_ALTUMO=0
 
 $PROJECT_PATH/symfony altumo:git-hook-handler $HOOK_NAME
 
