@@ -45,7 +45,7 @@ class ContactInformationTableMap extends TableMap {
 		$this->addColumn('PHONE_OTHER_NUMBER', 'PhoneOtherNumber', 'VARCHAR', false, 32, null);
 		$this->addColumn('MAILING_ADDRESS', 'MailingAddress', 'VARCHAR', false, 255, null);
 		$this->addColumn('CITY', 'City', 'VARCHAR', false, 64, null);
-		$this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', true, null, null);
+		$this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', false, null, null);
 		$this->addColumn('ZIP_CODE', 'ZipCode', 'VARCHAR', false, 16, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

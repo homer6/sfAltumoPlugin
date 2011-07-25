@@ -601,7 +601,7 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 *
 	 * @return    ContactInformationQuery The current query, for fluid interface
 	 */
-	public function joinState($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+	public function joinState($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
 	{
 		$tableMap = $this->getTableMap();
 		$relationMap = $tableMap->getRelation('State');
@@ -636,7 +636,7 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 	 *
 	 * @return    StateQuery A secondary query class using the current class as primary query
 	 */
-	public function useStateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+	public function useStateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
 	{
 		return $this
 			->joinState($relationAlias, $joinType)

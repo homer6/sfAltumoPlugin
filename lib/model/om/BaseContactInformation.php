@@ -1612,6 +1612,31 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		return $this->getUsers($query, $con);
 	}
 
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this ContactInformation is new, it will return
+	 * an empty collection; or if this ContactInformation has previously
+	 * been saved, it will retrieve related Users from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in ContactInformation.
+	 *
+	 * @param      Criteria $criteria optional Criteria object to narrow the query
+	 * @param      PropelPDO $con optional connection object
+	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+	 * @return     PropelCollection|array User[] List of User objects
+	 */
+	public function getUsersJoinClient($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$query = UserQuery::create(null, $criteria);
+		$query->joinWith('Client', $join_behavior);
+
+		return $this->getUsers($query, $con);
+	}
+
 	/**
 	 * Clears out the collClientsRelatedByDefaultBillingContactInformationId collection
 	 *
@@ -1727,31 +1752,6 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		}
 	}
 
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this ContactInformation is new, it will return
-	 * an empty collection; or if this ContactInformation has previously
-	 * been saved, it will retrieve related ClientsRelatedByDefaultBillingContactInformationId from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in ContactInformation.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-	 * @return     PropelCollection|array Client[] List of Client objects
-	 */
-	public function getClientsRelatedByDefaultBillingContactInformationIdJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$query = ClientQuery::create(null, $criteria);
-		$query->joinWith('User', $join_behavior);
-
-		return $this->getClientsRelatedByDefaultBillingContactInformationId($query, $con);
-	}
-
 	/**
 	 * Clears out the collClientsRelatedByDefaultShippingContactInformationId collection
 	 *
@@ -1865,31 +1865,6 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 			$this->collClientsRelatedByDefaultShippingContactInformationId[]= $l;
 			$l->setContactInformationRelatedByDefaultShippingContactInformationId($this);
 		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this ContactInformation is new, it will return
-	 * an empty collection; or if this ContactInformation has previously
-	 * been saved, it will retrieve related ClientsRelatedByDefaultShippingContactInformationId from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in ContactInformation.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @param      string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-	 * @return     PropelCollection|array Client[] List of Client objects
-	 */
-	public function getClientsRelatedByDefaultShippingContactInformationIdJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$query = ClientQuery::create(null, $criteria);
-		$query->joinWith('User', $join_behavior);
-
-		return $this->getClientsRelatedByDefaultShippingContactInformationId($query, $con);
 	}
 
 	/**

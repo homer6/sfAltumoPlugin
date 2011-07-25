@@ -91,7 +91,7 @@
         <column name="phone_other_number" type="VARCHAR" size="32"/>
         <column name="mailing_address" type="VARCHAR" size="255"/>
         <column name="city" type="VARCHAR" size="64"/>
-        <column name="state_id" type="INTEGER" required="true" />
+        <column name="state_id" type="INTEGER" required="false" />
         <column name="zip_code" type="VARCHAR" size="16"/>
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
