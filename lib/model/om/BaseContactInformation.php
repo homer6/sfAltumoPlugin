@@ -79,6 +79,12 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	protected $state_id;
 
 	/**
+	 * The value for the cxd field.
+	 * @var        int
+	 */
+	protected $cxd;
+
+	/**
 	 * The value for the zip_code field.
 	 * @var        string
 	 */
@@ -223,6 +229,16 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	public function getStateId()
 	{
 		return $this->state_id;
+	}
+
+	/**
+	 * Get the [cxd] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getCxd()
+	{
+		return $this->cxd;
 	}
 
 	/**
@@ -496,6 +512,26 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 	} // setStateId()
 
 	/**
+	 * Set the value of [cxd] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     ContactInformation The current object (for fluent API support)
+	 */
+	public function setCxd($v)
+	{
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->cxd !== $v) {
+			$this->cxd = $v;
+			$this->modifiedColumns[] = ContactInformationPeer::CXD;
+		}
+
+		return $this;
+	} // setCxd()
+
+	/**
 	 * Set the value of [zip_code] column.
 	 * 
 	 * @param      string $v new value
@@ -600,9 +636,10 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 			$this->mailing_address = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->city = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->state_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->zip_code = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->cxd = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->zip_code = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -611,7 +648,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 12; // 12 = ContactInformationPeer::NUM_HYDRATE_COLUMNS.
+			return $startcol + 13; // 13 = ContactInformationPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ContactInformation object", $e);
@@ -1082,12 +1119,15 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				return $this->getStateId();
 				break;
 			case 9:
-				return $this->getZipCode();
+				return $this->getCxd();
 				break;
 			case 10:
-				return $this->getCreatedAt();
+				return $this->getZipCode();
 				break;
 			case 11:
+				return $this->getCreatedAt();
+				break;
+			case 12:
 				return $this->getUpdatedAt();
 				break;
 			default:
@@ -1128,9 +1168,10 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 			$keys[6] => $this->getMailingAddress(),
 			$keys[7] => $this->getCity(),
 			$keys[8] => $this->getStateId(),
-			$keys[9] => $this->getZipCode(),
-			$keys[10] => $this->getCreatedAt(),
-			$keys[11] => $this->getUpdatedAt(),
+			$keys[9] => $this->getCxd(),
+			$keys[10] => $this->getZipCode(),
+			$keys[11] => $this->getCreatedAt(),
+			$keys[12] => $this->getUpdatedAt(),
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aState) {
@@ -1207,12 +1248,15 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 				$this->setStateId($value);
 				break;
 			case 9:
-				$this->setZipCode($value);
+				$this->setCxd($value);
 				break;
 			case 10:
-				$this->setCreatedAt($value);
+				$this->setZipCode($value);
 				break;
 			case 11:
+				$this->setCreatedAt($value);
+				break;
+			case 12:
 				$this->setUpdatedAt($value);
 				break;
 		} // switch()
@@ -1248,9 +1292,10 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		if (array_key_exists($keys[6], $arr)) $this->setMailingAddress($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setCity($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setStateId($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setZipCode($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCxd($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setZipCode($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
 	}
 
 	/**
@@ -1271,6 +1316,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		if ($this->isColumnModified(ContactInformationPeer::MAILING_ADDRESS)) $criteria->add(ContactInformationPeer::MAILING_ADDRESS, $this->mailing_address);
 		if ($this->isColumnModified(ContactInformationPeer::CITY)) $criteria->add(ContactInformationPeer::CITY, $this->city);
 		if ($this->isColumnModified(ContactInformationPeer::STATE_ID)) $criteria->add(ContactInformationPeer::STATE_ID, $this->state_id);
+		if ($this->isColumnModified(ContactInformationPeer::CXD)) $criteria->add(ContactInformationPeer::CXD, $this->cxd);
 		if ($this->isColumnModified(ContactInformationPeer::ZIP_CODE)) $criteria->add(ContactInformationPeer::ZIP_CODE, $this->zip_code);
 		if ($this->isColumnModified(ContactInformationPeer::CREATED_AT)) $criteria->add(ContactInformationPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(ContactInformationPeer::UPDATED_AT)) $criteria->add(ContactInformationPeer::UPDATED_AT, $this->updated_at);
@@ -1344,6 +1390,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		$copyObj->setMailingAddress($this->getMailingAddress());
 		$copyObj->setCity($this->getCity());
 		$copyObj->setStateId($this->getStateId());
+		$copyObj->setCxd($this->getCxd());
 		$copyObj->setZipCode($this->getZipCode());
 		$copyObj->setCreatedAt($this->getCreatedAt());
 		$copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -2071,6 +2118,7 @@ abstract class BaseContactInformation extends BaseObject  implements Persistent
 		$this->mailing_address = null;
 		$this->city = null;
 		$this->state_id = null;
+		$this->cxd = null;
 		$this->zip_code = null;
 		$this->created_at = null;
 		$this->updated_at = null;

@@ -15,6 +15,7 @@
  * @method     ContactInformationQuery orderByMailingAddress($order = Criteria::ASC) Order by the mailing_address column
  * @method     ContactInformationQuery orderByCity($order = Criteria::ASC) Order by the city column
  * @method     ContactInformationQuery orderByStateId($order = Criteria::ASC) Order by the state_id column
+ * @method     ContactInformationQuery orderByCxd($order = Criteria::ASC) Order by the cxd column
  * @method     ContactInformationQuery orderByZipCode($order = Criteria::ASC) Order by the zip_code column
  * @method     ContactInformationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ContactInformationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -28,6 +29,7 @@
  * @method     ContactInformationQuery groupByMailingAddress() Group by the mailing_address column
  * @method     ContactInformationQuery groupByCity() Group by the city column
  * @method     ContactInformationQuery groupByStateId() Group by the state_id column
+ * @method     ContactInformationQuery groupByCxd() Group by the cxd column
  * @method     ContactInformationQuery groupByZipCode() Group by the zip_code column
  * @method     ContactInformationQuery groupByCreatedAt() Group by the created_at column
  * @method     ContactInformationQuery groupByUpdatedAt() Group by the updated_at column
@@ -68,6 +70,7 @@
  * @method     ContactInformation findOneByMailingAddress(string $mailing_address) Return the first ContactInformation filtered by the mailing_address column
  * @method     ContactInformation findOneByCity(string $city) Return the first ContactInformation filtered by the city column
  * @method     ContactInformation findOneByStateId(int $state_id) Return the first ContactInformation filtered by the state_id column
+ * @method     ContactInformation findOneByCxd(int $cxd) Return the first ContactInformation filtered by the cxd column
  * @method     ContactInformation findOneByZipCode(string $zip_code) Return the first ContactInformation filtered by the zip_code column
  * @method     ContactInformation findOneByCreatedAt(string $created_at) Return the first ContactInformation filtered by the created_at column
  * @method     ContactInformation findOneByUpdatedAt(string $updated_at) Return the first ContactInformation filtered by the updated_at column
@@ -81,6 +84,7 @@
  * @method     array findByMailingAddress(string $mailing_address) Return ContactInformation objects filtered by the mailing_address column
  * @method     array findByCity(string $city) Return ContactInformation objects filtered by the city column
  * @method     array findByStateId(int $state_id) Return ContactInformation objects filtered by the state_id column
+ * @method     array findByCxd(int $cxd) Return ContactInformation objects filtered by the cxd column
  * @method     array findByZipCode(string $zip_code) Return ContactInformation objects filtered by the zip_code column
  * @method     array findByCreatedAt(string $created_at) Return ContactInformation objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ContactInformation objects filtered by the updated_at column
@@ -455,6 +459,46 @@ abstract class BaseContactInformationQuery extends ModelCriteria
 			}
 		}
 		return $this->addUsingAlias(ContactInformationPeer::STATE_ID, $stateId, $comparison);
+	}
+
+	/**
+	 * Filter the query on the cxd column
+	 * 
+	 * Example usage:
+	 * <code>
+	 * $query->filterByCxd(1234); // WHERE cxd = 1234
+	 * $query->filterByCxd(array(12, 34)); // WHERE cxd IN (12, 34)
+	 * $query->filterByCxd(array('min' => 12)); // WHERE cxd > 12
+	 * </code>
+	 *
+	 * @param     mixed $cxd The value to use as filter.
+	 *              Use scalar values for equality.
+	 *              Use array values for in_array() equivalent.
+	 *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+	 * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+	 *
+	 * @return    ContactInformationQuery The current query, for fluid interface
+	 */
+	public function filterByCxd($cxd = null, $comparison = null)
+	{
+		if (is_array($cxd)) {
+			$useMinMax = false;
+			if (isset($cxd['min'])) {
+				$this->addUsingAlias(ContactInformationPeer::CXD, $cxd['min'], Criteria::GREATER_EQUAL);
+				$useMinMax = true;
+			}
+			if (isset($cxd['max'])) {
+				$this->addUsingAlias(ContactInformationPeer::CXD, $cxd['max'], Criteria::LESS_EQUAL);
+				$useMinMax = true;
+			}
+			if ($useMinMax) {
+				return $this;
+			}
+			if (null === $comparison) {
+				$comparison = Criteria::IN;
+			}
+		}
+		return $this->addUsingAlias(ContactInformationPeer::CXD, $cxd, $comparison);
 	}
 
 	/**

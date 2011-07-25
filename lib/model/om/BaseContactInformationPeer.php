@@ -26,13 +26,13 @@ abstract class BaseContactInformationPeer {
 	const TM_CLASS = 'ContactInformationTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 12;
+	const NUM_COLUMNS = 13;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-	const NUM_HYDRATE_COLUMNS = 12;
+	const NUM_HYDRATE_COLUMNS = 13;
 
 	/** the column name for the ID field */
 	const ID = 'contact_information.ID';
@@ -60,6 +60,9 @@ abstract class BaseContactInformationPeer {
 
 	/** the column name for the STATE_ID field */
 	const STATE_ID = 'contact_information.STATE_ID';
+
+	/** the column name for the CXD field */
+	const CXD = 'contact_information.CXD';
 
 	/** the column name for the ZIP_CODE field */
 	const ZIP_CODE = 'contact_information.ZIP_CODE';
@@ -96,12 +99,12 @@ abstract class BaseContactInformationPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	protected static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'FirstName', 'LastName', 'EmailAddress', 'PhoneMainNumber', 'PhoneOtherNumber', 'MailingAddress', 'City', 'StateId', 'ZipCode', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'firstName', 'lastName', 'emailAddress', 'phoneMainNumber', 'phoneOtherNumber', 'mailingAddress', 'city', 'stateId', 'zipCode', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::FIRST_NAME, self::LAST_NAME, self::EMAIL_ADDRESS, self::PHONE_MAIN_NUMBER, self::PHONE_OTHER_NUMBER, self::MAILING_ADDRESS, self::CITY, self::STATE_ID, self::ZIP_CODE, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FIRST_NAME', 'LAST_NAME', 'EMAIL_ADDRESS', 'PHONE_MAIN_NUMBER', 'PHONE_OTHER_NUMBER', 'MAILING_ADDRESS', 'CITY', 'STATE_ID', 'ZIP_CODE', 'CREATED_AT', 'UPDATED_AT', ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'first_name', 'last_name', 'email_address', 'phone_main_number', 'phone_other_number', 'mailing_address', 'city', 'state_id', 'zip_code', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'FirstName', 'LastName', 'EmailAddress', 'PhoneMainNumber', 'PhoneOtherNumber', 'MailingAddress', 'City', 'StateId', 'Cxd', 'ZipCode', 'CreatedAt', 'UpdatedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'firstName', 'lastName', 'emailAddress', 'phoneMainNumber', 'phoneOtherNumber', 'mailingAddress', 'city', 'stateId', 'cxd', 'zipCode', 'createdAt', 'updatedAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::FIRST_NAME, self::LAST_NAME, self::EMAIL_ADDRESS, self::PHONE_MAIN_NUMBER, self::PHONE_OTHER_NUMBER, self::MAILING_ADDRESS, self::CITY, self::STATE_ID, self::CXD, self::ZIP_CODE, self::CREATED_AT, self::UPDATED_AT, ),
+		BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FIRST_NAME', 'LAST_NAME', 'EMAIL_ADDRESS', 'PHONE_MAIN_NUMBER', 'PHONE_OTHER_NUMBER', 'MAILING_ADDRESS', 'CITY', 'STATE_ID', 'CXD', 'ZIP_CODE', 'CREATED_AT', 'UPDATED_AT', ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'first_name', 'last_name', 'email_address', 'phone_main_number', 'phone_other_number', 'mailing_address', 'city', 'state_id', 'cxd', 'zip_code', 'created_at', 'updated_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -111,12 +114,12 @@ abstract class BaseContactInformationPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	protected static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FirstName' => 1, 'LastName' => 2, 'EmailAddress' => 3, 'PhoneMainNumber' => 4, 'PhoneOtherNumber' => 5, 'MailingAddress' => 6, 'City' => 7, 'StateId' => 8, 'ZipCode' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'firstName' => 1, 'lastName' => 2, 'emailAddress' => 3, 'phoneMainNumber' => 4, 'phoneOtherNumber' => 5, 'mailingAddress' => 6, 'city' => 7, 'stateId' => 8, 'zipCode' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FIRST_NAME => 1, self::LAST_NAME => 2, self::EMAIL_ADDRESS => 3, self::PHONE_MAIN_NUMBER => 4, self::PHONE_OTHER_NUMBER => 5, self::MAILING_ADDRESS => 6, self::CITY => 7, self::STATE_ID => 8, self::ZIP_CODE => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, ),
-		BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FIRST_NAME' => 1, 'LAST_NAME' => 2, 'EMAIL_ADDRESS' => 3, 'PHONE_MAIN_NUMBER' => 4, 'PHONE_OTHER_NUMBER' => 5, 'MAILING_ADDRESS' => 6, 'CITY' => 7, 'STATE_ID' => 8, 'ZIP_CODE' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'first_name' => 1, 'last_name' => 2, 'email_address' => 3, 'phone_main_number' => 4, 'phone_other_number' => 5, 'mailing_address' => 6, 'city' => 7, 'state_id' => 8, 'zip_code' => 9, 'created_at' => 10, 'updated_at' => 11, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FirstName' => 1, 'LastName' => 2, 'EmailAddress' => 3, 'PhoneMainNumber' => 4, 'PhoneOtherNumber' => 5, 'MailingAddress' => 6, 'City' => 7, 'StateId' => 8, 'Cxd' => 9, 'ZipCode' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'firstName' => 1, 'lastName' => 2, 'emailAddress' => 3, 'phoneMainNumber' => 4, 'phoneOtherNumber' => 5, 'mailingAddress' => 6, 'city' => 7, 'stateId' => 8, 'cxd' => 9, 'zipCode' => 10, 'createdAt' => 11, 'updatedAt' => 12, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FIRST_NAME => 1, self::LAST_NAME => 2, self::EMAIL_ADDRESS => 3, self::PHONE_MAIN_NUMBER => 4, self::PHONE_OTHER_NUMBER => 5, self::MAILING_ADDRESS => 6, self::CITY => 7, self::STATE_ID => 8, self::CXD => 9, self::ZIP_CODE => 10, self::CREATED_AT => 11, self::UPDATED_AT => 12, ),
+		BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FIRST_NAME' => 1, 'LAST_NAME' => 2, 'EMAIL_ADDRESS' => 3, 'PHONE_MAIN_NUMBER' => 4, 'PHONE_OTHER_NUMBER' => 5, 'MAILING_ADDRESS' => 6, 'CITY' => 7, 'STATE_ID' => 8, 'CXD' => 9, 'ZIP_CODE' => 10, 'CREATED_AT' => 11, 'UPDATED_AT' => 12, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'first_name' => 1, 'last_name' => 2, 'email_address' => 3, 'phone_main_number' => 4, 'phone_other_number' => 5, 'mailing_address' => 6, 'city' => 7, 'state_id' => 8, 'cxd' => 9, 'zip_code' => 10, 'created_at' => 11, 'updated_at' => 12, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -197,6 +200,7 @@ abstract class BaseContactInformationPeer {
 			$criteria->addSelectColumn(ContactInformationPeer::MAILING_ADDRESS);
 			$criteria->addSelectColumn(ContactInformationPeer::CITY);
 			$criteria->addSelectColumn(ContactInformationPeer::STATE_ID);
+			$criteria->addSelectColumn(ContactInformationPeer::CXD);
 			$criteria->addSelectColumn(ContactInformationPeer::ZIP_CODE);
 			$criteria->addSelectColumn(ContactInformationPeer::CREATED_AT);
 			$criteria->addSelectColumn(ContactInformationPeer::UPDATED_AT);
@@ -210,6 +214,7 @@ abstract class BaseContactInformationPeer {
 			$criteria->addSelectColumn($alias . '.MAILING_ADDRESS');
 			$criteria->addSelectColumn($alias . '.CITY');
 			$criteria->addSelectColumn($alias . '.STATE_ID');
+			$criteria->addSelectColumn($alias . '.CXD');
 			$criteria->addSelectColumn($alias . '.ZIP_CODE');
 			$criteria->addSelectColumn($alias . '.CREATED_AT');
 			$criteria->addSelectColumn($alias . '.UPDATED_AT');
