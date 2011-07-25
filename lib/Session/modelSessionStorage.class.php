@@ -20,6 +20,24 @@
 */
 class modelSessionStorage extends sfPDOSessionStorage {
     
+    
+    /**
+    * Override the initializa function to set better session defaults.
+    * 
+    * @param array $options
+    * @return bool
+    */
+    public function initialize( $options = null ) {
+
+        $options = array_merge(array(
+            'session_cookie_lifetime' => 86400, // 1 day
+            'session_cookie_secure'   => true
+        ), $options);
+
+        return parent::initialize( $options );      
+    }
+
+    
     /**
     * Reads a session.
     *
