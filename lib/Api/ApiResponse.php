@@ -18,7 +18,7 @@ namespace sfAltumoPlugin\Api;
 *
 * @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
-class ApiResponse extends sfWebResponse{
+class ApiResponse extends \sfWebResponse{
             
     protected $action = null;
     protected $request = null;

@@ -19,7 +19,7 @@ namespace sfAltumoPlugin\Api;
 *
 * @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
-class ApiRequest extends sfWebRequest{
+class ApiRequest extends \sfWebRequest{
     
     protected $incoming_http_request = null;
     
