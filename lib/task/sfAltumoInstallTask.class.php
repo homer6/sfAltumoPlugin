@@ -193,6 +193,9 @@ $database_script
         ./symfony altumo:test-environment
         ./symfony cc
         ./symfony altumo:update-environment
+        
+        //if this is a dev environment, you may want to set debug to true
+        //in both the api.php and index.php controllers in the web folder
             
 STEPS;
         
