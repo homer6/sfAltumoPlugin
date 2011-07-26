@@ -86,12 +86,16 @@ EOF;
             );
         
 
-        //fixes the file and directory permissions        
-            `./symfony project:permissions`;
-            $this->log( 'Symfony permissions set.' );
+        //fixes the file and directory permissions
+           
+            //set the default symfony permissions with the symfony task
+                `./symfony project:permissions`;
+                $this->log( 'Symfony permissions set.' );
+            
             //make apache logs folder writable
-            chmod( $project_root . '/htdocs/logs', 0777 );
-            $this->log( 'Apache log file permissions set.' );
+                chmod( $project_root . '/htdocs/logs', 0777 );
+                $this->log( 'Apache log file permissions set.' );
+                
             
         //setup the database builder
             `./symfony altumo:update-database init`;
@@ -111,6 +115,10 @@ EOF;
                 array(
                     'source' => $template_path . '/' . 'index.php.tpl',
                     'destination' => sfConfig::get('sf_web_dir') . '/index.php'
+                ),
+                array(
+                    'source' => $template_path . '/' . 'api.php.tpl',
+                    'destination' => sfConfig::get('sf_web_dir') . '/api.php'
                 ),
                 array(
                     'source' => $template_path . '/' . 'vhost.tpl',

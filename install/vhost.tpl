@@ -36,9 +36,12 @@
             # we check if the .html version is here (caching)
             RewriteRule ^$ index.html [QSA]
             RewriteRule ^([^.]+)$ $1.html [QSA]
+            
+            # no, so we redirect to our front web controllers
             RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^(api.*)$ api.php [NC,QSA,L]
 
-            # no, so we redirect to our front web controller
+            RewriteCond %{REQUEST_FILENAME} !-f
             RewriteRule ^(.*)$ index.php [QSA,L]
             
         </IfModule>
