@@ -43,43 +43,58 @@ EOF;
     }
 
     
-   /**
-   * @see sfTask
-   */
+    /**
+    * @see sfTask
+    */
     protected function execute( $arguments = array(), $options = array() ) {
 
         $hook_name = $arguments['hook-name'];
-        $general_hook_template_file = sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/install/git_hook_handler.sh';
         
-        if( $hook_name == 'install' ){
+        if( $hook_name === 'install' ){
             
-            $target_path = realpath( sfConfig::get( 'sf_root_dir' ) . '/../../.git/hooks' ) . '/';
-            
+            //install a general git hook handler for all of the targets (in both
+            //this project and sfAltumoPlugin).
             $targets = array(
                 'post-commit'
             );
             
-            //check that all targets don't exist (just to be safe)
-                foreach( $targets as $target ){
-                    
-                    $target_filename = $target_path . $target;
-                    if( file_exists($target_filename) ){
-                        throw new sfCommandException( sprintf('Hook "%s" is already installed. Please remove it first.', $target_filename) );
-                    }
-                       
-                }
-                if( !is_writable($target_path) ){
-                    throw new sfCommandException( sprintf('"%s" is not writable. Please ensure this user can write to that directory.', $target_path) );
-                }
+            $git_hooks = array(
+                array(
+                    'source' => sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/install/git_hook_handler.sh',
+                    'destination_path' => realpath( sfConfig::get( 'sf_root_dir' ) . '/../../.git/hooks' )
+                ),
+                array(
+                    'source' => sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/install/git_hook_handler_sfAltumoPlugin.sh',
+                    'destination_path' => realpath( sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/.git/hooks' )
+                )
+            );
+            
+            foreach( $git_hooks as $git_hook ){
                 
-            //install the hooks
-                foreach( $targets as $target ){
+                $general_hook_template_file = $git_hook['source'];
+                $target_path = $git_hook['destination_path'];
+
+                //check that all targets don't exist (just to be safe)
+                    foreach( $targets as $target ){
+                        
+                        $target_filename = $target_path . '/' . $target;
+                        if( file_exists($target_filename) ){
+                            throw new sfCommandException( sprintf('Hook "%s" is already installed. Please remove it first.', $target_filename) );
+                        }
+
+                    }
+                    if( !is_writable($target_path) ){
+                        throw new sfCommandException( sprintf('"%s" is not writable. Please ensure this user can write to that directory.', $target_path) );
+                    }
                     
-                    $target_filename = $target_path . $target;
-                    copy( $general_hook_template_file, $target_filename );
-                    chmod( $target_filename, 0755 );
-                                       
-                }
+                //install the hooks
+                    foreach( $targets as $target ){
+                        $target_filename = $target_path . '/' . $target;
+                        copy( $general_hook_template_file, $target_filename );
+                        chmod( $target_filename, 0755 );
+                    }
+                
+            }
             
         }else{
             
