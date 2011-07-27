@@ -87,12 +87,12 @@
         <column name="time" type="integer" required="true" />
         
         <!-- this reference will have to change to whatever user class ends up being Altumo's -->
-        <column name="user_id" required="false" type="INTEGER" />
+<!--        <column name="user_id" required="false" type="INTEGER" />
         
 
         <foreign-key foreignTable="user" onDelete="cascade">
             <reference local="user_id" foreign="id" />
-        </foreign-key>
+        </foreign-key>-->
         
         
         <index>
@@ -174,7 +174,7 @@
     <table name="system_event_subscription">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="system_event_id" type="integer" required="true" />
-        <column name="user_id" type="integer" required="true" />
+        <!--<column name="user_id" type="integer" required="true" />-->
         <column name="remote_url" type="varchar" size="255" />
         <column name="enabled" type="boolean" required="true" default="1" />
         <column name="created_at" type="timestamp" />
@@ -185,10 +185,10 @@
             <reference local="system_event_id" foreign="id" />
         </foreign-key>
         
-        <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
+<!--        <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
             <reference local="user_id" foreign="id" />
         </foreign-key>
-        
+        -->
         
         <index>
             <index-column name="enabled" />
@@ -199,7 +199,7 @@
     <table name="system_event_instance">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="system_event_id" type="integer" required="true" />
-        <column name="user_id" type="integer" />
+        <!--<column name="user_id" type="integer" />-->
         <column name="message" type="longvarchar" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
@@ -209,9 +209,9 @@
             <reference local="system_event_id" foreign="id" />
         </foreign-key>
         
-        <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
+<!--        <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
             <reference local="user_id" foreign="id" />
-        </foreign-key>
+        </foreign-key>-->
     </table>
 
 

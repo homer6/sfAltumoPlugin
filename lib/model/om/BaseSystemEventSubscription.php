@@ -37,12 +37,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	protected $system_event_id;
 
 	/**
-	 * The value for the user_id field.
-	 * @var        int
-	 */
-	protected $user_id;
-
-	/**
 	 * The value for the remote_url field.
 	 * @var        string
 	 */
@@ -71,11 +65,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	 * @var        SystemEvent
 	 */
 	protected $aSystemEvent;
-
-	/**
-	 * @var        User
-	 */
-	protected $aUser;
 
 	/**
 	 * @var        array SystemEventInstanceMessage[] Collection to store aggregation of SystemEventInstanceMessage objects.
@@ -135,16 +124,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	public function getSystemEventId()
 	{
 		return $this->system_event_id;
-	}
-
-	/**
-	 * Get the [user_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getUserId()
-	{
-		return $this->user_id;
 	}
 
 	/**
@@ -288,30 +267,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	} // setSystemEventId()
 
 	/**
-	 * Set the value of [user_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     SystemEventSubscription The current object (for fluent API support)
-	 */
-	public function setUserId($v)
-	{
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->user_id !== $v) {
-			$this->user_id = $v;
-			$this->modifiedColumns[] = SystemEventSubscriptionPeer::USER_ID;
-		}
-
-		if ($this->aUser !== null && $this->aUser->getId() !== $v) {
-			$this->aUser = null;
-		}
-
-		return $this;
-	} // setUserId()
-
-	/**
 	 * Set the value of [remote_url] column.
 	 * 
 	 * @param      string $v new value
@@ -441,11 +396,10 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->system_event_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->user_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->remote_url = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->enabled = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
-			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->remote_url = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->enabled = ($row[$startcol + 3] !== null) ? (boolean) $row[$startcol + 3] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -454,7 +408,7 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 7; // 7 = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS.
+			return $startcol + 6; // 6 = SystemEventSubscriptionPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating SystemEventSubscription object", $e);
@@ -479,9 +433,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 
 		if ($this->aSystemEvent !== null && $this->system_event_id !== $this->aSystemEvent->getId()) {
 			$this->aSystemEvent = null;
-		}
-		if ($this->aUser !== null && $this->user_id !== $this->aUser->getId()) {
-			$this->aUser = null;
 		}
 	} // ensureConsistency
 
@@ -523,7 +474,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aSystemEvent = null;
-			$this->aUser = null;
 			$this->collSystemEventInstanceMessages = null;
 
 		} // if (deep)
@@ -692,13 +642,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 				$this->setSystemEvent($this->aSystemEvent);
 			}
 
-			if ($this->aUser !== null) {
-				if ($this->aUser->isModified() || $this->aUser->isNew()) {
-					$affectedRows += $this->aUser->save($con);
-				}
-				$this->setUser($this->aUser);
-			}
-
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = SystemEventSubscriptionPeer::ID;
 			}
@@ -807,12 +750,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 				}
 			}
 
-			if ($this->aUser !== null) {
-				if (!$this->aUser->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aUser->getValidationFailures());
-				}
-			}
-
 
 			if (($retval = SystemEventSubscriptionPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
@@ -867,18 +804,15 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 				return $this->getSystemEventId();
 				break;
 			case 2:
-				return $this->getUserId();
-				break;
-			case 3:
 				return $this->getRemoteUrl();
 				break;
-			case 4:
+			case 3:
 				return $this->getEnabled();
 				break;
-			case 5:
+			case 4:
 				return $this->getCreatedAt();
 				break;
-			case 6:
+			case 5:
 				return $this->getUpdatedAt();
 				break;
 			default:
@@ -912,18 +846,14 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getSystemEventId(),
-			$keys[2] => $this->getUserId(),
-			$keys[3] => $this->getRemoteUrl(),
-			$keys[4] => $this->getEnabled(),
-			$keys[5] => $this->getCreatedAt(),
-			$keys[6] => $this->getUpdatedAt(),
+			$keys[2] => $this->getRemoteUrl(),
+			$keys[3] => $this->getEnabled(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getUpdatedAt(),
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aSystemEvent) {
 				$result['SystemEvent'] = $this->aSystemEvent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-			}
-			if (null !== $this->aUser) {
-				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
 			}
 			if (null !== $this->collSystemEventInstanceMessages) {
 				$result['SystemEventInstanceMessages'] = $this->collSystemEventInstanceMessages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -966,18 +896,15 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 				$this->setSystemEventId($value);
 				break;
 			case 2:
-				$this->setUserId($value);
-				break;
-			case 3:
 				$this->setRemoteUrl($value);
 				break;
-			case 4:
+			case 3:
 				$this->setEnabled($value);
 				break;
-			case 5:
+			case 4:
 				$this->setCreatedAt($value);
 				break;
-			case 6:
+			case 5:
 				$this->setUpdatedAt($value);
 				break;
 		} // switch()
@@ -1006,11 +933,10 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setSystemEventId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setUserId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setRemoteUrl($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setEnabled($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+		if (array_key_exists($keys[2], $arr)) $this->setRemoteUrl($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setEnabled($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
 	}
 
 	/**
@@ -1024,7 +950,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 
 		if ($this->isColumnModified(SystemEventSubscriptionPeer::ID)) $criteria->add(SystemEventSubscriptionPeer::ID, $this->id);
 		if ($this->isColumnModified(SystemEventSubscriptionPeer::SYSTEM_EVENT_ID)) $criteria->add(SystemEventSubscriptionPeer::SYSTEM_EVENT_ID, $this->system_event_id);
-		if ($this->isColumnModified(SystemEventSubscriptionPeer::USER_ID)) $criteria->add(SystemEventSubscriptionPeer::USER_ID, $this->user_id);
 		if ($this->isColumnModified(SystemEventSubscriptionPeer::REMOTE_URL)) $criteria->add(SystemEventSubscriptionPeer::REMOTE_URL, $this->remote_url);
 		if ($this->isColumnModified(SystemEventSubscriptionPeer::ENABLED)) $criteria->add(SystemEventSubscriptionPeer::ENABLED, $this->enabled);
 		if ($this->isColumnModified(SystemEventSubscriptionPeer::CREATED_AT)) $criteria->add(SystemEventSubscriptionPeer::CREATED_AT, $this->created_at);
@@ -1092,7 +1017,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
 	{
 		$copyObj->setSystemEventId($this->getSystemEventId());
-		$copyObj->setUserId($this->getUserId());
 		$copyObj->setRemoteUrl($this->getRemoteUrl());
 		$copyObj->setEnabled($this->getEnabled());
 		$copyObj->setCreatedAt($this->getCreatedAt());
@@ -1202,55 +1126,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 			 */
 		}
 		return $this->aSystemEvent;
-	}
-
-	/**
-	 * Declares an association between this object and a User object.
-	 *
-	 * @param      User $v
-	 * @return     SystemEventSubscription The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setUser(User $v = null)
-	{
-		if ($v === null) {
-			$this->setUserId(NULL);
-		} else {
-			$this->setUserId($v->getId());
-		}
-
-		$this->aUser = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the User object, it will not be re-added.
-		if ($v !== null) {
-			$v->addSystemEventSubscription($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated User object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     User The associated User object.
-	 * @throws     PropelException
-	 */
-	public function getUser(PropelPDO $con = null)
-	{
-		if ($this->aUser === null && ($this->user_id !== null)) {
-			$this->aUser = UserQuery::create()->findPk($this->user_id, $con);
-			/* The following can be used additionally to
-				guarantee the related object contains a reference
-				to this object.  This level of coupling may, however, be
-				undesirable since it could result in an only partially populated collection
-				in the referenced object.
-				$this->aUser->addSystemEventSubscriptions($this);
-			 */
-		}
-		return $this->aUser;
 	}
 
 	/**
@@ -1400,7 +1275,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 	{
 		$this->id = null;
 		$this->system_event_id = null;
-		$this->user_id = null;
 		$this->remote_url = null;
 		$this->enabled = null;
 		$this->created_at = null;
@@ -1438,7 +1312,6 @@ abstract class BaseSystemEventSubscription extends BaseObject  implements Persis
 		}
 		$this->collSystemEventInstanceMessages = null;
 		$this->aSystemEvent = null;
-		$this->aUser = null;
 	}
 
 	/**

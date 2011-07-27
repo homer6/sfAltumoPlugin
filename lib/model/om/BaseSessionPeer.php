@@ -26,13 +26,13 @@ abstract class BaseSessionPeer {
 	const TM_CLASS = 'SessionTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 7;
+	const NUM_COLUMNS = 6;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-	const NUM_HYDRATE_COLUMNS = 7;
+	const NUM_HYDRATE_COLUMNS = 6;
 
 	/** the column name for the ID field */
 	const ID = 'session.ID';
@@ -51,9 +51,6 @@ abstract class BaseSessionPeer {
 
 	/** the column name for the TIME field */
 	const TIME = 'session.TIME';
-
-	/** the column name for the USER_ID field */
-	const USER_ID = 'session.USER_ID';
 
 	/** The default string format for model objects of the related table **/
 	const DEFAULT_STRING_FORMAT = 'YAML';
@@ -81,12 +78,12 @@ abstract class BaseSessionPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	protected static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'SessionKey', 'Data', 'ClientIpAddress', 'SessionType', 'Time', 'UserId', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'sessionKey', 'data', 'clientIpAddress', 'sessionType', 'time', 'userId', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::SESSION_KEY, self::DATA, self::CLIENT_IP_ADDRESS, self::SESSION_TYPE, self::TIME, self::USER_ID, ),
-		BasePeer::TYPE_RAW_COLNAME => array ('ID', 'SESSION_KEY', 'DATA', 'CLIENT_IP_ADDRESS', 'SESSION_TYPE', 'TIME', 'USER_ID', ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'session_key', 'data', 'client_ip_address', 'session_type', 'time', 'user_id', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'SessionKey', 'Data', 'ClientIpAddress', 'SessionType', 'Time', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'sessionKey', 'data', 'clientIpAddress', 'sessionType', 'time', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::SESSION_KEY, self::DATA, self::CLIENT_IP_ADDRESS, self::SESSION_TYPE, self::TIME, ),
+		BasePeer::TYPE_RAW_COLNAME => array ('ID', 'SESSION_KEY', 'DATA', 'CLIENT_IP_ADDRESS', 'SESSION_TYPE', 'TIME', ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'session_key', 'data', 'client_ip_address', 'session_type', 'time', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
 	/**
@@ -96,12 +93,12 @@ abstract class BaseSessionPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	protected static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'SessionKey' => 1, 'Data' => 2, 'ClientIpAddress' => 3, 'SessionType' => 4, 'Time' => 5, 'UserId' => 6, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'sessionKey' => 1, 'data' => 2, 'clientIpAddress' => 3, 'sessionType' => 4, 'time' => 5, 'userId' => 6, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SESSION_KEY => 1, self::DATA => 2, self::CLIENT_IP_ADDRESS => 3, self::SESSION_TYPE => 4, self::TIME => 5, self::USER_ID => 6, ),
-		BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'SESSION_KEY' => 1, 'DATA' => 2, 'CLIENT_IP_ADDRESS' => 3, 'SESSION_TYPE' => 4, 'TIME' => 5, 'USER_ID' => 6, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'session_key' => 1, 'data' => 2, 'client_ip_address' => 3, 'session_type' => 4, 'time' => 5, 'user_id' => 6, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'SessionKey' => 1, 'Data' => 2, 'ClientIpAddress' => 3, 'SessionType' => 4, 'Time' => 5, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'sessionKey' => 1, 'data' => 2, 'clientIpAddress' => 3, 'sessionType' => 4, 'time' => 5, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SESSION_KEY => 1, self::DATA => 2, self::CLIENT_IP_ADDRESS => 3, self::SESSION_TYPE => 4, self::TIME => 5, ),
+		BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'SESSION_KEY' => 1, 'DATA' => 2, 'CLIENT_IP_ADDRESS' => 3, 'SESSION_TYPE' => 4, 'TIME' => 5, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'session_key' => 1, 'data' => 2, 'client_ip_address' => 3, 'session_type' => 4, 'time' => 5, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
 	/**
@@ -179,7 +176,6 @@ abstract class BaseSessionPeer {
 			$criteria->addSelectColumn(SessionPeer::CLIENT_IP_ADDRESS);
 			$criteria->addSelectColumn(SessionPeer::SESSION_TYPE);
 			$criteria->addSelectColumn(SessionPeer::TIME);
-			$criteria->addSelectColumn(SessionPeer::USER_ID);
 		} else {
 			$criteria->addSelectColumn($alias . '.ID');
 			$criteria->addSelectColumn($alias . '.SESSION_KEY');
@@ -187,7 +183,6 @@ abstract class BaseSessionPeer {
 			$criteria->addSelectColumn($alias . '.CLIENT_IP_ADDRESS');
 			$criteria->addSelectColumn($alias . '.SESSION_TYPE');
 			$criteria->addSelectColumn($alias . '.TIME');
-			$criteria->addSelectColumn($alias . '.USER_ID');
 		}
 	}
 
@@ -487,264 +482,6 @@ abstract class BaseSessionPeer {
 		}
 		return array($obj, $col);
 	}
-
-	/**
-	 * Returns the number of rows matching criteria, joining the related User table
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinUser(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(SessionPeer::TABLE_NAME);
-
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			SessionPeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-
-		if ($con === null) {
-			$con = Propel::getConnection(SessionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		}
-
-		$criteria->addJoin(SessionPeer::USER_ID, UserPeer::ID, $join_behavior);
-
-		// symfony_behaviors behavior
-		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
-		{
-		  call_user_func($sf_hook, 'BaseSessionPeer', $criteria, $con);
-		}
-
-		$stmt = BasePeer::doCount($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
-
-	/**
-	 * Selects a collection of Session objects pre-filled with their User objects.
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of Session objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		SessionPeer::addSelectColumns($criteria);
-		$startcol = SessionPeer::NUM_HYDRATE_COLUMNS;
-		UserPeer::addSelectColumns($criteria);
-
-		$criteria->addJoin(SessionPeer::USER_ID, UserPeer::ID, $join_behavior);
-
-		// symfony_behaviors behavior
-		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
-		{
-		  call_user_func($sf_hook, 'BaseSessionPeer', $criteria, $con);
-		}
-
-		$stmt = BasePeer::doSelect($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = SessionPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = SessionPeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://www.propelorm.org/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-
-				$cls = SessionPeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				SessionPeer::addInstanceToPool($obj1, $key1);
-			} // if $obj1 already loaded
-
-			$key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol);
-			if ($key2 !== null) {
-				$obj2 = UserPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = UserPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol);
-					UserPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 already loaded
-
-				// Add the $obj1 (Session) to $obj2 (User)
-				$obj2->addSession($obj1);
-
-			} // if joined row was not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		return $results;
-	}
-
-
-	/**
-	 * Returns the number of rows matching criteria, joining all related tables
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(SessionPeer::TABLE_NAME);
-
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			SessionPeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-
-		if ($con === null) {
-			$con = Propel::getConnection(SessionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		}
-
-		$criteria->addJoin(SessionPeer::USER_ID, UserPeer::ID, $join_behavior);
-
-		// symfony_behaviors behavior
-		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
-		{
-		  call_user_func($sf_hook, 'BaseSessionPeer', $criteria, $con);
-		}
-
-		$stmt = BasePeer::doCount($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
-	/**
-	 * Selects a collection of Session objects pre-filled with all related objects.
-	 *
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of Session objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		SessionPeer::addSelectColumns($criteria);
-		$startcol2 = SessionPeer::NUM_HYDRATE_COLUMNS;
-
-		UserPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
-
-		$criteria->addJoin(SessionPeer::USER_ID, UserPeer::ID, $join_behavior);
-
-		// symfony_behaviors behavior
-		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
-		{
-		  call_user_func($sf_hook, 'BaseSessionPeer', $criteria, $con);
-		}
-
-		$stmt = BasePeer::doSelect($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = SessionPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = SessionPeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://www.propelorm.org/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-				$cls = SessionPeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				SessionPeer::addInstanceToPool($obj1, $key1);
-			} // if obj1 already loaded
-
-			// Add objects for joined User rows
-
-			$key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-			if ($key2 !== null) {
-				$obj2 = UserPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = UserPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol2);
-					UserPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 loaded
-
-				// Add the $obj1 (Session) to the collection in $obj2 (User)
-				$obj2->addSession($obj1);
-			} // if joined row not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		return $results;
-	}
-
 	/**
 	 * Returns the TableMap related to this peer.
 	 * This method is not needed for general use but a specific application could have a need.

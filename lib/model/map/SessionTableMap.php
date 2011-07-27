@@ -43,7 +43,6 @@ class SessionTableMap extends TableMap {
 		$this->addColumn('CLIENT_IP_ADDRESS', 'ClientIpAddress', 'VARCHAR', false, 39, null);
 		$this->addColumn('SESSION_TYPE', 'SessionType', 'VARCHAR', false, 32, null);
 		$this->addColumn('TIME', 'Time', 'INTEGER', true, null, null);
-		$this->addForeignKey('USER_ID', 'UserId', 'INTEGER', 'user', 'ID', false, null, null);
 		// validators
 	} // initialize()
 
@@ -52,7 +51,6 @@ class SessionTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('User', 'User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), 'CASCADE', null);
     $this->addRelation('SingleSignOnKey', 'SingleSignOnKey', RelationMap::ONE_TO_MANY, array('id' => 'session_id', ), 'CASCADE', null);
 	} // buildRelations()
 

@@ -72,11 +72,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 	protected $aCountry;
 
 	/**
-	 * @var        array ContactInformation[] Collection to store aggregation of ContactInformation objects.
-	 */
-	protected $collContactInformations;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -477,8 +472,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aCountry = null;
-			$this->collContactInformations = null;
-
 		} // if (deep)
 	}
 
@@ -668,14 +661,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
 			}
 
-			if ($this->collContactInformations !== null) {
-				foreach ($this->collContactInformations as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
 			$this->alreadyInSave = false;
 
 		}
@@ -758,14 +743,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
-
-				if ($this->collContactInformations !== null) {
-					foreach ($this->collContactInformations as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
 
 
 			$this->alreadyInValidation = false;
@@ -861,9 +838,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 		if ($includeForeignObjects) {
 			if (null !== $this->aCountry) {
 				$result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-			}
-			if (null !== $this->collContactInformations) {
-				$result['ContactInformations'] = $this->collContactInformations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
 		}
 		return $result;
@@ -1034,20 +1008,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 		$copyObj->setCountryId($this->getCountryId());
 		$copyObj->setCreatedAt($this->getCreatedAt());
 		$copyObj->setUpdatedAt($this->getUpdatedAt());
-
-		if ($deepCopy) {
-			// important: temporarily setNew(false) because this affects the behavior of
-			// the getter/setter methods for fkey referrer objects.
-			$copyObj->setNew(false);
-
-			foreach ($this->getContactInformations() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addContactInformation($relObj->copy($deepCopy));
-				}
-			}
-
-		} // if ($deepCopy)
-
 		if ($makeNew) {
 			$copyObj->setNew(true);
 			$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1142,121 +1102,6 @@ abstract class BaseState extends BaseObject  implements Persistent
 	}
 
 	/**
-	 * Clears out the collContactInformations collection
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addContactInformations()
-	 */
-	public function clearContactInformations()
-	{
-		$this->collContactInformations = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collContactInformations collection.
-	 *
-	 * By default this just sets the collContactInformations collection to an empty array (like clearcollContactInformations());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @param      boolean $overrideExisting If set to true, the method call initializes
-	 *                                        the collection even if it is not empty
-	 *
-	 * @return     void
-	 */
-	public function initContactInformations($overrideExisting = true)
-	{
-		if (null !== $this->collContactInformations && !$overrideExisting) {
-			return;
-		}
-		$this->collContactInformations = new PropelObjectCollection();
-		$this->collContactInformations->setModel('ContactInformation');
-	}
-
-	/**
-	 * Gets an array of ContactInformation objects which contain a foreign key that references this object.
-	 *
-	 * If the $criteria is not null, it is used to always fetch the results from the database.
-	 * Otherwise the results are fetched from the database the first time, then cached.
-	 * Next time the same method is called without $criteria, the cached collection is returned.
-	 * If this State is new, it will return
-	 * an empty collection or the current collection; the criteria is ignored on a new object.
-	 *
-	 * @param      Criteria $criteria optional Criteria object to narrow the query
-	 * @param      PropelPDO $con optional connection object
-	 * @return     PropelCollection|array ContactInformation[] List of ContactInformation objects
-	 * @throws     PropelException
-	 */
-	public function getContactInformations($criteria = null, PropelPDO $con = null)
-	{
-		if(null === $this->collContactInformations || null !== $criteria) {
-			if ($this->isNew() && null === $this->collContactInformations) {
-				// return empty collection
-				$this->initContactInformations();
-			} else {
-				$collContactInformations = ContactInformationQuery::create(null, $criteria)
-					->filterByState($this)
-					->find($con);
-				if (null !== $criteria) {
-					return $collContactInformations;
-				}
-				$this->collContactInformations = $collContactInformations;
-			}
-		}
-		return $this->collContactInformations;
-	}
-
-	/**
-	 * Returns the number of related ContactInformation objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related ContactInformation objects.
-	 * @throws     PropelException
-	 */
-	public function countContactInformations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if(null === $this->collContactInformations || null !== $criteria) {
-			if ($this->isNew() && null === $this->collContactInformations) {
-				return 0;
-			} else {
-				$query = ContactInformationQuery::create(null, $criteria);
-				if($distinct) {
-					$query->distinct();
-				}
-				return $query
-					->filterByState($this)
-					->count($con);
-			}
-		} else {
-			return count($this->collContactInformations);
-		}
-	}
-
-	/**
-	 * Method called to associate a ContactInformation object to this object
-	 * through the ContactInformation foreign key attribute.
-	 *
-	 * @param      ContactInformation $l ContactInformation
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addContactInformation(ContactInformation $l)
-	{
-		if ($this->collContactInformations === null) {
-			$this->initContactInformations();
-		}
-		if (!$this->collContactInformations->contains($l)) { // only add it if the **same** object is not already associated
-			$this->collContactInformations[]= $l;
-			$l->setState($this);
-		}
-	}
-
-	/**
 	 * Clears the current object and sets all attributes to their default values
 	 */
 	public function clear()
@@ -1288,17 +1133,8 @@ abstract class BaseState extends BaseObject  implements Persistent
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->collContactInformations) {
-				foreach ($this->collContactInformations as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 		} // if ($deep)
 
-		if ($this->collContactInformations instanceof PropelCollection) {
-			$this->collContactInformations->clearIterator();
-		}
-		$this->collContactInformations = null;
 		$this->aCountry = null;
 	}
 

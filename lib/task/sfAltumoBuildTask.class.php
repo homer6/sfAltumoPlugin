@@ -62,7 +62,7 @@ EOF;
             './symfony propel:build-forms',
             './symfony propel:build-model',
             './symfony propel:build-filters',
-            './symfony build-javascript-dependencies'        
+            './symfony altumo:build-javascript-dependencies'        
         );
         
         foreach( $commands as $command ){

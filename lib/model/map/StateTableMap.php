@@ -53,7 +53,6 @@ class StateTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('Country', 'Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'CASCADE', null);
-    $this->addRelation('ContactInformation', 'ContactInformation', RelationMap::ONE_TO_MANY, array('id' => 'state_id', ), 'CASCADE', null);
 	} // buildRelations()
 
 	/**

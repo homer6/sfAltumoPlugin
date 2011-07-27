@@ -39,7 +39,6 @@ class SystemEventInstanceTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addForeignKey('SYSTEM_EVENT_ID', 'SystemEventId', 'INTEGER', 'system_event', 'ID', true, null, null);
-		$this->addForeignKey('USER_ID', 'UserId', 'INTEGER', 'user', 'ID', false, null, null);
 		$this->addColumn('MESSAGE', 'Message', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -52,7 +51,6 @@ class SystemEventInstanceTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('SystemEvent', 'SystemEvent', RelationMap::MANY_TO_ONE, array('system_event_id' => 'id', ), 'CASCADE', 'CASCADE');
-    $this->addRelation('User', 'User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), 'CASCADE', 'CASCADE');
     $this->addRelation('SystemEventInstanceMessage', 'SystemEventInstanceMessage', RelationMap::ONE_TO_MANY, array('id' => 'system_event_instance_id', ), 'CASCADE', 'CASCADE');
 	} // buildRelations()
 

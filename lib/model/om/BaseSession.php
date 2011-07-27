@@ -61,17 +61,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	protected $time;
 
 	/**
-	 * The value for the user_id field.
-	 * @var        int
-	 */
-	protected $user_id;
-
-	/**
-	 * @var        User
-	 */
-	protected $aUser;
-
-	/**
 	 * @var        array SingleSignOnKey[] Collection to store aggregation of SingleSignOnKey objects.
 	 */
 	protected $collSingleSignOnKeys;
@@ -148,16 +137,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	public function getTime()
 	{
 		return $this->time;
-	}
-
-	/**
-	 * Get the [user_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getUserId()
-	{
-		return $this->user_id;
 	}
 
 	/**
@@ -284,30 +263,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	} // setTime()
 
 	/**
-	 * Set the value of [user_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     Session The current object (for fluent API support)
-	 */
-	public function setUserId($v)
-	{
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->user_id !== $v) {
-			$this->user_id = $v;
-			$this->modifiedColumns[] = SessionPeer::USER_ID;
-		}
-
-		if ($this->aUser !== null && $this->aUser->getId() !== $v) {
-			$this->aUser = null;
-		}
-
-		return $this;
-	} // setUserId()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -351,7 +306,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			$this->client_ip_address = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->session_type = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->time = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->user_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -360,7 +314,7 @@ abstract class BaseSession extends BaseObject  implements Persistent
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 7; // 7 = SessionPeer::NUM_HYDRATE_COLUMNS.
+			return $startcol + 6; // 6 = SessionPeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Session object", $e);
@@ -383,9 +337,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 	public function ensureConsistency()
 	{
 
-		if ($this->aUser !== null && $this->user_id !== $this->aUser->getId()) {
-			$this->aUser = null;
-		}
 	} // ensureConsistency
 
 	/**
@@ -425,7 +376,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->aUser = null;
 			$this->collSingleSignOnKeys = null;
 
 		} // if (deep)
@@ -570,18 +520,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
 
-			// We call the save method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aUser !== null) {
-				if ($this->aUser->isModified() || $this->aUser->isNew()) {
-					$affectedRows += $this->aUser->save($con);
-				}
-				$this->setUser($this->aUser);
-			}
-
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = SessionPeer::ID;
 			}
@@ -595,11 +533,11 @@ abstract class BaseSession extends BaseObject  implements Persistent
 					}
 
 					$pk = BasePeer::doInsert($criteria, $con);
-					$affectedRows += 1;
+					$affectedRows = 1;
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 					$this->setNew(false);
 				} else {
-					$affectedRows += SessionPeer::doUpdate($this, $con);
+					$affectedRows = SessionPeer::doUpdate($this, $con);
 				}
 
 				// Rewind the data LOB column, since PDO does not rewind after inserting value.
@@ -684,18 +622,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			$failureMap = array();
 
 
-			// We call the validate method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aUser !== null) {
-				if (!$this->aUser->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aUser->getValidationFailures());
-				}
-			}
-
-
 			if (($retval = SessionPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
@@ -760,9 +686,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			case 5:
 				return $this->getTime();
 				break;
-			case 6:
-				return $this->getUserId();
-				break;
 			default:
 				return null;
 				break;
@@ -798,12 +721,8 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			$keys[3] => $this->getClientIpAddress(),
 			$keys[4] => $this->getSessionType(),
 			$keys[5] => $this->getTime(),
-			$keys[6] => $this->getUserId(),
 		);
 		if ($includeForeignObjects) {
-			if (null !== $this->aUser) {
-				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-			}
 			if (null !== $this->collSingleSignOnKeys) {
 				$result['SingleSignOnKeys'] = $this->collSingleSignOnKeys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
 			}
@@ -856,9 +775,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			case 5:
 				$this->setTime($value);
 				break;
-			case 6:
-				$this->setUserId($value);
-				break;
 		} // switch()
 	}
 
@@ -889,7 +805,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		if (array_key_exists($keys[3], $arr)) $this->setClientIpAddress($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setSessionType($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setTime($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setUserId($arr[$keys[6]]);
 	}
 
 	/**
@@ -907,7 +822,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		if ($this->isColumnModified(SessionPeer::CLIENT_IP_ADDRESS)) $criteria->add(SessionPeer::CLIENT_IP_ADDRESS, $this->client_ip_address);
 		if ($this->isColumnModified(SessionPeer::SESSION_TYPE)) $criteria->add(SessionPeer::SESSION_TYPE, $this->session_type);
 		if ($this->isColumnModified(SessionPeer::TIME)) $criteria->add(SessionPeer::TIME, $this->time);
-		if ($this->isColumnModified(SessionPeer::USER_ID)) $criteria->add(SessionPeer::USER_ID, $this->user_id);
 
 		return $criteria;
 	}
@@ -975,7 +889,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		$copyObj->setClientIpAddress($this->getClientIpAddress());
 		$copyObj->setSessionType($this->getSessionType());
 		$copyObj->setTime($this->getTime());
-		$copyObj->setUserId($this->getUserId());
 
 		if ($deepCopy) {
 			// important: temporarily setNew(false) because this affects the behavior of
@@ -1032,55 +945,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			self::$peer = new SessionPeer();
 		}
 		return self::$peer;
-	}
-
-	/**
-	 * Declares an association between this object and a User object.
-	 *
-	 * @param      User $v
-	 * @return     Session The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setUser(User $v = null)
-	{
-		if ($v === null) {
-			$this->setUserId(NULL);
-		} else {
-			$this->setUserId($v->getId());
-		}
-
-		$this->aUser = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the User object, it will not be re-added.
-		if ($v !== null) {
-			$v->addSession($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated User object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     User The associated User object.
-	 * @throws     PropelException
-	 */
-	public function getUser(PropelPDO $con = null)
-	{
-		if ($this->aUser === null && ($this->user_id !== null)) {
-			$this->aUser = UserQuery::create()->findPk($this->user_id, $con);
-			/* The following can be used additionally to
-				guarantee the related object contains a reference
-				to this object.  This level of coupling may, however, be
-				undesirable since it could result in an only partially populated collection
-				in the referenced object.
-				$this->aUser->addSessions($this);
-			 */
-		}
-		return $this->aUser;
 	}
 
 	/**
@@ -1209,7 +1073,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 		$this->client_ip_address = null;
 		$this->session_type = null;
 		$this->time = null;
-		$this->user_id = null;
 		$this->alreadyInSave = false;
 		$this->alreadyInValidation = false;
 		$this->clearAllReferences();
@@ -1241,7 +1104,6 @@ abstract class BaseSession extends BaseObject  implements Persistent
 			$this->collSingleSignOnKeys->clearIterator();
 		}
 		$this->collSingleSignOnKeys = null;
-		$this->aUser = null;
 	}
 
 	/**

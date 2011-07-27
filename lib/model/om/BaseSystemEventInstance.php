@@ -37,12 +37,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 	protected $system_event_id;
 
 	/**
-	 * The value for the user_id field.
-	 * @var        int
-	 */
-	protected $user_id;
-
-	/**
 	 * The value for the message field.
 	 * @var        string
 	 */
@@ -64,11 +58,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 	 * @var        SystemEvent
 	 */
 	protected $aSystemEvent;
-
-	/**
-	 * @var        User
-	 */
-	protected $aUser;
 
 	/**
 	 * @var        array SystemEventInstanceMessage[] Collection to store aggregation of SystemEventInstanceMessage objects.
@@ -107,16 +96,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 	public function getSystemEventId()
 	{
 		return $this->system_event_id;
-	}
-
-	/**
-	 * Get the [user_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getUserId()
-	{
-		return $this->user_id;
 	}
 
 	/**
@@ -250,30 +229,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 	} // setSystemEventId()
 
 	/**
-	 * Set the value of [user_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     SystemEventInstance The current object (for fluent API support)
-	 */
-	public function setUserId($v)
-	{
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->user_id !== $v) {
-			$this->user_id = $v;
-			$this->modifiedColumns[] = SystemEventInstancePeer::USER_ID;
-		}
-
-		if ($this->aUser !== null && $this->aUser->getId() !== $v) {
-			$this->aUser = null;
-		}
-
-		return $this;
-	} // setUserId()
-
-	/**
 	 * Set the value of [message] column.
 	 * 
 	 * @param      string $v new value
@@ -371,10 +326,9 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->system_event_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->user_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->message = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->message = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -383,7 +337,7 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 				$this->ensureConsistency();
 			}
 
-			return $startcol + 6; // 6 = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS.
+			return $startcol + 5; // 5 = SystemEventInstancePeer::NUM_HYDRATE_COLUMNS.
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating SystemEventInstance object", $e);
@@ -408,9 +362,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 
 		if ($this->aSystemEvent !== null && $this->system_event_id !== $this->aSystemEvent->getId()) {
 			$this->aSystemEvent = null;
-		}
-		if ($this->aUser !== null && $this->user_id !== $this->aUser->getId()) {
-			$this->aUser = null;
 		}
 	} // ensureConsistency
 
@@ -452,7 +403,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aSystemEvent = null;
-			$this->aUser = null;
 			$this->collSystemEventInstanceMessages = null;
 
 		} // if (deep)
@@ -621,13 +571,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 				$this->setSystemEvent($this->aSystemEvent);
 			}
 
-			if ($this->aUser !== null) {
-				if ($this->aUser->isModified() || $this->aUser->isNew()) {
-					$affectedRows += $this->aUser->save($con);
-				}
-				$this->setUser($this->aUser);
-			}
-
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = SystemEventInstancePeer::ID;
 			}
@@ -736,12 +679,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 				}
 			}
 
-			if ($this->aUser !== null) {
-				if (!$this->aUser->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aUser->getValidationFailures());
-				}
-			}
-
 
 			if (($retval = SystemEventInstancePeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
@@ -796,15 +733,12 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 				return $this->getSystemEventId();
 				break;
 			case 2:
-				return $this->getUserId();
-				break;
-			case 3:
 				return $this->getMessage();
 				break;
-			case 4:
+			case 3:
 				return $this->getCreatedAt();
 				break;
-			case 5:
+			case 4:
 				return $this->getUpdatedAt();
 				break;
 			default:
@@ -838,17 +772,13 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getSystemEventId(),
-			$keys[2] => $this->getUserId(),
-			$keys[3] => $this->getMessage(),
-			$keys[4] => $this->getCreatedAt(),
-			$keys[5] => $this->getUpdatedAt(),
+			$keys[2] => $this->getMessage(),
+			$keys[3] => $this->getCreatedAt(),
+			$keys[4] => $this->getUpdatedAt(),
 		);
 		if ($includeForeignObjects) {
 			if (null !== $this->aSystemEvent) {
 				$result['SystemEvent'] = $this->aSystemEvent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-			}
-			if (null !== $this->aUser) {
-				$result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
 			}
 			if (null !== $this->collSystemEventInstanceMessages) {
 				$result['SystemEventInstanceMessages'] = $this->collSystemEventInstanceMessages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -891,15 +821,12 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 				$this->setSystemEventId($value);
 				break;
 			case 2:
-				$this->setUserId($value);
-				break;
-			case 3:
 				$this->setMessage($value);
 				break;
-			case 4:
+			case 3:
 				$this->setCreatedAt($value);
 				break;
-			case 5:
+			case 4:
 				$this->setUpdatedAt($value);
 				break;
 		} // switch()
@@ -928,10 +855,9 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setSystemEventId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setUserId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setMessage($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[2], $arr)) $this->setMessage($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
 	}
 
 	/**
@@ -945,7 +871,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 
 		if ($this->isColumnModified(SystemEventInstancePeer::ID)) $criteria->add(SystemEventInstancePeer::ID, $this->id);
 		if ($this->isColumnModified(SystemEventInstancePeer::SYSTEM_EVENT_ID)) $criteria->add(SystemEventInstancePeer::SYSTEM_EVENT_ID, $this->system_event_id);
-		if ($this->isColumnModified(SystemEventInstancePeer::USER_ID)) $criteria->add(SystemEventInstancePeer::USER_ID, $this->user_id);
 		if ($this->isColumnModified(SystemEventInstancePeer::MESSAGE)) $criteria->add(SystemEventInstancePeer::MESSAGE, $this->message);
 		if ($this->isColumnModified(SystemEventInstancePeer::CREATED_AT)) $criteria->add(SystemEventInstancePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(SystemEventInstancePeer::UPDATED_AT)) $criteria->add(SystemEventInstancePeer::UPDATED_AT, $this->updated_at);
@@ -1012,7 +937,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 	public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
 	{
 		$copyObj->setSystemEventId($this->getSystemEventId());
-		$copyObj->setUserId($this->getUserId());
 		$copyObj->setMessage($this->getMessage());
 		$copyObj->setCreatedAt($this->getCreatedAt());
 		$copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1121,55 +1045,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 			 */
 		}
 		return $this->aSystemEvent;
-	}
-
-	/**
-	 * Declares an association between this object and a User object.
-	 *
-	 * @param      User $v
-	 * @return     SystemEventInstance The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setUser(User $v = null)
-	{
-		if ($v === null) {
-			$this->setUserId(NULL);
-		} else {
-			$this->setUserId($v->getId());
-		}
-
-		$this->aUser = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the User object, it will not be re-added.
-		if ($v !== null) {
-			$v->addSystemEventInstance($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated User object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     User The associated User object.
-	 * @throws     PropelException
-	 */
-	public function getUser(PropelPDO $con = null)
-	{
-		if ($this->aUser === null && ($this->user_id !== null)) {
-			$this->aUser = UserQuery::create()->findPk($this->user_id, $con);
-			/* The following can be used additionally to
-				guarantee the related object contains a reference
-				to this object.  This level of coupling may, however, be
-				undesirable since it could result in an only partially populated collection
-				in the referenced object.
-				$this->aUser->addSystemEventInstances($this);
-			 */
-		}
-		return $this->aUser;
 	}
 
 	/**
@@ -1319,7 +1194,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 	{
 		$this->id = null;
 		$this->system_event_id = null;
-		$this->user_id = null;
 		$this->message = null;
 		$this->created_at = null;
 		$this->updated_at = null;
@@ -1355,7 +1229,6 @@ abstract class BaseSystemEventInstance extends BaseObject  implements Persistent
 		}
 		$this->collSystemEventInstanceMessages = null;
 		$this->aSystemEvent = null;
-		$this->aUser = null;
 	}
 
 	/**

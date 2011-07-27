@@ -39,7 +39,6 @@ class SystemEventSubscriptionTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addForeignKey('SYSTEM_EVENT_ID', 'SystemEventId', 'INTEGER', 'system_event', 'ID', true, null, null);
-		$this->addForeignKey('USER_ID', 'UserId', 'INTEGER', 'user', 'ID', true, null, null);
 		$this->addColumn('REMOTE_URL', 'RemoteUrl', 'VARCHAR', false, 255, null);
 		$this->addColumn('ENABLED', 'Enabled', 'BOOLEAN', true, null, true);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
@@ -53,7 +52,6 @@ class SystemEventSubscriptionTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('SystemEvent', 'SystemEvent', RelationMap::MANY_TO_ONE, array('system_event_id' => 'id', ), 'CASCADE', 'CASCADE');
-    $this->addRelation('User', 'User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), 'CASCADE', 'CASCADE');
     $this->addRelation('SystemEventInstanceMessage', 'SystemEventInstanceMessage', RelationMap::ONE_TO_MANY, array('id' => 'system_event_subscription_id', ), 'CASCADE', 'CASCADE');
 	} // buildRelations()
 
