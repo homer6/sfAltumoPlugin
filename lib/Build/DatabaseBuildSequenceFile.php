@@ -57,9 +57,9 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * @param boolean $upgrade
     * @param boolean $drop
     * @param boolean $snapshot
-    * 
+    * @param boolean $altumo
     */    
-    public function addChange( $hash, $upgrade = null, $drop = null, $snapshot = null ){
+    public function addChange( $hash, $upgrade = null, $drop = null, $snapshot = null, $altumo = null ){
         
         $this->assertFileOpen();
         $this->assertFileWritable();
@@ -92,7 +92,27 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
                         $change->addAttribute( 'snapshot', 'false' );
                     }
                 }
+            
+                if( !is_null($altumo) ){
+                    if( $altumo ){
+                        $change->addAttribute( 'altumo', 'true' );
+                    }else{
+                        $change->addAttribute( 'altumo', 'false' );
+                    }
+                }        
         
+    }
+    
+    
+    /**
+    * Gets the hash of the latest delta
+    * 
+    * @return string
+    */
+    public function getLastestHash(){
+        
+        $this->assertFileOpen();
+        return $this->getXmlRoot()->xpath( 'Change[last()]/attribute::hash', false );
         
     }
     
@@ -111,11 +131,26 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
+    * Gets an array of commit hashes (that was an altumo plugin delta) 
+    * since (but not including) the supplied commit hash.
+    * 
+    * @param string $since_hash             //if empty, will return all altumo
+    *                                         hashes         
+    * @return array
+    */
+    public function getAltumoHashesSince( $since_hash = '' ){
+        
+        return $this->getHashesSince( $since_hash, 'altumo' );
+        
+    }
+    
+    
+    /**
     * Gets an array of commit hashes (that an upgrade 
     * script was present in) since (but not including)
     * the supplied commit hash.
     * 
-    * @param $since_hash
+    * @param string $since_hash
     * @return array
     */
     public function getUpgradeHashesSince( $since_hash ){
@@ -130,7 +165,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * script was present in) since (but not including)
     * the supplied commit hash.
     * 
-    * @param $since_hash
+    * @param string $since_hash
     * @return array
     */
     public function getSnapshotHashesSince( $since_hash ){
@@ -145,7 +180,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * script was present in) since (but not including)
     * the supplied commit hash.
     * 
-    * @param $since_hash
+    * @param string $since_hash
     * @return array
     */
     public function getDropHashesSince( $since_hash ){
@@ -160,7 +195,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * script was present in) before (AND including the current hash)
     * the supplied commit hash.
     * 
-    * @param $before_hash
+    * @param string $before_hash
     * @return array
     */
     public function getUpgradeHashesBefore( $before_hash ){
@@ -175,7 +210,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * script was present in) before (AND including the current hash)
     * the supplied commit hash.
     * 
-    * @param $before_hash
+    * @param string $before_hash
     * @return array
     */
     public function getSnapshotHashesBefore( $before_hash ){
@@ -190,7 +225,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * script was present in) before (AND including the current hash)
     * the supplied commit hash.
     * 
-    * @param $before_hash
+    * @param string $before_hash
     * @return array
     */
     public function getDropHashesBefore( $before_hash ){

@@ -84,7 +84,6 @@ EOF;
                 'DATABASE' => $arguments['database'],
                 'ENVIRONMENT' => $arguments['environment']
             );
-        
 
         //fixes the file and directory permissions
            
@@ -97,7 +96,7 @@ EOF;
                 $this->log( 'Apache log file permissions set.' );
                 
             
-        //setup the database builder
+        //setup the database builders
             `./symfony altumo:update-database init`;
             $this->log( 'Database updater initialized.' );
 

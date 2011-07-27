@@ -39,6 +39,7 @@ class DatabaseUpdater{
     * @param \sfAltumoPlugin\Deployment\DatabaseUpdaterConfigurationFile $database_builder_configuration_file
     * @param \sfAltumoPlugin\Build\DatabaseBuildSequenceFile $database_build_sequence_file
     * @param \sfAltumoPlugin\Deployment\DatabaseUpdateLogFile $database_build_log_file
+    * 
     * @return \sfAltumoPlugin\Deployment\DatabaseUpdater
     */
     public function __construct( 
@@ -50,7 +51,6 @@ class DatabaseUpdater{
         $this->setDatabaseUpdaterConfigurationFile( $database_updater_configuration_file );
         $this->setDatabaseBuildSequenceFile( $database_build_sequence_file );
         $this->setDatabaseUpdateLogFile( $database_update_log_file );
-                
         $this->initialize();
                 
     }
@@ -147,7 +147,7 @@ class DatabaseUpdater{
         return $this->database_update_log_file;
         
     }
-        
+    
     
     /**
     * Drops all of the tables in this database.
@@ -196,11 +196,11 @@ class DatabaseUpdater{
     * @param array $parameters //CLI Parameters
     * @return integer //number of scripts that were applied
     */
-    public function build( $parameters ){
+    public function update( $parameters ){
         
         $script_count = 0;
         
-        //get the latest applied hash
+        //get the latest applied hash in the application update log
             $last_applied_script = $this->getDatabaseUpdateLogFile()->getLastLogEntry();
             if( is_null($last_applied_script) ){
                 $last_applied_type = null;
@@ -243,12 +243,16 @@ class DatabaseUpdater{
     /**
     * Applies a drop, snapshot or upgrade script to the current database.
     * 
-    * @param string $hash
-    * @param string $delta_type
+    * @param string $hash                   //the commit hash of the delta
+    * @param string $delta_type             //the type of delta (snapshot, 
+    *                                         upgrade, drop)
+    * @param boolean $altumo_delta          //whether this delta comes from the
+    *                                         sfAltumoPlugin build sequence
+    * 
     * @throws \Exception if build_type is unknown
     * @throws \Exception if script file does not exist
     */    
-    protected function applyScript( $hash, $delta_type = self::DELTA_TYPE_UPGRADE_SCRIPT ){
+    protected function applyScript( $hash, $delta_type = self::DELTA_TYPE_UPGRADE_SCRIPT, $altumo_delta = false ){
         
         //validate delta type
             if( !in_array($delta_type, array( self::DELTA_TYPE_UPGRADE_SCRIPT, self::DELTA_TYPE_DROP, self::DELTA_TYPE_SNAPSHOT ) ) ){
@@ -257,8 +261,16 @@ class DatabaseUpdater{
         
         //determine the sql script filename and ensure the file exists
             $database_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/' . $delta_type . 's/' . $delta_type . '_' . $hash . '.sql';
+            $sf_altumo_delta = false;
             if( !file_exists($database_filename) ){
-                throw new \Exception('Script File ' . $database_filename . ' does not exist.');
+                //try to find it in the sfAltumoPlugin folder too
+                $sf_altumo_database_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/../plugins/sfAltumoPlugin/data/' . $delta_type . 's/' . $delta_type . '_' . $hash . '.sql';
+                if( !file_exists($sf_altumo_database_filename) ){
+                    throw new \Exception('Script File ' . $database_filename . ' does not exist.');
+                }else{
+                    $database_filename = $sf_altumo_database_filename;
+                    $sf_altumo_delta = true;
+                }
             }
         
         //build and run the shell command (using the mysql client)
@@ -272,15 +284,15 @@ class DatabaseUpdater{
         //log the action
             switch( $delta_type ){
                 case self::DELTA_TYPE_UPGRADE_SCRIPT:
-                    $this->getDatabaseUpdateLogFile()->addUpgrade( $hash );
+                    $this->getDatabaseUpdateLogFile()->addUpgrade( $hash, $sf_altumo_delta );
                     break;
                     
                 case self::DELTA_TYPE_DROP:
-                    $this->getDatabaseUpdateLogFile()->addDrop( $hash );
+                    $this->getDatabaseUpdateLogFile()->addDrop( $hash, $sf_altumo_delta );
                     break;
                     
                 case self::DELTA_TYPE_SNAPSHOT:
-                    $this->getDatabaseUpdateLogFile()->addSnapshot( $hash );
+                    $this->getDatabaseUpdateLogFile()->addSnapshot( $hash, $sf_altumo_delta );
                     break;
                     
                 default:

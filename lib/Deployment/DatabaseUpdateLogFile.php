@@ -57,65 +57,79 @@ class DatabaseUpdateLogFile extends \Altumo\Xml\XmlFile{
     * 
     * 
     * @param string $hash
-    * 
+    * @param boolean $altumo_hash           //whether this is an sfAltumoPlugin
+    *                                         delta
+    * @throws \Exception                    //if this log file isn't open
     */    
-    public function addUpgrade( $hash ){
+    public function addUpgrade( $hash, $altumo_hash = null ){
         
-        $this->assertFileOpen();
-        $this->assertFileWritable();
-        
-        $xml_root = $this->getXmlRoot();
-            $change = $xml_root->addChild('Upgrade');
-            
-                $change->addAttribute( 'hash', $hash );
-                $change->addAttribute( 'datetime', date('c') );
-        
+        $this->addLogEntryByType( $hash, 'Upgrade', $altumo_hash );
         
     }    
     
     
     /**
-    * Adds a record of a drop.  This happens when a drop gets applied to a database.
-    * 
-    * 
+    * Adds a record of a drop.  This happens when a drop gets applied to a 
+    * database.
+    *
     * @param string $hash
-    * 
+    * @param boolean $altumo_hash           //whether this is an sfAltumoPlugin
+    *                                         delta
+    * @throws \Exception                    //if this log file isn't open
     */    
-    public function addDrop( $hash ){
+    public function addDrop( $hash, $altumo_hash = null ){
         
-        $this->assertFileOpen();
-        $this->assertFileWritable();
-        
-        $xml_root = $this->getXmlRoot();
-            $change = $xml_root->addChild('Drop');
-            
-                $change->addAttribute( 'hash', $hash );
-                $change->addAttribute( 'datetime', date('c') );
+        $this->addLogEntryByType( $hash, 'Drop', $altumo_hash );
                 
     }
     
     
     /**
-    * Adds a record of a snapshot.  This happens when a snapshot gets applied to a database.
+    * Adds a record of a snapshot.  This happens when a snapshot gets applied 
+    * to a database.
     * 
     * 
     * @param string $hash
-    * 
+    * @param boolean $altumo_hash           //whether this is an sfAltumoPlugin
+    *                                         delta
+    * @throws \Exception                    //if this log file isn't open
     */    
-    public function addSnapshot( $hash ){
+    public function addSnapshot( $hash, $altumo_hash = null ){
+        
+        $this->addLogEntryByType( $hash, 'Snapshot', $altumo_hash );        
+        
+    }
+    
+    
+    /**
+    * Adds a log type to this Update Log.
+    * 
+    * @param string $hash
+    * @param string $log_type
+    * @param boolean $altumo_hash           //whether this is an sfAltumoPlugin
+    *                                         delta
+    * @throws \Exception                    //if this log file isn't open
+    */
+    protected function addLogEntryByType( $hash, $log_type, $altumo_hash = null ){
         
         $this->assertFileOpen();
         $this->assertFileWritable();
         
         $xml_root = $this->getXmlRoot();
-            $change = $xml_root->addChild('Snapshot');
+            $change = $xml_root->addChild( $log_type );
             
                 $change->addAttribute( 'hash', $hash );
                 $change->addAttribute( 'datetime', date('c') );
-        
+                if( !is_null($altumo_hash) ){
+                    if( $altumo_hash ){
+                        $change->addAttribute( 'altumo', 'true' );
+                    }else{
+                        $change->addAttribute( 'altumo', 'false' );
+                    }
+                }
         
     }
-    
+        
     
     /**
     * Gets the last log entry
