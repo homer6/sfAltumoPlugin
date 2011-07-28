@@ -275,7 +275,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     */
     protected function getValidAttributes(){
         
-        return array( 'upgrade', 'drop', 'snapshot' );
+        return array( 'upgrade', 'drop', 'snapshot', 'altumo' );
         
     }
     
@@ -294,7 +294,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
         $this->assertFileOpen();
         
         if( !in_array($attribute, $this->getValidAttributes()) ){
-            throw new \Exception('Invalid attribute.');
+            throw new \Exception( 'Invalid build sequence attribute.' );
         }
         
         //if the "since" hash was not found, set the hash position to so that it will match all entries
