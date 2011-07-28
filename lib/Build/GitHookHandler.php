@@ -158,7 +158,6 @@ class GitHookHandler{
                 
             //check to see if there are any new scripts in the "new" folder  
                 $sql_files = self::getFilesToMove( $last_commit_hash, $database_dir );
-                //\Altumo\Utils\Debug::dump( $last_commit_hash, $sql_files );
                 if( empty($sql_files) ){
                     //no sql files to move
                     return;
