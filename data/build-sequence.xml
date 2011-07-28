@@ -1,2 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<BuildSequence/>
+<BuildSequence>
+    <Change hash="d812da5af0d0bb0cd81fe499fa0cd3b630d2cafb" upgrade="true" drop="false" snapshot="false"/>
+</BuildSequence>
