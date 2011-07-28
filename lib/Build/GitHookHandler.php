@@ -26,6 +26,7 @@ class GitHookHandler{
         
     protected $git_root_directory = null;
     protected $import_from_sf_altumo = null;
+    protected $database_directory = null;
 
     
     /**
@@ -41,6 +42,7 @@ class GitHookHandler{
         
         $old_pwd = getcwd();
         $this->setGitRootDirectory( getenv( 'GIT_ROOT_DIRECTORY' ) );
+        $this->setDatabaseDirectory( $this->getGitRootDirectory() . '/data' );
         $this->setImportFromSfAltumo( getenv( 'IMPORT_FROM_SF_ALTUMO' ) );
         chdir( $this->getGitRootDirectory() );
         $this->handle( $hook_name );
@@ -107,12 +109,8 @@ class GitHookHandler{
        
         //get the environment parameters 
             $git_root_directory = $this->getGitRootDirectory();
-            $import_from_sf_altumo = $this->getImportFromSfAltumo();
-            
-            $database_dir = realpath( $git_root_directory ) . '/data';
-            if( !file_exists($database_dir) ){
-                throw new \sfCommandException( sprintf('Database directory does not exist: "%s".', $database_dir) );
-            }
+            $import_from_sf_altumo = $this->getImportFromSfAltumo();            
+            $database_dir = $this->getDatabaseDirectory();
             
         //open the application build sequence for writing
             $database_file = $database_dir . '/build-sequence.xml';
@@ -157,7 +155,7 @@ class GitHookHandler{
                 $last_commit_hash = \Altumo\Git\History::getLastCommitHash();
                 
             //check to see if there are any new scripts in the "new" folder  
-                $sql_files = self::getFilesToMove( $last_commit_hash, $database_dir );
+                $sql_files = $this->getFilesToMove( $last_commit_hash );
                 if( empty($sql_files) ){
                     //no sql files to move
                     return;
@@ -238,6 +236,7 @@ class GitHookHandler{
         if( !file_exists($git_root_directory) ){
             throw new \sfCommandException( sprintf('Directory does not exist: "%s".', $git_root_directory) );
         }
+        $git_root_directory = realpath( $git_root_directory );
         
         $this->git_root_directory = $git_root_directory;
         
@@ -285,20 +284,48 @@ class GitHookHandler{
         
     }
     
+    
+    /**
+    * Setter for the database_directory field on this GitHookHandler.
+    * 
+    * @param string $database_directory
+    */
+    public function setDatabaseDirectory( $database_directory ){
+
+        if( !file_exists($database_directory) ){
+            throw new \sfCommandException( sprintf('Database directory does not exist: "%s".', $database_directory) );
+        }
+        
+        $this->database_directory = realpath($database_directory);
+        
+    }
+    
+    
+    /**
+    * Getter for the database_directory field on this GitHookHandler.
+    * 
+    * @return string
+    */
+    public function getDatabaseDirectory(){
+    
+        return $this->database_directory;
+        
+    }
+    
         
     /**
     * Gets an array of sql files to move to the appropriate directories.
     * Files must be in the data/new folder AND be in the current commit to qualify for being moved.
     * 
     * @param string $commit_hash
-    * @param string $database_dir  //full pathname of the database directory (without the trailing slash)
     * @return array
     */
-    protected function getFilesToMove( $commit_hash, $database_dir ){
+    protected function getFilesToMove( $commit_hash ){
           
+        $database_dir = $this->getDatabaseDirectory();
         $sql_files_in_filesystem = \Altumo\Utils\Finder::type('file')->name('*.sql')->in( $database_dir . '/new' );
         
-        $sql_files_in_commit = self::getNewDatabaseFilesByCommit( $commit_hash, $database_dir );
+        $sql_files_in_commit = $this->getNewDatabaseFilesByCommit( $commit_hash );
         
         $move_sql_files = array();
         foreach( $sql_files_in_filesystem as $sql_file_in_filesystem ){
@@ -316,20 +343,20 @@ class GitHookHandler{
     * Gets an array of files that were in the supplied commit
     * 
     * @param string $commit_hash
-    * @param string $database_dir  //full pathname of the database directory (without the trailing slash)
     * 
     * @return array
     */
-    protected function getNewDatabaseFilesByCommit( $commit_hash, $database_dir ){
+    protected function getNewDatabaseFilesByCommit( $commit_hash ){
         
+        $git_root_directory = $this->getGitRootDirectory();
         $git_command = 'git show --name-status ' . $commit_hash;
         $git_output = `$git_command`;
            
         $files = array();
-        preg_match_all( '%^(([DMA])\\s+(/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
+        preg_match_all( '%^(([MA])\\s+(data/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
         foreach( $results as $result ){
             if( array_key_exists(3,$result) ){
-                $files[] = $database_dir . $result[3];
+                $files[] = $git_root_directory . '/' . $result[3];
             }
         }
         
