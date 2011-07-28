@@ -39,12 +39,12 @@ class GitHookHandler{
     */
     public function __construct( $hook_name ){    
         
-        $old_pwd = `pwd`;
+        $old_pwd = getcwd();
         $this->setGitRootDirectory( getenv( 'GIT_ROOT_DIRECTORY' ) );
         $this->setImportFromSfAltumo( getenv( 'IMPORT_FROM_SF_ALTUMO' ) );
-        putenv("PWD=". $this->getGitRootDirectory() );
+        chdir( $this->getGitRootDirectory() );
         $this->handle( $hook_name );
-        putenv("PWD=". $old_pwd );
+        chdir( $old_pwd );
      
     }        
     
