@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+ 
 /**
  * Handles all installed Git hooks by passing the call onto 
  * \sfAltumoPlugin\Build\GitHookHandler::handle()
@@ -52,20 +53,21 @@ EOF;
         
         if( $hook_name === 'install' ){
             
-            //install a general git hook handler for all of the targets (in both
-            //this project and sfAltumoPlugin).
-            $targets = array(
-                'post-commit'
-            );
-            
             $git_hooks = array(
                 array(
                     'source' => sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/install/git_hook_handler.sh',
-                    'destination_path' => realpath( sfConfig::get( 'sf_root_dir' ) . '/../../.git/hooks' )
+                    'destination_path' => realpath( sfConfig::get( 'sf_root_dir' ) . '/../../.git/hooks' ),
+                    'targets' => array(
+                        'post-commit'
+                    )
                 ),
                 array(
                     'source' => sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/install/git_hook_handler_sfAltumoPlugin.sh',
-                    'destination_path' => realpath( sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/.git/hooks' )
+                    'destination_path' => realpath( sfConfig::get( 'sf_root_dir' ) . '/plugins/sfAltumoPlugin/.git/hooks' ),
+                    'targets' => array(
+                        'post-commit', 
+                        'post-merge' //git pull
+                    )
                 )
             );
             
@@ -75,7 +77,7 @@ EOF;
                 $target_path = $git_hook['destination_path'];
 
                 //check that all targets don't exist (just to be safe)
-                    foreach( $targets as $target ){
+                    foreach( $git_hook['targets'] as $target ){
                         
                         $target_filename = $target_path . '/' . $target;
                         if( file_exists($target_filename) ){
@@ -88,7 +90,7 @@ EOF;
                     }
                     
                 //install the hooks
-                    foreach( $targets as $target ){
+                    foreach( $git_hook['targets'] as $target ){
                         $target_filename = $target_path . '/' . $target;
                         copy( $general_hook_template_file, $target_filename );
                         chmod( $target_filename, 0755 );

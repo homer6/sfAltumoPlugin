@@ -58,6 +58,9 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * @param boolean $drop
     * @param boolean $snapshot
     * @param boolean $altumo
+    * 
+    * @throws \Exception if file is not open
+    * @throws \Exception if file is not writable
     */    
     public function addChange( $hash, $upgrade = null, $drop = null, $snapshot = null, $altumo = null ){
         
@@ -242,6 +245,9 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * 
     * @param string $since_hash
     * @param string $attribute
+    * 
+    * @throws \Exception //if build sequence attribute isn't recognized
+    * @throws \Exception //if file is not open
     * @return array
     */
     protected function getHashesSince( $since_hash, $attribute ){
@@ -249,7 +255,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
         $this->assertFileOpen();
         
         if( !in_array($attribute, $this->getValidAttributes()) ){
-            throw new \Exception('Invalid attribute.');
+            throw new \Exception( 'Invalid build sequence attribute.' );
         }
         
         //if the "since" hash was not found, set the hash position to so that it will match all entries
@@ -287,6 +293,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * 
     * @param string $before_hash
     * @param string $attribute
+    * 
+    * @throws \Exception //if build sequence attribute isn't recognized
     * @return array
     */
     protected function getHashesBefore( $before_hash, $attribute ){

@@ -22,12 +22,13 @@ namespace sfAltumoPlugin\Build;
 * @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
 class GitHookHandler{
-    
-        
+            
     protected $git_root_directory = null;
     protected $import_from_sf_altumo = null;
     protected $database_directory = null;
-
+    protected $application_build_sequence = null;
+    protected $altumo_build_sequence = null;
+    
     
     /**
     * Constructor for this GitHookHandler.
@@ -76,6 +77,10 @@ class GitHookHandler{
                 $this->onPostCommit();
                 break;
             
+            case 'post-merge':  //git pull
+                $this->onPostMerge();
+                break;
+            
             default:
                 throw new \sfCommandException( sprintf('Hook "%s" does not have a handler.', $hook_name) );
             
@@ -113,40 +118,11 @@ class GitHookHandler{
             $database_dir = $this->getDatabaseDirectory();
             
         //open the application build sequence for writing
-            $database_file = $database_dir . '/build-sequence.xml';
-            $xml_application_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $database_file, false );                        
+            $xml_application_build_sequence = $this->getApplicationBuildSequence();                  
             
         //import new database deltas from the sfAltumoPlugin build sequence            
-            if( $import_from_sf_altumo ){
-                
-                $xml_sf_altumo_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $database_dir . '/../plugins/sfAltumoPlugin/data/build-sequence.xml' );
-                                
-                //get all of the altumo hashes from the application build sequence
-                    $all_altumo_deltas = $xml_application_build_sequence->getAltumoHashesSince();
-                                
-                //if the latest delta IS in the application build sequence, nothing to import
-                    $latest_sf_altumo_hash = $xml_sf_altumo_build_sequence->getLastestHash();
-                    if( empty($all_altumo_deltas) ){
-                        $latest_sf_altumo_hash_in_application = '';
-                    }else{
-                        $latest_sf_altumo_hash_in_application = end($all_altumo_deltas);
-                    }                    
-                    
-                    if( $latest_sf_altumo_hash === $latest_sf_altumo_hash_in_application ){
-                        //nothing to import, up to date    
-                    }else{
-                        
-                        //if there are missing sfAltumoPlugin deltas to add to this application build sequence
-                            //get all of the deltas in the sfAltumoPlugin build sequence since the lastest one in the application build sequence
-                                $pending_deltas = $xml_sf_altumo_build_sequence->getUpgradeHashesSince( $latest_sf_altumo_hash_in_application );
-                            
-                            //add all of them, in order
-                                foreach( $pending_deltas as $delta ){
-                                    $xml_application_build_sequence->addChange( $delta, true, null, null, true );
-                                }
-                                
-                    }
-                    
+            if( $import_from_sf_altumo ){                
+                $this->importAltumoDeltasIntoApplicationBuildSequence();                    
             }
         
         //creates a new application "database build" if there is a delta
@@ -225,11 +201,125 @@ class GitHookHandler{
         
     }
         
+        
+    /**
+    * Handler that is invoked by the "post-merge" git hook. This is invoked when
+    * running a "git pull" command.
+    * 
+    * @throws \sfCommandException           //on error
+    */
+    public function onPostMerge(){
+               
+        //import new deltas from the sfAltumoPlugin build sequence
+            $this->importAltumoDeltasIntoApplicationBuildSequence();
+            
+    }
+    
+    
+    /**
+    * Adds the new deltas from the sfAltumoPlugin build sequence to the 
+    * application build sequence.
+    * 
+    * The application build sequence must be open for writing.
+    * 
+    * @throws \Exception if $xml_application_build_sequence is not open
+    * @throws \Exception if $xml_application_build_sequence is not writable
+    */
+    protected function importAltumoDeltasIntoApplicationBuildSequence(){
+                
+        $xml_application_build_sequence = $this->getApplicationBuildSequence();
+        $xml_sf_altumo_build_sequence = $this->getAltumoBuildSequence();
+                
+        //get all of the altumo hashes from the application build sequence
+            $all_altumo_deltas = $xml_application_build_sequence->getAltumoHashesSince();
+                        
+        //if the latest delta IS in the application build sequence, nothing to import
+            $latest_sf_altumo_hash = $xml_sf_altumo_build_sequence->getLastestHash();
+            if( empty($all_altumo_deltas) ){
+                $latest_sf_altumo_hash_in_application = '';
+            }else{
+                $latest_sf_altumo_hash_in_application = end($all_altumo_deltas);
+            }                    
+            
+            if( $latest_sf_altumo_hash === $latest_sf_altumo_hash_in_application ){
+                //nothing to import, up to date    
+            }else{
+                
+                //if there are missing sfAltumoPlugin deltas to add to this application build sequence
+                    //get all of the deltas in the sfAltumoPlugin build sequence since the lastest one in the application build sequence
+                        $pending_deltas = $xml_sf_altumo_build_sequence->getUpgradeHashesSince( $latest_sf_altumo_hash_in_application );
+                    
+                    //add all of them, in order
+                        foreach( $pending_deltas as $delta ){
+                            $xml_application_build_sequence->addChange( $delta, true, null, null, true );
+                        }
+                        
+            }
+        
+    }
+    
+    
+    /**
+    * Returns the Application Build Sequence file, open for writing.
+    * 
+    * @return \sfAltumoPlugin\Build\DatabaseBuildSequenceFile
+    */
+    protected function getApplicationBuildSequence(){
+        
+        if( is_null($this->application_build_sequence) ){
+            
+            //get the environment parameters 
+                $git_root_directory = $this->getGitRootDirectory();
+                $database_dir = $this->getDatabaseDirectory();
+                
+            //open the build sequence files
+                if( $this->calledFromPlugin() ){
+                    $application_filename = $git_root_directory . '/../../data/build-sequence.xml';                
+                }else{
+                    $application_filename = $database_dir . '/build-sequence.xml';
+                }
+                $this->application_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $application_filename, false );
+                
+        }
+        
+        return $this->application_build_sequence;
+        
+    }
+    
+    
+    /**
+    * Returns the sfAltumoPlugin Build Sequence file, open for reading.
+    * 
+    * @return \sfAltumoPlugin\Build\DatabaseBuildSequenceFile
+    */
+    protected function getAltumoBuildSequence(){
+        
+        if( is_null($this->altumo_build_sequence) ){
+        
+        //get the environment parameters 
+            $database_dir = $this->getDatabaseDirectory();
+            
+        //open the build sequence files
+            if( $this->calledFromPlugin() ){
+                $sf_altumo_filename = $database_dir . '/build-sequence.xml';
+            }else{
+                $sf_altumo_filename = $database_dir . '/../plugins/sfAltumoPlugin/data/build-sequence.xml';           
+            }
+
+            $this->altumo_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $sf_altumo_filename );
+            
+        }
+        
+        return $this->altumo_build_sequence;
+        
+    }
+    
     
     /**
     * Setter for the git_root_directory field on this GitHookHandler.
     * 
     * @param string $git_root_directory
+    * @throws \sfCommandException           //if directory does not exist
     */
     public function setGitRootDirectory( $git_root_directory ){
         
@@ -289,6 +379,7 @@ class GitHookHandler{
     * Setter for the database_directory field on this GitHookHandler.
     * 
     * @param string $database_directory
+    * @throws \sfCommandException           //if directory does not exist
     */
     public function setDatabaseDirectory( $database_directory ){
 
@@ -362,6 +453,19 @@ class GitHookHandler{
         
         return $files;
 
+    }
+    
+    
+    /**
+    * Determines if this hook handler was called from within a plugin (eg. 
+    * sfAltumoPlugin).
+    * 
+    * @return boolean
+    */
+    protected function calledFromPlugin(){
+
+        return !file_exists( $this->getGitRootDirectory() . '/htdocs' );
+        
     }
    
 
