@@ -42,7 +42,11 @@ class GitHookHandler{
         
         $old_pwd = getcwd();
         $this->setGitRootDirectory( getenv( 'GIT_ROOT_DIRECTORY' ) );
-        $this->setDatabaseDirectory( $this->getGitRootDirectory() . '/data' );
+        if( $this->calledFromPlugin() ){
+            $this->setDatabaseDirectory( $this->getGitRootDirectory() . '/data' );
+        }else{
+            $this->setDatabaseDirectory( $this->getGitRootDirectory() . '/htdocs/project/data' );
+        }
         chdir( $this->getGitRootDirectory() );
         $this->handle( $hook_name );
         chdir( $old_pwd );
