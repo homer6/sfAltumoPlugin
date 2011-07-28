@@ -24,7 +24,6 @@ namespace sfAltumoPlugin\Build;
 class GitHookHandler{
             
     protected $git_root_directory = null;
-    protected $import_from_sf_altumo = null;
     protected $database_directory = null;
     protected $application_build_sequence = null;
     protected $altumo_build_sequence = null;
@@ -111,19 +110,41 @@ class GitHookHandler{
     */
     public function onPostCommit(){
         
-       
-        //get the environment parameters 
-            $git_root_directory = $this->getGitRootDirectory();
-            $import_from_sf_altumo = $this->getImportFromSfAltumo();            
-            $database_dir = $this->getDatabaseDirectory();
-            
-        //open the application build sequence for writing
-            $xml_application_build_sequence = $this->getApplicationBuildSequence();                  
-            
+        $this->createDatabaseDelta();
+        
         //import new database deltas from the sfAltumoPlugin build sequence            
-            if( $import_from_sf_altumo ){                
+            if( $this->calledFromPlugin() ){
                 $this->importAltumoDeltasIntoApplicationBuildSequence();                    
             }
+
+    }
+        
+        
+    /**
+    * Handler that is invoked by the "post-merge" git hook. This is invoked when
+    * running a "git pull" command.
+    * 
+    * @throws \sfCommandException           //on error
+    */
+    public function onPostMerge(){
+               
+        //import new deltas from the sfAltumoPlugin build sequence
+            $this->importAltumoDeltasIntoApplicationBuildSequence();
+            
+    }
+    
+    
+    /**
+    * Checks the "data/new" folder for new SQL files. If it finds some (and 
+    * they're being committed), it moves them to the appropriate folder and 
+    * makes a git commit automatically.
+    * 
+    */
+    protected function createDatabaseDelta(){
+        
+        $database_dir = $this->getDatabaseDirectory();
+        //open the application build sequence for writing
+            $xml_application_build_sequence = $this->getApplicationBuildSequence();      
         
         //creates a new application "database build" if there is a delta
         
@@ -198,23 +219,9 @@ class GitHookHandler{
             //commit the files
                 $shell_command = 'git commit -m "Autocommit: moving sql files to appropriate locations for commit ' . $last_commit_hash . '"';
                 `$shell_command`;
-        
+                
     }
         
-        
-    /**
-    * Handler that is invoked by the "post-merge" git hook. This is invoked when
-    * running a "git pull" command.
-    * 
-    * @throws \sfCommandException           //on error
-    */
-    public function onPostMerge(){
-               
-        //import new deltas from the sfAltumoPlugin build sequence
-            $this->importAltumoDeltasIntoApplicationBuildSequence();
-            
-    }
-    
     
     /**
     * Adds the new deltas from the sfAltumoPlugin build sequence to the 
@@ -343,37 +350,7 @@ class GitHookHandler{
         return $this->git_root_directory;
         
     }
-        
-    
-    /**
-    * Setter for the import_from_sf_altumo field on this GitHookHandler.
-    * 
-    * @param boolean $import_from_sf_altumo
-    */
-    public function setImportFromSfAltumo( $import_from_sf_altumo ){
-    
-        try{
-            $import_from_sf_altumo = \Altumo\Validation\Booleans::assertLooseBoolean( $import_from_sf_altumo );
-        }catch( \Exception $e ){
-            $import_from_sf_altumo = false;
-        }
-        
-        $this->import_from_sf_altumo = $import_from_sf_altumo;
-        
-    }
-    
-    
-    /**
-    * Getter for the import_from_sf_altumo field on this GitHookHandler.
-    * 
-    * @return boolean
-    */
-    public function getImportFromSfAltumo(){
-    
-        return $this->import_from_sf_altumo;
-        
-    }
-    
+   
     
     /**
     * Setter for the database_directory field on this GitHookHandler.

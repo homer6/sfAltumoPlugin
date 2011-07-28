@@ -76,15 +76,8 @@ EOF;
                 $general_hook_template_file = $git_hook['source'];
                 $target_path = $git_hook['destination_path'];
 
-                //check that all targets don't exist (just to be safe)
-                    foreach( $git_hook['targets'] as $target ){
-                        
-                        $target_filename = $target_path . '/' . $target;
-                        if( file_exists($target_filename) ){
-                            throw new sfCommandException( sprintf('Hook "%s" is already installed. Please remove it first.', $target_filename) );
-                        }
-
-                    }
+                //check to make sure the folder is writable
+                //we want the hooks to be overwritten, so we're not going to check for that here
                     if( !is_writable($target_path) ){
                         throw new sfCommandException( sprintf('"%s" is not writable. Please ensure this user can write to that directory.', $target_path) );
                     }

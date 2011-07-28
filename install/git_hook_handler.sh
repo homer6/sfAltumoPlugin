@@ -11,7 +11,6 @@ HOOK_NAME=$(basename $SCRIPT)
 # see: http://debuggable.com/posts/git-tip-auto-update-working-tree-via-post-receive-hook:49551efe-6414-4e86-aec6-544f4834cda3
 unset GIT_DIR
 export GIT_ROOT_DIRECTORY=$PROJECT_PATH
-export IMPORT_FROM_SF_ALTUMO=1
 
 $PROJECT_PATH/symfony altumo:git-hook-handler $HOOK_NAME
 
