@@ -78,20 +78,22 @@ class ApplicationUpdater{
     */
     public function update(){
         
-        throw new \Exception( 'Build database task not implemented.' );
-        
+        $old_pwd = getcwd();
+        chdir( $this->getProjectRoot() );
         $commands = array(
             'git pull',
             'git submodule sync',
             'git submodule update --init --recursive',
             $this->getProjectRoot() . '/htdocs/project/symfony cc',
-            $this->getProjectRoot() . '/htdocs/project/cli/build-database.php build'
+            $this->getProjectRoot() . '/htdocs/project/symfony altumo:update-database update'
         );
         
         foreach( $commands as $command ){
             echo $command . "\n";
-            `$command`;
+            \Altumo\Utils\Shell::runWithPipedOutput( $command );
+            //`$command`;
         }
+        chdir( $old_pwd );
         
     }
 

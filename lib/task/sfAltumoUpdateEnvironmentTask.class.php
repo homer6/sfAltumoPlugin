@@ -56,7 +56,7 @@ EOF;
 
         try{
             
-            $project_root = sfConfig::get( 'sf_root_dir' );
+            $project_root = realpath( sfConfig::get( 'sf_root_dir' ) . '/../..' );
             $application_builder = new \sfAltumoPlugin\Deployment\ApplicationUpdater( $project_root );                    
             $application_builder->update();
 

@@ -64,17 +64,8 @@ EOF;
                         " -p" . $xml_updater_configuration->getDatabasePassword() .
                         " -h" . $xml_updater_configuration->getDatabaseHostname() .
                         " " . $xml_updater_configuration->getDatabaseName() . "\n";
-            
-            
-        //Thanks to Wrikken
-        //See: http://stackoverflow.com/questions/6769313/how-can-i-invoke-the-mysql-interactive-client-from-php
-            $descriptorspec = array(
-               0 => STDIN,
-               1 => STDOUT,
-               2 => STDERR
-            );            
-            $cwd = '/tmp';            
-            $process = proc_open( $command, $descriptorspec, $pipes, $cwd );
+                        
+            \Altumo\Utils\Shell::runWithPipedOutput( $command );
 
     }
     

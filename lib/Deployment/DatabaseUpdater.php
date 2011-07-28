@@ -65,11 +65,11 @@ class DatabaseUpdater{
     protected function initialize(){
         
         //this is used to check if the database connection credentials are correct
-        $pdo = new PDO(
+        $pdo = new \PDO(
             'mysql:host=' . $this->getDatabaseUpdaterConfigurationFile()->getDatabaseHostname() . ';dbname=' . $this->getDatabaseUpdaterConfigurationFile()->getDatabaseName(),
             $this->getDatabaseUpdaterConfigurationFile()->getDatabaseUsername(),
             $this->getDatabaseUpdaterConfigurationFile()->getDatabasePassword(),
-            array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
+            array( \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8" )
         );
         
     }
@@ -216,12 +216,19 @@ class DatabaseUpdater{
                 
                 $snapshot_hash = $this->getDatabaseBuildSequenceFile()->getLastestSnapshotHash();
                 if( !$snapshot_hash ){
-                    throw new \Exception('There are no snapshots to run.  At least one is required on a new database.');
+                    try{
+                        $first_upgrade_hash = $this->getDatabaseBuildSequenceFile()->getFirstUpgrade();
+                        $this->applyScript( $first_upgrade_hash, self::DELTA_TYPE_UPGRADE_SCRIPT ); 
+                        ++$script_count;
+                        $hash = $first_upgrade_hash;
+                    }catch( \Exception $e ){
+                        throw new \Exception('Your build sequence is empty. No work to be done.');
+                    }
+                }else{
+                    $this->applyScript( $snapshot_hash, self::DELTA_TYPE_SNAPSHOT ); 
+                    ++$script_count;
+                    $hash = $snapshot_hash;
                 }
-                $this->applyScript( $snapshot_hash, self::DELTA_TYPE_SNAPSHOT ); 
-                ++$script_count;
-                                
-                $hash = $snapshot_hash;
                 
             }else{
                 

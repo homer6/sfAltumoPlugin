@@ -148,10 +148,26 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     }
     
     
+    
     /**
-    * Gets an array of commit hashes (that an upgrade 
-    * script was present in) since (but not including)
-    * the supplied commit hash.
+    * Gets a single upgrade hash string.
+    * 
+    * @return string
+    */
+    public function getFirstUpgrade(){
+        
+        $result = $this->getXmlRoot()->xpath( 'Change[@upgrade="true"][1]/attribute::hash', false );
+        if( is_null($result) ){
+            throw new \Exception( 'This build sequence does not contain an upgrade script.' );
+        }
+        return $result;
+        
+    }
+    
+    
+    /**
+    * Gets an array of commit hashes (that an upgrade script was present in) 
+    * since (but not including) the supplied commit hash.
     * 
     * @param string $since_hash
     * @return array
@@ -164,9 +180,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that an snapshot 
-    * script was present in) since (but not including)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that an snapshot script was present in) 
+    * since (but not including) the supplied commit hash.
     * 
     * @param string $since_hash
     * @return array
@@ -179,9 +194,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that a drop 
-    * script was present in) since (but not including)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that a drop script was present in) since
+    * (but not including) the supplied commit hash.
     * 
     * @param string $since_hash
     * @return array
@@ -194,9 +208,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that an upgrade 
-    * script was present in) before (AND including the current hash)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that an upgrade script was present in) 
+    * before (AND including the current hash) the supplied commit hash.
     * 
     * @param string $before_hash
     * @return array
@@ -209,9 +222,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that a snapshot 
-    * script was present in) before (AND including the current hash)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that a snapshot script was present in) 
+    * before (AND including the current hash) the supplied commit hash.
     * 
     * @param string $before_hash
     * @return array
@@ -224,9 +236,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that a drop 
-    * script was present in) before (AND including the current hash)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that a drop script was present in) before
+    * (AND including the current hash) the supplied commit hash.
     * 
     * @param string $before_hash
     * @return array
@@ -239,9 +250,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that an $attribute 
-    * script was present in) since (but not including)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that an $attribute script was present in) 
+    * since (but not including) the supplied commit hash.
     * 
     * @param string $since_hash
     * @param string $attribute
@@ -275,7 +285,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of the valid attibutes a Change element may have
+    * Gets an array of the valid XML attributes a "Change" element may have.
     * 
     * @return array
     */
@@ -287,9 +297,8 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     
     
     /**
-    * Gets an array of commit hashes (that an $attribute 
-    * script was present in) before (AND including)
-    * the supplied commit hash.
+    * Gets an array of commit hashes (that an $attribute script was present in) 
+    * before (AND including) the supplied commit hash.
     * 
     * @param string $before_hash
     * @param string $attribute
