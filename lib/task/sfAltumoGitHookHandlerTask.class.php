@@ -98,7 +98,7 @@ EOF;
             
         }else{
             
-            \sfAltumoPlugin\Build\GitHookHandler::handle( $hook_name );
+            $handler = new \sfAltumoPlugin\Build\GitHookHandler( $hook_name );
             
         }     
         

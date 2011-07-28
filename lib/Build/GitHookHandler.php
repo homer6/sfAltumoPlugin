@@ -23,6 +23,33 @@ namespace sfAltumoPlugin\Build;
 */
 class GitHookHandler{
     
+        
+    protected $git_root_directory = null;
+    protected $import_from_sf_altumo = null;
+
+    
+    /**
+    * Constructor for this GitHookHandler.
+    * This invokes the handler for the given hook name.
+    * 
+    * @param string $hook_name
+    * 
+    * @throws \sfCommandException           //on error
+    * @return GitHookHandler
+    */
+    public function __construct( $hook_name ){    
+        
+        $old_pwd = `pwd`;
+        $this->setGitRootDirectory( getenv( 'GIT_ROOT_DIRECTORY' ) );
+        $this->setImportFromSfAltumo( getenv( 'IMPORT_FROM_SF_ALTUMO' ) );
+        $command = "cd " . $this->getGitRootDirectory();
+        `$command`;
+        $this->handle( $hook_name );
+        $command = "cd " . $old_pwd;
+        `$command`;
+     
+    }        
+    
     
     /**
     * Main controller for all git hooks. Invokes the proper handler based 
@@ -35,7 +62,7 @@ class GitHookHandler{
     * 
     * @throws \sfCommandException           //if hook wasn't a non-empty string
     */
-    static public function handle( $hook_name ){
+    public function handle( $hook_name ){
         
         try{
             \Altumo\Validation\Strings::assertNonEmptyString($hook_name);    
@@ -46,7 +73,7 @@ class GitHookHandler{
         switch( $hook_name ){
             
             case 'post-commit':
-                self::onPostCommit();
+                $this->onPostCommit();
                 break;
             
             default:
@@ -77,22 +104,16 @@ class GitHookHandler{
     * 
     * @throws \sfCommandException           //on error
     */
-    static public function onPostCommit(){
+    public function onPostCommit(){
         
        
-        //validate and santitize the environment parameters 
-            $git_root_directory = getenv( 'GIT_ROOT_DIRECTORY' );
-            $import_from_sf_altumo = getenv( 'IMPORT_FROM_SF_ALTUMO' );
+        //get the environment parameters 
+            $git_root_directory = $this->getGitRootDirectory();
+            $import_from_sf_altumo = $this->getImportFromSfAltumo();
             
-            if( !file_exists($git_root_directory) ){
-                throw new \sfCommandException( sprintf('Directory does not exist: "%s".', $git_root_directory) );
-            }
             $database_dir = realpath( $git_root_directory ) . '/data';
-            
-            try{
-                $import_from_sf_altumo = \Altumo\Validation\Booleans::assertLooseBoolean( $import_from_sf_altumo );
-            }catch( \Exception $e ){
-                $import_from_sf_altumo = false;
+            if( !file_exists($database_dir) ){
+                throw new \sfCommandException( sprintf('Database directory does not exist: "%s".', $database_dir) );
             }
             
         //open the application build sequence for writing
@@ -139,6 +160,7 @@ class GitHookHandler{
                 
             //check to see if there are any new scripts in the "new" folder  
                 $sql_files = self::getFilesToMove( $last_commit_hash, $database_dir );
+                //\Altumo\Utils\Debug::dump( $last_commit_hash, $sql_files );
                 if( empty($sql_files) ){
                     //no sql files to move
                     return;
@@ -207,6 +229,64 @@ class GitHookHandler{
                 `$shell_command`;
         
     }
+        
+    
+    /**
+    * Setter for the git_root_directory field on this GitHookHandler.
+    * 
+    * @param string $git_root_directory
+    */
+    public function setGitRootDirectory( $git_root_directory ){
+        
+        if( !file_exists($git_root_directory) ){
+            throw new \sfCommandException( sprintf('Directory does not exist: "%s".', $git_root_directory) );
+        }
+        
+        $this->git_root_directory = $git_root_directory;
+        
+    }
+    
+    
+    /**
+    * Getter for the git_root_directory field on this GitHookHandler.
+    * 
+    * @return string
+    */
+    public function getGitRootDirectory(){
+    
+        return $this->git_root_directory;
+        
+    }
+        
+    
+    /**
+    * Setter for the import_from_sf_altumo field on this GitHookHandler.
+    * 
+    * @param boolean $import_from_sf_altumo
+    */
+    public function setImportFromSfAltumo( $import_from_sf_altumo ){
+    
+        try{
+            $import_from_sf_altumo = \Altumo\Validation\Booleans::assertLooseBoolean( $import_from_sf_altumo );
+        }catch( \Exception $e ){
+            $import_from_sf_altumo = false;
+        }
+        
+        $this->import_from_sf_altumo = $import_from_sf_altumo;
+        
+    }
+    
+    
+    /**
+    * Getter for the import_from_sf_altumo field on this GitHookHandler.
+    * 
+    * @return boolean
+    */
+    public function getImportFromSfAltumo(){
+    
+        return $this->import_from_sf_altumo;
+        
+    }
     
         
     /**
@@ -217,7 +297,7 @@ class GitHookHandler{
     * @param string $database_dir  //full pathname of the database directory (without the trailing slash)
     * @return array
     */
-    static protected function getFilesToMove( $commit_hash, $database_dir ){
+    protected function getFilesToMove( $commit_hash, $database_dir ){
           
         $sql_files_in_filesystem = \Altumo\Utils\Finder::type('file')->name('*.sql')->in( $database_dir . '/new' );
         
@@ -243,7 +323,7 @@ class GitHookHandler{
     * 
     * @return array
     */
-    static protected function getNewDatabaseFilesByCommit( $commit_hash, $database_dir ){
+    protected function getNewDatabaseFilesByCommit( $commit_hash, $database_dir ){
         
         $git_command = 'git show --name-status ' . $commit_hash;
         $git_output = `$git_command`;
