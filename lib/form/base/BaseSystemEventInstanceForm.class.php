@@ -16,7 +16,6 @@ abstract class BaseSystemEventInstanceForm extends BaseFormPropel
     $this->setWidgets(array(
       'id'              => new sfWidgetFormInputHidden(),
       'system_event_id' => new sfWidgetFormPropelChoice(array('model' => 'SystemEvent', 'add_empty' => false)),
-      'user_id'         => new sfWidgetFormPropelChoice(array('model' => 'User', 'add_empty' => true)),
       'message'         => new sfWidgetFormTextarea(),
       'created_at'      => new sfWidgetFormDateTime(),
       'updated_at'      => new sfWidgetFormDateTime(),
@@ -25,7 +24,6 @@ abstract class BaseSystemEventInstanceForm extends BaseFormPropel
     $this->setValidators(array(
       'id'              => new sfValidatorPropelChoice(array('model' => 'SystemEventInstance', 'column' => 'id', 'required' => false)),
       'system_event_id' => new sfValidatorPropelChoice(array('model' => 'SystemEvent', 'column' => 'id')),
-      'user_id'         => new sfValidatorPropelChoice(array('model' => 'User', 'column' => 'id', 'required' => false)),
       'message'         => new sfValidatorString(array('required' => false)),
       'created_at'      => new sfValidatorDateTime(array('required' => false)),
       'updated_at'      => new sfValidatorDateTime(array('required' => false)),

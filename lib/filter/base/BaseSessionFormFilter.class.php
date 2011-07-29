@@ -17,7 +17,6 @@ abstract class BaseSessionFormFilter extends BaseFormFilterPropel
       'client_ip_address' => new sfWidgetFormFilterInput(),
       'session_type'      => new sfWidgetFormFilterInput(),
       'time'              => new sfWidgetFormFilterInput(array('with_empty' => false)),
-      'user_id'           => new sfWidgetFormPropelChoice(array('model' => 'User', 'add_empty' => true)),
     ));
 
     $this->setValidators(array(
@@ -26,7 +25,6 @@ abstract class BaseSessionFormFilter extends BaseFormFilterPropel
       'client_ip_address' => new sfValidatorPass(array('required' => false)),
       'session_type'      => new sfValidatorPass(array('required' => false)),
       'time'              => new sfValidatorSchemaFilter('text', new sfValidatorInteger(array('required' => false))),
-      'user_id'           => new sfValidatorPropelChoice(array('required' => false, 'model' => 'User', 'column' => 'id')),
     ));
 
     $this->widgetSchema->setNameFormat('session_filters[%s]');
@@ -50,7 +48,6 @@ abstract class BaseSessionFormFilter extends BaseFormFilterPropel
       'client_ip_address' => 'Text',
       'session_type'      => 'Text',
       'time'              => 'Number',
-      'user_id'           => 'ForeignKey',
     );
   }
 }

@@ -20,7 +20,6 @@ abstract class BaseSessionForm extends BaseFormPropel
       'client_ip_address' => new sfWidgetFormInputText(),
       'session_type'      => new sfWidgetFormInputText(),
       'time'              => new sfWidgetFormInputText(),
-      'user_id'           => new sfWidgetFormPropelChoice(array('model' => 'User', 'add_empty' => true)),
     ));
 
     $this->setValidators(array(
@@ -30,7 +29,6 @@ abstract class BaseSessionForm extends BaseFormPropel
       'client_ip_address' => new sfValidatorString(array('max_length' => 39, 'required' => false)),
       'session_type'      => new sfValidatorString(array('max_length' => 32, 'required' => false)),
       'time'              => new sfValidatorInteger(array('min' => -2147483648, 'max' => 2147483647)),
-      'user_id'           => new sfValidatorPropelChoice(array('model' => 'User', 'column' => 'id', 'required' => false)),
     ));
 
     $this->validatorSchema->setPostValidator(
