@@ -29,7 +29,7 @@ class ApiRequest extends \sfWebRequest{
     *
     * @see initialize()
     */
-    public function __construct( sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array() ){
+    public function __construct( \sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array() ){
         
         $this->initialize($dispatcher, $parameters, $attributes, $options);
         $this->setIncomingHttpRequest( new \Altumo\Http\IncomingHttpRequest() );

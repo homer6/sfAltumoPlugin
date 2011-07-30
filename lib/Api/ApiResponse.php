@@ -32,7 +32,7 @@ class ApiResponse extends \sfWebResponse{
     *
     * @see initialize()
     */
-    public function __construct( sfEventDispatcher $dispatcher, $options = array() ){
+    public function __construct( \sfEventDispatcher $dispatcher, $options = array() ){
         
         $this->initialize($dispatcher, $options);
         $this->setResponseBody( new \sfAltumoPlugin\Api\ApiResponseBody() );
@@ -50,7 +50,7 @@ class ApiResponse extends \sfWebResponse{
     public function respond( $response_body = null ){
         
         $request = $this->getRequest();
-        $format_response = sfConfig::get('app_api_pretty_format_json_response', false);
+        $format_response = \sfConfig::get('app_api_pretty_format_json_response', false);
         
         //if has errors, add them to the response
             if( $this->hasErrors() ){
@@ -92,7 +92,7 @@ class ApiResponse extends \sfWebResponse{
         
         $this->setContent( $response_body );
         
-        return sfView::NONE;
+        return \sfView::NONE;
         
     }
         
@@ -117,7 +117,7 @@ class ApiResponse extends \sfWebResponse{
     public function getAction(){
     
         if( is_null($this->action) ){
-            $this->action = sfContext::getInstance()->getActionStack()->getLastEntry()->getActionInstance();
+            $this->action = \sfContext::getInstance()->getActionStack()->getLastEntry()->getActionInstance();
         }
         
         return $this->action;
@@ -145,7 +145,7 @@ class ApiResponse extends \sfWebResponse{
     public function getRequest(){
     
         if( is_null($this->request) ){
-            $this->request = sfContext::getInstance()->getRequest();
+            $this->request = \sfContext::getInstance()->getRequest();
         }
         return $this->request;
         

@@ -42,7 +42,7 @@ class ApiResponseBody{
         
         $this->setPager( $pager );
         
-        if( !is_null(body) ){
+        if( !is_null($body) ){
             $this->setBody( $body );
         }
         $this->setBodyName( $body_name );
