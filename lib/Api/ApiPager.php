@@ -31,8 +31,10 @@ class ApiPager{
     /**
     * Constructor for this ApiPager.
     * 
-    * @param boolean $paged  //determines if this result is going to be wrapped around a result set //set this true for queries
-    * @param ApiRequest $request
+    * @param boolean $paged                 //determines if this result is going
+    *                                         to be wrapped around a result set 
+    *                                       //set this to true for queries
+    * @param \sfAltumoPlugin\Api\ApiRequest $request
     * 
     * @return \sfAltumoPlugin\Api\ApiPager
     */

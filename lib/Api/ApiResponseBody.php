@@ -143,7 +143,7 @@ class ApiResponseBody{
     */
     public function getReponseBody( $format = false, $errors = null ){
     
-        $response = new stdClass();
+        $response = new \stdClass();
         $body_name = $this->getBodyName();
         
         if( $this->isPaged() ){
@@ -151,26 +151,30 @@ class ApiResponseBody{
             $response->has_many_pages = $this->getPager()->hasManyPages();
             $response->total_results = $this->getPager()->getTotalResults();
             $response->page_size = $this->getPager()->getPageSize();
-            $response->page = $this->getPager()->getPageNumber();            
-            $response->$body_name = $this->getBody();
-            
-        }else{
-            
-            $response = $this->getBody();
-            
+            $response->page = $this->getPager()->getPageNumber();               
         }
         
-        if( $response instanceof stdClass ){
+        if( !empty( $body_name ) ){
+            $response->$body_name = $this->getBody();
+        } else {
+            $response = $this->getBody();
+        }
+        
+        
+        if( $response instanceof \stdClass ){
+        
             $response->errors = $errors;
+        
         }elseif( is_string($response) ){
+        
             $string = $response;
             $response = array();
             $response['message'] = $string;
             $response['errors'] = $errors;
+        
         }else{            
             $response['errors'] = $errors;
         }
-        
 
         $json_string = json_encode($response);
         

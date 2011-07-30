@@ -77,18 +77,20 @@ class ApiResponse extends \sfWebResponse{
             if( !is_null($json_method) && !empty($json_method) ){
                 $this->setContentType('application/javascript');
                 if( !empty($response) ){
-                    echo $json_method . '( ' . $response . ' )';
+                    $response_body = $json_method . '( ' . $response . ' )';
                 }else{
-                    echo $json_method . '( {} )';
+                    $response_body = $json_method . '( {} )';
                 }
             }else{
                 $this->setContentType('application/json');
                 if( !empty($response) ){
-                    echo $response;
+                    $response_body = $response;
                 }else{
-                    echo '{}';
+                    $response_body = '{}';
                 }
             }
+        
+        $this->setContent( $response_body );
         
         return sfView::NONE;
         
@@ -126,7 +128,7 @@ class ApiResponse extends \sfWebResponse{
     /**
     * Setter for the request field on this ApiResponse.
     * 
-    * @param ApiRequest $request
+    * @param \sfAltumoPlugin\Api\ApiRequest $request
     */
     public function setRequest( $request ){
     
@@ -138,7 +140,7 @@ class ApiResponse extends \sfWebResponse{
     /**
     * Getter for the request field on this ApiResponse.
     * 
-    * @return ApiRequest
+    * @return \sfAltumoPlugin\Api\ApiRequest
     */
     public function getRequest(){
     
@@ -190,7 +192,7 @@ class ApiResponse extends \sfWebResponse{
         
         $remote_ids = array();
         foreach( $errors as $error ){
-            if( !( $error instanceof ApiError ) ){
+            if( !( $error instanceof \sfAltumoPlugin\Api\ApiError ) ){
                 throw new \Exception('Errors must be an array of ApiError objects.');
             }
             $remote_ids[ $error->getRemoteId() ] = '';
@@ -248,7 +250,21 @@ class ApiResponse extends \sfWebResponse{
         $this->errors[] = $error;
         
     }
+
+
+    /**
+    * Adds this exception to this response as an ApiError.
+    * 
+    * @param \Exception $exception
+    */
+    public function addException( $exception ){
         
+        $this->setStatusCode( '403' ); //forbidden
+        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
+        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
+        
+    }
+    
         
     /**
     * Determines if there are errors set for this ApiResponse.

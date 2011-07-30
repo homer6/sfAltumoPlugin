@@ -12,51 +12,46 @@
 namespace sfAltumoPlugin\Api;
 
 
-  
+
 /**
-* This class represents a HTTP GET request designed to retrieve records.
-* It supports paging.
-*
+* This class represents a API request designed to delete records (models).
+* 
 * @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
-class ApiGetQuery{
+class ApiDeleteOperation {
         
     protected $request = null;
     protected $response = null;
-    protected $query = null;
-    protected $pager = null;
 
-    
     /**
-    * Constructor for this ApiGetQuery.
+    * Constructor for this ApiWriteOperation.
     * 
     * @param \sfAltumoPlugin\Api\ApiRequest $request
     * @param \sfAltumoPlugin\Api\ApiResponse $response
-    * @param \ModelCriteria $query
-    * @param string $body_name
-    * @param function $modify_result
+    * @param \ModelCriteria $query              // Base query to use in order to retrieve objects that will be deleted.
+    * @param function $delete_object           // the function to call in order to perform the delete operation.
     * 
     * @return \sfAltumoPlugin\Api\ApiGetQuery
     */
-    public function __construct( $request, $response, $query, $body_name, $modify_result = null ){    
-        
-        if( is_null($modify_result) ){
-            $modify_result = function( &$model, &$result ){};
+    public function __construct( $request, $response, $query, $delete_object = null){    
+
+        if( is_null($delete_object) ){
+            $delete_object = function( &$object ){
+                return $object->delete();
+            };
         }
         
-    
-        $pager = new \sfAltumoPlugin\Api\ApiPager( true, $request );
         $response_body = new \sfAltumoPlugin\Api\ApiResponseBody( array(), $body_name, $pager );
         $response->setResponseBody($response_body);
         
         $this->setRequest( $request );
         $this->setResponse( $response );
+
         $this->setQuery( $query );
-        $this->setPager( $pager );
-        $this->setModifyResult( $modify_result );
+        
+        $this->setDeleteObject( $delete_object );
      
     }          
-      
       
     /**
     * Setter for the request field on this ApiGetQuery.
@@ -127,87 +122,75 @@ class ApiGetQuery{
     
         return $this->query;
         
-    }
-        
+    }    
+    
     
     /**
-    * Setter for the pager field on this ApiGetQuery.
+    * Setter for the delete_object field on this ApiGetQuery.
     * 
-    * @param \sfAltumoPlugin\Api\ApiPager $pager
+    * @param function $delete_object
     */
-    protected function setPager( $pager ){
+    public function setDeleteObject( $delete_object ){
     
-        $this->pager = $pager;
+        $this->delete_object = $delete_object;
         
     }
     
     
     /**
-    * Getter for the pager field on this ApiGetQuery.
-    * 
-    * @return \sfAltumoPlugin\Api\ApiPager
-    */
-    protected function getPager(){
-    
-        return $this->pager;
-        
-    }
-        
-    
-    /**
-    * Setter for the modify_result field on this ApiGetQuery.
-    * 
-    * @param function $modify_result
-    */
-    public function setModifyResult( $modify_result ){
-    
-        $this->modify_result = $modify_result;
-        
-    }
-    
-    
-    /**
-    * Getter for the modify_result field on this ApiGetQuery.
+    * Getter for the delete_object field on this ApiGetQuery.
     * 
     * @return function
     */
-    public function getModifyResult(){
+    public function getDeleteObject(){
     
-        return $this->modify_result;
+        return $this->delete_object;
         
     }
 
     
     /**
-    * Runs the queries that have been supplied and updates the 
+    * Runs the write operation and sets the response body.
+    * 
     * ApiResponseBody within the ApiResponse.
     * 
     */    
-    public function runQuery(){
-        
+    public function run(){
+
+        $delete_object = $this->getDeleteObject(); //function
         $query = $this->getQuery();
-        $pager = $this->getPager();
-        $modify_result = $this->getModifyResult();
+        $request = $this->getRequest();
         
-        $count_query = clone $query;
-        $pager->setTotalResults( $count_query->count() );
-        $pager->decorateQuery( $query );
-        $limit = $query->getLimit();
-        
-        $results = array();
-        if( $pager->getPageSize() > 0 ){
-            $db_results = $query->find();
-            foreach( $db_results as $model ){
-                $result_object = array();
-                $modify_result( $model, $result_object );
-                $results[] = $result_object;
+        // Validate IDs
+            try{
+                $delete_object_ids = \Altumo\Validation\Arrays::sanitizeCsvArrayPostitiveInteger( $request->getParameter('ids', '') );
+            }catch( Exception $e ){
+                throw new \Exception( "One of the ids provided was invalid." );
             }
-        }
+            
+            if( empty( $delete_object_ids ) ){
+                throw new \Exception( "No valid ids were provided for deletion." );
+            }
         
+        // Get objects based on $query and filtering by ids
+            $query->filterById( $delete_object_ids );
+            
+            $objects_to_delete = $query->find();
+            
+            if( $objects_to_delete->isEmpty() ){
+                throw new \Exception( "No valid ids were provided for deletion." );
+            }
+        
+        // Delete objects
+            $deleted_ids = array();
+            foreach( $objects_to_delete as $object_to_delete ){
+                $deleted_ids[] = $object_to_delete->getId();
+                $delete_object( $object_to_delete );
+            }
+
         $api_response_body = $this->getResponse()->getResponseBody();
-        $api_response_body->setBody($results);
+        $api_response_body->setBody( array( "deleted" => $deleted_ids ) );
         
     }
-    
     
 }
