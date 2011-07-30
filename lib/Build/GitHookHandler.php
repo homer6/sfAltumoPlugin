@@ -155,7 +155,7 @@ class GitHookHandler{
                 $last_commit_hash = \Altumo\Git\History::getLastCommitHash();
                 
             //check to see if there are any new scripts in the "new" folder  
-                $sql_files = $this->getFilesToMove( $last_commit_hash );
+                $sql_files = $this->getFilesToMove( $last_commit_hash );                
                 if( empty($sql_files) ){
                     //no sql files to move
                     return;
@@ -215,8 +215,9 @@ class GitHookHandler{
                 
             //update the build sequence log
                 $xml_application_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_drop, $has_snapshot );
-                $xml_application_build_sequence->closeFile();
-                $shell_command = "git add $database_file";
+                $build_sequence_filename = $xml_application_build_sequence->getFilename();
+                $xml_application_build_sequence->closeFile();                
+                $shell_command = "git add $build_sequence_filename";
                 `$shell_command`;
                         
             //commit the files
@@ -424,13 +425,13 @@ class GitHookHandler{
         $git_output = `$git_command`;
            
         $files = array();
-        preg_match_all( '%^(([MA])\\s+(data/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
+        preg_match_all( '%^(([MA])\\s+((.*?)data/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
         foreach( $results as $result ){
             if( array_key_exists(3,$result) ){
                 $files[] = $git_root_directory . '/' . $result[3];
             }
         }
-        
+
         return $files;
 
     }
