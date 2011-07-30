@@ -147,7 +147,12 @@ class GitHookHandler{
         
         $database_dir = $this->getDatabaseDirectory();
         //open the application build sequence for writing
-            $xml_application_build_sequence = $this->getApplicationBuildSequence();      
+            if( !$this->calledFromPlugin() ){
+                $xml_build_sequence = $this->getApplicationBuildSequence();
+            }else{
+                $xml_build_sequence = $this->getAltumoBuildSequence();
+            }
+              
         
         //creates a new application "database build" if there is a delta
         
@@ -214,9 +219,9 @@ class GitHookHandler{
                     }
                 
             //update the build sequence log
-                $xml_application_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_drop, $has_snapshot );
-                $build_sequence_filename = $xml_application_build_sequence->getFilename();
-                $xml_application_build_sequence->closeFile();                
+                $xml_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_drop, $has_snapshot );                
+                $xml_build_sequence->writeToFile();
+                $build_sequence_filename = $xml_build_sequence->getFilename();
                 $shell_command = "git add $build_sequence_filename";
                 `$shell_command`;
                         
@@ -299,7 +304,7 @@ class GitHookHandler{
     
     
     /**
-    * Returns the sfAltumoPlugin Build Sequence file, open for reading.
+    * Returns the sfAltumoPlugin Build Sequence file, open for writing.
     * 
     * @return \sfAltumoPlugin\Build\DatabaseBuildSequenceFile
     */
@@ -317,7 +322,7 @@ class GitHookHandler{
                 $sf_altumo_filename = $database_dir . '/../plugins/sfAltumoPlugin/data/build-sequence.xml';           
             }
 
-            $this->altumo_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $sf_altumo_filename );
+            $this->altumo_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $sf_altumo_filename, false );
             
         }
         
