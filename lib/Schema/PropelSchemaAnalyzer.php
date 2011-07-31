@@ -31,7 +31,7 @@ class PropelSchemaAnalyzer{
     * If the first parameter is an array, the list of paths will be taken from it 
     * and all other arguments ignored.
     * 
-    * @params Array | (string schema_xml_path[,...])      // One or more schema.xml paths
+    * @params array | (string schema_xml_path[,...])      // One or more schema.xml paths
     */
     public function __construct( ) {
 
@@ -55,6 +55,7 @@ class PropelSchemaAnalyzer{
             }
  
     }
+    
     
     /**
     * Adds the contents of a Propel XML schema file to the buffer of data
@@ -83,7 +84,7 @@ class PropelSchemaAnalyzer{
     * 
     * The array is indexed by table name.
     * 
-    * @param Array $table_elements    // of \Altumo\Xml\XmlElement
+    * @param array $table_elements    // of \Altumo\Xml\XmlElement
     *                                 //  table elements to add
     * @return void
     * 
@@ -116,7 +117,7 @@ class PropelSchemaAnalyzer{
     /**
     * Get array of current <table> elements (\Altumo\Xml\XmlElement).
     * 
-    * @return Array         // of \Altumo\Xml\XmlElement
+    * @return array         // of \Altumo\Xml\XmlElement
     *                       //  indexes being table names
     */
     protected function &getTableElements(){
@@ -133,7 +134,7 @@ class PropelSchemaAnalyzer{
     * The resulting array is indexed by parent table names and the values are
     * tables that are extending them.
     * 
-    * @return Array
+    * @return array
     */
     public function getTableConcreteInheritanceMap(){
         
@@ -160,12 +161,12 @@ class PropelSchemaAnalyzer{
                     foreach( $concrete_inheritance_parent_tables as $parent_table ){
                         $table_inheritance_map[$parent_table][] = $table_name;
                     }
+                    
             }
         
         return $table_inheritance_map;
+        
     }
-    
-    
     
     
     /**
@@ -267,5 +268,7 @@ class PropelSchemaAnalyzer{
                 
             }
         }
+        
     }
+    
 }

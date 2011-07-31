@@ -147,7 +147,12 @@ class GitHookHandler{
         
         $database_dir = $this->getDatabaseDirectory();
         //open the application build sequence for writing
-            $xml_application_build_sequence = $this->getApplicationBuildSequence();      
+            if( !$this->calledFromPlugin() ){
+                $xml_build_sequence = $this->getApplicationBuildSequence();
+            }else{
+                $xml_build_sequence = $this->getAltumoBuildSequence();
+            }
+              
         
         //creates a new application "database build" if there is a delta
         
@@ -155,7 +160,7 @@ class GitHookHandler{
                 $last_commit_hash = \Altumo\Git\History::getLastCommitHash();
                 
             //check to see if there are any new scripts in the "new" folder  
-                $sql_files = $this->getFilesToMove( $last_commit_hash );
+                $sql_files = $this->getFilesToMove( $last_commit_hash );                
                 if( empty($sql_files) ){
                     //no sql files to move
                     return;
@@ -214,9 +219,10 @@ class GitHookHandler{
                     }
                 
             //update the build sequence log
-                $xml_application_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_drop, $has_snapshot );
-                $xml_application_build_sequence->closeFile();
-                $shell_command = "git add $database_file";
+                $xml_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_drop, $has_snapshot );                
+                $xml_build_sequence->writeToFile();
+                $build_sequence_filename = $xml_build_sequence->getFilename();
+                $shell_command = "git add $build_sequence_filename";
                 `$shell_command`;
                         
             //commit the files
@@ -298,7 +304,7 @@ class GitHookHandler{
     
     
     /**
-    * Returns the sfAltumoPlugin Build Sequence file, open for reading.
+    * Returns the sfAltumoPlugin Build Sequence file, open for writing.
     * 
     * @return \sfAltumoPlugin\Build\DatabaseBuildSequenceFile
     */
@@ -316,7 +322,7 @@ class GitHookHandler{
                 $sf_altumo_filename = $database_dir . '/../plugins/sfAltumoPlugin/data/build-sequence.xml';           
             }
 
-            $this->altumo_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $sf_altumo_filename );
+            $this->altumo_build_sequence = new \sfAltumoPlugin\Build\DatabaseBuildSequenceFile( $sf_altumo_filename, false );
             
         }
         
@@ -424,13 +430,13 @@ class GitHookHandler{
         $git_output = `$git_command`;
            
         $files = array();
-        preg_match_all( '%^(([MA])\\s+(data/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
+        preg_match_all( '%^(([MA])\\s+((.*?)data/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
         foreach( $results as $result ){
             if( array_key_exists(3,$result) ){
                 $files[] = $git_root_directory . '/' . $result[3];
             }
         }
-        
+
         return $files;
 
     }

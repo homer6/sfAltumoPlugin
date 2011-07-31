@@ -32,7 +32,7 @@ class ApiResponse extends \sfWebResponse{
     *
     * @see initialize()
     */
-    public function __construct( sfEventDispatcher $dispatcher, $options = array() ){
+    public function __construct( \sfEventDispatcher $dispatcher, $options = array() ){
         
         $this->initialize($dispatcher, $options);
         $this->setResponseBody( new \sfAltumoPlugin\Api\ApiResponseBody() );
@@ -50,7 +50,7 @@ class ApiResponse extends \sfWebResponse{
     public function respond( $response_body = null ){
         
         $request = $this->getRequest();
-        $format_response = sfConfig::get('app_api_pretty_format_json_response', false);
+        $format_response = \sfConfig::get('app_api_pretty_format_json_response', false);
         
         //if has errors, add them to the response
             if( $this->hasErrors() ){
@@ -77,20 +77,22 @@ class ApiResponse extends \sfWebResponse{
             if( !is_null($json_method) && !empty($json_method) ){
                 $this->setContentType('application/javascript');
                 if( !empty($response) ){
-                    echo $json_method . '( ' . $response . ' )';
+                    $response_body = $json_method . '( ' . $response . ' )';
                 }else{
-                    echo $json_method . '( {} )';
+                    $response_body = $json_method . '( {} )';
                 }
             }else{
                 $this->setContentType('application/json');
                 if( !empty($response) ){
-                    echo $response;
+                    $response_body = $response;
                 }else{
-                    echo '{}';
+                    $response_body = '{}';
                 }
             }
         
-        return sfView::NONE;
+        $this->setContent( $response_body );
+        
+        return \sfView::NONE;
         
     }
         
@@ -115,7 +117,7 @@ class ApiResponse extends \sfWebResponse{
     public function getAction(){
     
         if( is_null($this->action) ){
-            $this->action = sfContext::getInstance()->getActionStack()->getLastEntry()->getActionInstance();
+            $this->action = \sfContext::getInstance()->getActionStack()->getLastEntry()->getActionInstance();
         }
         
         return $this->action;
@@ -126,7 +128,7 @@ class ApiResponse extends \sfWebResponse{
     /**
     * Setter for the request field on this ApiResponse.
     * 
-    * @param ApiRequest $request
+    * @param \sfAltumoPlugin\Api\ApiRequest $request
     */
     public function setRequest( $request ){
     
@@ -138,12 +140,12 @@ class ApiResponse extends \sfWebResponse{
     /**
     * Getter for the request field on this ApiResponse.
     * 
-    * @return ApiRequest
+    * @return \sfAltumoPlugin\Api\ApiRequest
     */
     public function getRequest(){
     
         if( is_null($this->request) ){
-            $this->request = sfContext::getInstance()->getRequest();
+            $this->request = \sfContext::getInstance()->getRequest();
         }
         return $this->request;
         
@@ -190,7 +192,7 @@ class ApiResponse extends \sfWebResponse{
         
         $remote_ids = array();
         foreach( $errors as $error ){
-            if( !( $error instanceof ApiError ) ){
+            if( !( $error instanceof \sfAltumoPlugin\Api\ApiError ) ){
                 throw new \Exception('Errors must be an array of ApiError objects.');
             }
             $remote_ids[ $error->getRemoteId() ] = '';
@@ -248,7 +250,21 @@ class ApiResponse extends \sfWebResponse{
         $this->errors[] = $error;
         
     }
+
+
+    /**
+    * Adds this exception to this response as an ApiError.
+    * 
+    * @param \Exception $exception
+    */
+    public function addException( $exception ){
         
+        $this->setStatusCode( '403' ); //forbidden
+        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
+        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
+        
+    }
+    
         
     /**
     * Determines if there are errors set for this ApiResponse.
