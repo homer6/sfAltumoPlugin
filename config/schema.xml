@@ -121,7 +121,6 @@
 
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="user_id" type="integer" required="true" />
-        <column name="client_id" type="integer" required="false" />
         <column name="contact_information_id" type="INTEGER" required="false" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
@@ -133,15 +132,6 @@
         <foreign-key foreignTable="sf_guard_user" onDelete="cascade">
             <reference local="user_id" foreign="id" />
         </foreign-key>    
-
-        <foreign-key foreignTable="client" onDelete="setnull">
-            <reference local="client_id" foreign="id" />
-        </foreign-key>
-
-
-        <unique>
-            <unique-column name="client_id" />
-        </unique>
 
     </table>
     
