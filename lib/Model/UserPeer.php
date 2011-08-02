@@ -16,6 +16,21 @@
 
 namespace sfAltumoPlugin\Model;
 
-class ContactInformationPeer extends \BaseContactInformationPeer {
+class UserPeer extends \BaseUserPeer {
 
+    /** 
+    * @param mixed $username
+    * 
+    * @return User
+    */
+    public static function retrieveByUsername( $username ){
+        
+        return UserQuery::create()
+            ->usesfGuardUserQuery()
+                ->filterByUsername( $username )
+            ->endUse()
+        ->findOne();
+
+    }
+    
 } // ContactInformationPeer
