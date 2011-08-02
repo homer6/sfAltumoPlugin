@@ -15,5 +15,22 @@
 namespace sfAltumoPlugin\Model;
 
 class User extends \BaseUser {
+    
+    /**
+    * Gets the user's full name
+    * 
+    * @param string $format
+    *   // sprintf style format with two strings. (first name, last name)
+    * 
+    * @return string
+    *   // Full name in the format specified
+    */
+    public function getFullName( $format = "%s %s" ){
+        
+        $first_name = $this->getContactInformation()->getFirstName();
+        $last_name = $this->getContactInformation()->getLastName();
+        
+        return sprintf( $format, $first_name, $last_name );
+    }
 
 } // ContactInformation
