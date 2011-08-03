@@ -55,12 +55,10 @@ EOF;
             $project_root = realpath( sfConfig::get('sf_root_dir') . '/../../' );
             $database_dir = sfConfig::get('sf_data_dir');
             
-            umask( 0002 );
-            
             $make_git_ignore = function( $directory, $contents = null ){
                     
                 if( !file_exists($directory) ){
-                    mkdir( $directory, true );                    
+                    mkdir( $directory, 0775, true );                    
                 }
                 if( is_null($contents) ){
                     touch( $directory . '/.gitignore' );
