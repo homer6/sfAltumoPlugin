@@ -61,7 +61,10 @@ EOF;
                 $database_dir . '/new',
                 $database_dir . '/snapshots',
                 $database_dir . '/sql',
-                $database_dir . '/upgrade_scripts'            
+                $database_dir . '/upgrade_scripts',
+                $project_root . '/htdocs/project/test',
+                $project_root . '/documents/technical',
+                $project_root . 'documents/design/published'
             );
             
             foreach( $create_directories as $directory ){
@@ -73,6 +76,15 @@ EOF;
 
             }
             
+            $ignore_pattern = <<<IGNORE
+*
+!.gitignore
+IGNORE;
+            file_put_contents( $project_root . '/htdocs/project/log/.gitignore', $ignore_pattern );
+            file_put_contents( $project_root . '/htdocs/project/cache/.gitignore', $ignore_pattern );            
+            file_put_contents( $project_root . '/htdocs/logs/.gitignore', '*.log' );
+            
+            
             $database_dir_ignore = <<<IGNORE
 update-log.xml
 updater-configuration.xml            
@@ -80,22 +92,26 @@ IGNORE;
             
             file_put_contents( $database_dir . '/.gitignore', $database_dir_ignore );
 
+            symlink( '../plugins/sfAltumoPlugin/web', $project_root . '/htdocs/project/web/altumo' );
+            
 
             $next_steps = <<<STEPS
             
     NEXT STEPS:
         
         //make an "api" app if one doesn't already exist
+            ./symfony generate:app api
 
         //add the following lines (replace the existing) to the "api" app's factories.yml
             response:
-                class: \\sfAltumoPlugin\\Api\\ApiResponse
+                class: \\\\sfAltumoPlugin\\\\Api\\ApiResponse
 
             request:
-                class: \\sfAltumoPlugin\\Api\\ApiRequest
+                class: \\\\sfAltumoPlugin\\\\Api\\\\ApiRequest
 
-
-
+        //you may want to copy parts of the layout from the blank project
+            https://github.com/homer6/blank_altumo/blob/master/htdocs/project/apps/frontend/templates/layout.php
+                
         //run the application install now
             ./symfony altumo:install
 
