@@ -55,6 +55,7 @@ EOF;
             $project_root = realpath( sfConfig::get('sf_root_dir') . '/../../' );
             $database_dir = sfConfig::get('sf_data_dir');
             
+            umask( 0002 );
             
             $make_git_ignore = function( $directory, $contents = null ){
                     
@@ -78,7 +79,7 @@ EOF;
                 $database_dir . '/upgrade_scripts',
                 $project_root . '/htdocs/project/test',
                 $project_root . '/documents/technical',
-                $project_root . 'documents/design/published'
+                $project_root . '/documents/design/published'
             );            
             foreach( $create_directories as $directory ){                
                 $make_git_ignore( $directory );
