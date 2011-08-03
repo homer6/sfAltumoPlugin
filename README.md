@@ -27,9 +27,9 @@ Installation - Existing Project
 -------------------------------
 
   - Symfony root must be in htdocs/project (relative to the git root).
-  - Symfony 1.4 must be installed in the lib/vendor directory.
+  - Symfony 1.4 must be installed in the lib/vendor directory (eg. htdocs/project/lib/vendor/symfony).
   - cd {git root}
-  - git submodule add git://github.com/homer6/sfAltumoPlugin.git project/plugins/sfAltumoPlugin
+  - git submodule add git://github.com/homer6/sfAltumoPlugin.git htdocs/project/plugins/sfAltumoPlugin
   - git submodule update --recursive --init
   - add "$this->enablePlugins('sfAltumoPlugin');" to ProjectConfiguration.class.php
   - cd htdocs/project 

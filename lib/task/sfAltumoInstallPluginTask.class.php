@@ -56,6 +56,20 @@ EOF;
             $database_dir = sfConfig::get('sf_data_dir');
             
             
+            $make_git_ignore = function( $directory, $contents = null ){
+                    
+                if( !file_exists($directory) ){
+                    mkdir( $directory, true );                    
+                }
+                if( is_null($contents) ){
+                    touch( $directory . '/.gitignore' );
+                }else{
+                    file_put_contents( $directory . '/.gitignore', $contents );
+                }                
+                
+            };
+            
+                        
             $create_directories = array( 
                 $database_dir . '/drops',
                 $database_dir . '/new',
@@ -65,35 +79,26 @@ EOF;
                 $project_root . '/htdocs/project/test',
                 $project_root . '/documents/technical',
                 $project_root . 'documents/design/published'
-            );
-            
-            foreach( $create_directories as $directory ){
-                
-                if( !file_exists($directory) ){
-                    mkdir( $directory );
-                    touch( $directory . '/.gitignore' );
-                }
-
+            );            
+            foreach( $create_directories as $directory ){                
+                $make_git_ignore( $directory );
             }
             
             $ignore_pattern = <<<IGNORE
 *
 !.gitignore
 IGNORE;
-            file_put_contents( $project_root . '/htdocs/project/log/.gitignore', $ignore_pattern );
-            file_put_contents( $project_root . '/htdocs/project/cache/.gitignore', $ignore_pattern );            
-            file_put_contents( $project_root . '/htdocs/logs/.gitignore', '*.log' );
-            
+            $make_git_ignore( $project_root . '/htdocs/project/log', $ignore_pattern );
+            $make_git_ignore( $project_root . '/htdocs/project/cache', $ignore_pattern );
+            $make_git_ignore( $project_root . '/htdocs/logs', '*.log' );
             
             $database_dir_ignore = <<<IGNORE
 update-log.xml
 updater-configuration.xml            
 IGNORE;
-            
-            file_put_contents( $database_dir . '/.gitignore', $database_dir_ignore );
+            $make_git_ignore( $database_dir, $database_dir_ignore );
 
             symlink( '../plugins/sfAltumoPlugin/web', $project_root . '/htdocs/project/web/altumo' );
-            
 
             $next_steps = <<<STEPS
             
