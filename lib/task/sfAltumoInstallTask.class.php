@@ -146,6 +146,17 @@ EOF;
             }
             $this->log( 'Template files installed.' );
             
+        //install build sequence file
+            $filename = sfConfig::get('sf_data_dir') . '/' . 'build-sequence.xml';
+            $contents = <<<BUILD_SEQUENCE
+<?xml version="1.0" encoding="UTF-8"?>
+<BuildSequence>
+</BuildSequence>
+BUILD_SEQUENCE;
+            if( !file_exists($filename) ){
+                file_put_contents( $filename, $contents );
+            }
+            
             
         //install git hooks
             `./symfony altumo:git-hook-handler install`;
@@ -195,6 +206,8 @@ $database_script
         
         //if this is a dev environment, you may want to set debug to true
         //in both the api.php and index.php controllers in the web folder
+        
+        //add all of the changed files to git (everything else should already be ignored)
             
 STEPS;
         

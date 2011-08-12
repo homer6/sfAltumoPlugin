@@ -68,7 +68,8 @@ EOF;
                 
             };
             
-                        
+            
+        //add all of the gitignore files
             $create_directories = array( 
                 $database_dir . '/drops',
                 $database_dir . '/new',
@@ -86,6 +87,7 @@ EOF;
             $ignore_pattern = <<<IGNORE
 *
 !.gitignore
+
 IGNORE;
             $make_git_ignore( $project_root . '/htdocs/project/log', $ignore_pattern );
             $make_git_ignore( $project_root . '/htdocs/project/cache', $ignore_pattern );
@@ -93,13 +95,25 @@ IGNORE;
             
             $database_dir_ignore = <<<IGNORE
 update-log.xml
-updater-configuration.xml            
+updater-configuration.xml
+
 IGNORE;
             $make_git_ignore( $database_dir, $database_dir_ignore );
+            
+            $ignore = <<<IGNORE
+index.php
+api.php
 
-            symlink( '../plugins/sfAltumoPlugin/web', $project_root . '/htdocs/project/web/altumo' );
+IGNORE;
+            $make_git_ignore( sfConfig::get('sf_web_dir'), $ignore );
 
-            $next_steps = <<<STEPS
+            
+            //create the web symlink to sfAltumoPlugin/web
+                symlink( '../plugins/sfAltumoPlugin/web', $project_root . '/htdocs/project/web/altumo' );
+
+                
+            //show the next steps 
+                $next_steps = <<<STEPS
             
     NEXT STEPS:
         
@@ -108,7 +122,7 @@ IGNORE;
 
         //add the following lines (replace the existing) to the "api" app's factories.yml
             response:
-                class: \\\\sfAltumoPlugin\\\\Api\\ApiResponse
+                class: \\\\sfAltumoPlugin\\\\Api\\\\ApiResponse
 
             request:
                 class: \\\\sfAltumoPlugin\\\\Api\\\\ApiRequest
@@ -118,11 +132,13 @@ IGNORE;
                 
         //run the application install now
             ./symfony altumo:install
+            
+        //add all of the changed files to git (everything else should already be ignored)
 
             
 STEPS;
         
-        echo $next_steps . "\n";
+                echo $next_steps . "\n";
     }
     
 }
