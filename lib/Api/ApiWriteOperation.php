@@ -11,8 +11,6 @@
  
 namespace sfAltumoPlugin\Api;
 
-
-  
 /**
 * This class represents an API request designed to write records (models).
 * 
@@ -156,6 +154,7 @@ class ApiWriteOperation {
             if( is_callable($modify_result) ){
                 $this->setModifyResult( $modify_result );
             }
+
             
         //before save
             if( is_callable($before_save) ){
@@ -375,11 +374,17 @@ class ApiWriteOperation {
     * @param string $model_name
     */
     public function setModelName( $model_name ){
-    
-        //if no namespace specified, mark as global
-        if( substr($model_name, 0, 1) !== '\\' ){
-            $model_name = '\\' . $model_name;
-        }
+        
+        /*
+            //if no namespace specified, mark as global
+                if( substr($model_name, 0, 1) !== '\\' ){
+                $model_name = '\\' . $model_name;
+            }
+        */
+        //some models (those that don't extend from sfAltumoPlugin) don't
+        //work with a global namespace "\" added to them..
+        //e.g. class_parents fails. (j)
+
         $this->model_name = $model_name;
         
     }
@@ -503,20 +508,22 @@ class ApiWriteOperation {
     */
     public function run(){
                 
-        $modify_result = $this->getModifyResult();
+        $modify_result = $this->getModifyResult();        
         $request_message_body = $this->getRequest()->getMessageBody();
         $response = $this->getResponse();
+
         
         if( $this->isAutomatic() ){
-            
+
             //Execute write operation
-                $write_operation_results = $this->saveGenericModels($request_message_body);
+                $write_operation_results = $this->saveGenericModels( $request_message_body );
                 if( !is_array($write_operation_results) ){
                     throw new \Exception( 'Write operations result must be an array.' );
                 }
                 
             //Extract the results
                 $results = array();
+
                 foreach( $write_operation_results as $model ){
                     if( !($model instanceof BaseObject) ){
                         throw new \Exception( 'Process objects must return an array of Model objects.' );
@@ -540,25 +547,41 @@ class ApiWriteOperation {
                 
             
         }else if( $this->isManual() ){
-            
+
             //Execute the manual write operation
                 $process_objects_manually = $this->getProcessObjectsManually();
                 if( is_callable($process_objects_manually) ){
                     $write_operation_results = $process_objects_manually( $response, $request_message_body );
+                    
+                    if( !is_array( $write_operation_results ) ){
+                        throw new \Exception( 'Process objects manually callback must return an array (of objects).' );
+                    }
+                    
                 }else{
                     throw new \Exception( 'If ApiWriteOperation is in manual mode, process objects callback must be defined.' );
                 }
 
+
             //Extract the results
                 $results = array();
                 foreach( $write_operation_results as $model ){
+                    
+                    /*
+                    Why is this a requirement? (j)                    
                     if( !($model instanceof \stdClass) ){
                         throw new \Exception( 'Process objects must return an array of \stdClass objects.' );
+                    }*/
+                    
+                    if( !is_object( $model ) ){
+                        throw new \Exception( 'Process objects manually callback must return an array of objects.' );
                     }
+                    
                     $result_object = array();
-                    if( is_callable($modify_result) ){
+                    
+                    if( is_callable( $modify_result ) ){
                         $modify_result( $model, $result_object );
                     }
+                    
                     $results[] = $result_object;
                 }
             
@@ -607,7 +630,7 @@ class ApiWriteOperation {
             }
         
         //validate the $model_type and get the peer and query classes.
-            if( !in_array('\BaseObject', class_parents($model_type)) ){
+            if( !in_array('BaseObject', class_parents($model_type ))){
                 throw new \Exception('Model Type must be an existing propel model class.');
             }
             
@@ -630,7 +653,7 @@ class ApiWriteOperation {
 
                 
         $returned_models = array();
-        
+
         foreach( $request_objects as $request_object ){
 
             try{
@@ -742,7 +765,7 @@ class ApiWriteOperation {
             }
         
         }
-        \Altumo\Utils\Debug::dump($connection);
+
         return $returned_models;
         
     }
