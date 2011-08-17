@@ -120,6 +120,8 @@ class ApiWriteOperation {
     *   //Used in Manual Mode. The function to call in order to perform a manual
     *     write operation. Must return an array of saved Models or stdObjects.
     *     $objects is an array of stdObjects that is the request body.
+    *     This function gets executed within a database transaction. If an
+    *     exception is thrown, the entire operation is rolled back.
     * 
     * @param function $before_setters( &$model, &$request_object, &$response )
     *   //Used in Automatic Mode. The function to call that is invoked just
@@ -550,8 +552,29 @@ class ApiWriteOperation {
 
             //Execute the manual write operation
                 $process_objects_manually = $this->getProcessObjectsManually();
+                
                 if( is_callable($process_objects_manually) ){
-                    $write_operation_results = $process_objects_manually( $response, $request_message_body );
+
+                    // Use a transaction for the write operations
+                        $peer = call_user_func( array( $this->getModelName(), 'getPeer' ) );
+
+                        try {
+                            
+                            $connection = \Propel::getConnection( $peer::DATABASE_NAME, \Propel::CONNECTION_WRITE );
+                            $connection->beginTransaction();
+                        
+                            $write_operation_results = $process_objects_manually( $response, $request_message_body );
+                            
+                            $connection->commit();
+                            
+                        } catch( \Exception $e ){
+                            
+                            $connection->rollBack();
+                            
+                            throw $e;
+                            
+                        }
+                        
                     
                     if( !is_array( $write_operation_results ) ){
                         throw new \Exception( 'Process objects manually callback must return an array (of objects).' );

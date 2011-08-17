@@ -32,5 +32,22 @@ class User extends \BaseUser {
         
         return sprintf( $format, $first_name, $last_name );
     }
+    
+    
+    /**
+    * Whether this User is active.
+    * 
+    * @see sfGuardUser::getIsActive
+    * 
+    * @return bool
+    */
+    public function getIsActive(){
+        
+        // Implementation currently based on sfGuardUser's "is_active" flag
+            $sf_guard_user = $this->getsfGuardUser();
+        
+            return $sf_guard_user->getIsActive();
+        
+    }
 
 } // ContactInformation

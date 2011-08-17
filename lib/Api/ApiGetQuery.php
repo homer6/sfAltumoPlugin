@@ -198,7 +198,15 @@ class ApiGetQuery{
         if( $pager->getPageSize() > 0 ){
             $db_results = $query->find();
             foreach( $db_results as $model ){
-                $result_object = array();
+                //$result_object = array(); // why was the code below changed to this? (j)
+                //$result_object = $model->toArray( BasePeer::TYPE_FIELDNAME );   
+                
+                if( is_callable( array( $model, 'toArray' ) ) ){
+                    $result_object = $model->toArray( \BasePeer::TYPE_FIELDNAME );   
+                } else {
+                    $result_object = array();
+                }
+                
                 $modify_result( $model, $result_object );
                 $results[] = $result_object;
             }

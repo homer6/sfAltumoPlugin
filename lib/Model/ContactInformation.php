@@ -16,4 +16,41 @@ namespace sfAltumoPlugin\Model;
 
 class ContactInformation extends \BaseContactInformation {
 
+    /**
+    * If state ( @see getState ) is set, return the state's iso code
+    * @see State::getIsoCode()
+    * 
+    * @return mixed
+    *   // ISO code of State (string) or null if not set.
+    */
+    public function getStateIsoCode(){
+        
+        if( $this->getState() ){
+            return $this->getState()->getIsoCode();
+        }
+        
+        return null;
+        
+    }
+    
+    
+    /**
+    * If state ( @see getState ) is set, return the state's iso short code
+    * @see State::getIsoShortCode()
+    * 
+    * @return mixed
+    *   // ISO code of State (string) or null if not set.
+    */
+    public function getStateIsoShortCode(){
+        
+        if( $this->getState() ){
+            return $this->getState()->getIsoShortCode();
+        }
+        
+        return null;
+        
+    }
+    
+    
+    
 } // ContactInformation
