@@ -108,7 +108,7 @@ class ApiPager{
     
         try{
             $page_size = \Altumo\Validation\Numerics::assertUnsignedInteger($page_size);
-        }catch( Exception $e ){
+        }catch( \Exception $e ){
             $page_size = 30;
         }
         if( $page_size > 100 ){
@@ -141,7 +141,7 @@ class ApiPager{
     
         try{
             $page_number = \Altumo\Validation\Numerics::assertPositiveInteger($page_number);
-        }catch( Exception $e ){
+        }catch( \Exception $e ){
             $page_number = 1;
         }
         $this->page_number = $page_number;
