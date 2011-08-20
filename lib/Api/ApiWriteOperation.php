@@ -556,7 +556,7 @@ class ApiWriteOperation {
                 if( is_callable($process_objects_manually) ){
 
                     // Use a transaction for the write operations
-                        $peer = call_user_func( array( $this->getModelName(), 'getPeer' ) );
+                        $peer = eval( 'return new ' . $this->getModelName() . 'Peer();' );
 
                         try {
                             
