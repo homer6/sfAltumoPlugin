@@ -13,13 +13,23 @@ namespace sfAltumoPlugin\Deployment;
  
 
 /**
-* This class is an object that updates the database based on the current state
-* of the database (via the log file) compared to the state of the application
-* models (via the database sequence file). It is used to ensure that an 
-* environment can be updated, along with the model classes, to ensure that 
-* both the database and the class models are always in sync.
+* This class is an object that loads an empty (bare) database based on the
+* sql files that Propel generates.
 * 
-* @author Steve Sperandeo <steve.sperandeo@altumo.com>
+* The purpose of a bare database is to provide a reference to make it easier
+* to generate upgrade scripts when schema changes are involved. For example,
+* when a new field is added to a table in schema.xml (or schema.yml), building 
+* the bare database will give you a database that includes that field change.
+* You can then use it to automatically build an upgrade script using a diff tool
+* like Toad for MySQL, or to verify that your manually-written upgrade script
+* really made your current database's schema look like what Propel would have
+* generated.
+* 
+* @see BareDatabaseLoader::loadBareDatabase
+* 
+* @see sfAltumoLoadBareDatabaseTask
+* 
+* @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
 class BareDatabaseLoader{
     
@@ -186,70 +196,5 @@ class BareDatabaseLoader{
         return $sql_files;
         
     }
-    
-    
-    /**
-    * Applies a drop, snapshot or upgrade script to the current database.
-    * 
-    * @param string $hash                   //the commit hash of the delta
-    * @param string $delta_type             //the type of delta (snapshot, 
-    *                                         upgrade, drop)
-    * @param boolean $altumo_delta          //whether this delta comes from the
-    *                                         sfAltumoPlugin build sequence
-    * 
-    * @throws \Exception if build_type is unknown
-    * @throws \Exception if script file does not exist
-    */    
-    protected function applyScript( $hash, $delta_type = self::DELTA_TYPE_UPGRADE_SCRIPT, $altumo_delta = false ){
-        
-        //validate delta type
-            if( !in_array($delta_type, array( self::DELTA_TYPE_UPGRADE_SCRIPT, self::DELTA_TYPE_DROP, self::DELTA_TYPE_SNAPSHOT ) ) ){
-                throw new \Exception('Unknown build type.');
-            }
-        
-        //determine the sql script filename and ensure the file exists
-            $database_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/' . $delta_type . 's/' . $delta_type . '_' . $hash . '.sql';
-            $sf_altumo_delta = false;
-            if( !file_exists($database_filename) ){
-                //try to find it in the sfAltumoPlugin folder too
-                $sf_altumo_database_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/../plugins/sfAltumoPlugin/data/' . $delta_type . 's/' . $delta_type . '_' . $hash . '.sql';
-                if( !file_exists($sf_altumo_database_filename) ){
-                    throw new \Exception('Script File ' . $database_filename . ' does not exist.');
-                }else{
-                    $database_filename = $sf_altumo_database_filename;
-                    $sf_altumo_delta = true;
-                }
-            }
-        
-        //build and run the shell command (using the mysql client)
-            $command = "mysql -u" . $this->getDatabaseUpdaterConfigurationFile()->getDatabaseUsername() .
-                        " -p" . $this->getDatabaseUpdaterConfigurationFile()->getDatabasePassword() .
-                        " -h" . $this->getDatabaseUpdaterConfigurationFile()->getDatabaseHostname() .
-                        " " . $this->getDatabaseUpdaterConfigurationFile()->getDatabaseName() .
-                        " < " . $database_filename;
-            `$command`;
-        
-        //log the action
-            switch( $delta_type ){
-                case self::DELTA_TYPE_UPGRADE_SCRIPT:
-                    $this->getDatabaseUpdateLogFile()->addUpgrade( $hash, $sf_altumo_delta );
-                    break;
-                    
-                case self::DELTA_TYPE_DROP:
-                    $this->getDatabaseUpdateLogFile()->addDrop( $hash, $sf_altumo_delta );
-                    break;
-                    
-                case self::DELTA_TYPE_SNAPSHOT:
-                    $this->getDatabaseUpdateLogFile()->addSnapshot( $hash, $sf_altumo_delta );
-                    break;
-                    
-                default:
-                    throw new \Exception('Unknown delta type.');
-                
-            }
-                
-        
-    }
-    
-    
+  
 }
