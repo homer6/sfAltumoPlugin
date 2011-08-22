@@ -55,6 +55,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * 
     * @param string $hash
     * @param boolean $upgrade
+    * @param boolean $data_update
     * @param boolean $drop
     * @param boolean $snapshot
     * @param boolean $altumo
@@ -62,7 +63,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * @throws \Exception if file is not open
     * @throws \Exception if file is not writable
     */    
-    public function addChange( $hash, $upgrade = null, $drop = null, $snapshot = null, $altumo = null ){
+    public function addChange( $hash, $upgrade = null, $data_update = null, $drop = null, $snapshot = null, $altumo = null ){
         
         $this->assertFileOpen();
         $this->assertFileWritable();
@@ -77,6 +78,14 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
                         $change->addAttribute( 'upgrade', 'true' );
                     }else{
                         $change->addAttribute( 'upgrade', 'false' );
+                    }
+                }       
+                                     
+                if( !is_null($data_update) ){
+                    if( $data_update ){
+                        $change->addAttribute( 'data_update', 'true' );
+                    }else{
+                        $change->addAttribute( 'data_update', 'false' );
                     }
                 }
             
@@ -176,6 +185,34 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
         
         return $this->getHashesSince( $since_hash, 'upgrade' );
         
+    }    
+    
+    
+    /**
+    * Gets an array of commit hashes (that a data update script was present in) 
+    * since (but not including) the supplied commit hash.
+    * 
+    * @param string $since_hash
+    * @return array
+    */
+    public function getDataUpdateHashesSince( $since_hash ){
+        
+        return $this->getHashesSince( $since_hash, 'data_update' );
+        
+    }
+        
+    
+    /**
+    * Gets an array of commit hashes (that a php or sql upgrade script was present in) 
+    * since (but not including) the supplied commit hash.
+    * 
+    * @param string $since_hash
+    * @return array
+    */
+    public function getPhpOrSqlUpgradeHashesSince( $since_hash ){
+        
+        return $this->getHashesSince( $since_hash, array( 'upgrade', 'data_update' ) );
+        
     }
     
     
@@ -249,35 +286,72 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     }
     
     
+    
     /**
     * Gets an array of commit hashes (that an $attribute script was present in) 
     * since (but not including) the supplied commit hash.
     * 
     * @param string $since_hash
-    * @param string $attribute
+    *   // The hash to start from, cronologically
     * 
-    * @throws \Exception //if build sequence attribute isn't recognized
-    * @throws \Exception //if file is not open
+    * @param string|array $attributes
+    *   // A single attribute or an array of attributes to match to "true"
+    * 
+    * @param string $match_all_attributes
+    *   // Whether to require all attributes to be "true" or to match based
+    *   // on at least one attribute. (when using an array of more than 2 attributes)
+    * 
+    * 
+    * @throws \Exception 
+    *   //if build sequence attribute isn't recognized
+    * 
+    * @throws \Exception 
+    *   //if file is not open
+    * 
+    * 
     * @return array
     */
-    protected function getHashesSince( $since_hash, $attribute ){
+    protected function getHashesSince( $since_hash, $attributes, $match_all_attributes ){
         
         $this->assertFileOpen();
         
-        if( !in_array($attribute, $this->getValidAttributes()) ){
-            throw new \Exception( 'Invalid build sequence attribute.' );
+        if( !is_array( $attributes ) ){
+            $attributes = array( $attributes );
+        }
+        
+        
+        if( $match_all_attributes ){
+            $attribute_operator = 'and';
+        } else {
+            $attribute_operator = 'or';
+        }
+
+        
+        foreach( $attributes as $attribute ){
+            if( !in_array($attribute, $this->getValidAttributes()) ){
+                throw new \Exception( sprintf('Invalid build sequence attribute "%s".', $attribute) );
+            }
         }
         
         //if the "since" hash was not found, set the hash position to so that it will match all entries
-        if( count( $this->getXmlRoot()->queryWithXpath( 'Change[@hash="' . $since_hash . '"]', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false ) ) == 0 ){
-            $hash_position = 0;
-        }else{
-            //get the position of the since_hash
-            $hash_position = count( $this->getXmlRoot()->queryWithXpath( 'Change[@hash="' . $since_hash . '"]/preceding-sibling::*', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false ) ) + 1;
-        }
+            if( count( $this->getXmlRoot()->queryWithXpath( 'Change[@hash="' . $since_hash . '"]', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false ) ) == 0 ){
+                $hash_position = 0;
+            }else{
+                //get the position of the since_hash
+                $hash_position = count( $this->getXmlRoot()->queryWithXpath( 'Change[@hash="' . $since_hash . '"]/preceding-sibling::*', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false ) ) + 1;
+            }
+        
+            $attribute_selector = '';
+            foreach( $attributes as $attribute ){
+                $attribute_selector[] = '@' . $attribute . '="true"';
+            }
+            
+            $attribute_selector = implode( ' ' . $attribute_operator . ' ', $attribute_selector );
+            
+
         
         //get the changes
-        $changes = $this->getXmlRoot()->queryWithXpath( 'Change[position() > ' . $hash_position . '][@' . $attribute . '="true"]/attribute::hash', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false );        
+        $changes = $this->getXmlRoot()->queryWithXpath( 'Change[position() > ' . $hash_position . '][' . $attribute_selector . ']/attribute::hash', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false );        
         
         return $changes;
         
@@ -291,7 +365,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     */
     protected function getValidAttributes(){
         
-        return array( 'upgrade', 'drop', 'snapshot', 'altumo' );
+        return array( 'upgrade', 'data_update', 'drop', 'snapshot', 'altumo' );
         
     }
     
@@ -327,6 +401,62 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
         
         return $changes;
         
+    }
+    
+    
+    /**
+    * Returns true if $hash has an upgrade_script.
+    * 
+    * 
+    * @param string $hash
+    * 
+    * 
+    * @return bool
+    */
+    public function isUpgradeHash( $hash ){
+
+        return $this->hashHasTrueAttribute( $hash, 'upgrade' );
+        
+    }
+ 
+
+    /**
+    * Returns true if $hash has a data_update
+    * 
+    * 
+    * @param string $hash
+    * 
+    * 
+    * @return bool
+    */
+    public function isDataUpdateHash( $hash ){
+
+        return $this->hashHasTrueAttribute( $hash, 'data_update' );
+        
+    }
+    
+    
+    /**
+    * Returns true if $hash has the given $attribute
+    * 
+    * 
+    * @param string $hash
+    *   // hash to evaluate
+    * 
+    * @param mixed $attribute
+    *   // attribute to match to "true"
+    */
+    protected function hashHasTrueAttribute( $hash, $attribute ){
+        
+        $this->assertFileOpen();
+        
+        if( !in_array($attribute, $this->getValidAttributes()) ){
+            throw new \Exception( 'Invalid build sequence attribute.' );
+        }
+        
+        $has_attribute = count( $this->getXmlRoot()->queryWithXpath( 'Change[@hash="' . $hash . '" and @' . $attribute . '="true"]', \Altumo\Xml\XmlElement::RETURN_TYPE_STRING, false ) ) == 1;
+
+        return $has_attribute;
     }
 
     

@@ -20,11 +20,13 @@ namespace sfAltumoPlugin\Deployment;
 * both the database and the class models are always in sync.
 * 
 * @author Steve Sperandeo <steve.sperandeo@altumo.com>
+* @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
 class DatabaseUpdater{
     
     const DELTA_TYPE_DROP = 'drop';
     const DELTA_TYPE_UPGRADE_SCRIPT = 'upgrade_script';
+    const DELTA_TYPE_DATA_UPDATE = 'data_update';
     const DELTA_TYPE_SNAPSHOT = 'snapshot';
     
     
@@ -236,12 +238,25 @@ class DatabaseUpdater{
                 
             }
             
-            $upgrade_hashes = $this->getDatabaseBuildSequenceFile()->getUpgradeHashesSince( $hash );
-            foreach( $upgrade_hashes as $upgrade_hash ){
-                $this->applyScript( $upgrade_hash, self::DELTA_TYPE_UPGRADE_SCRIPT );
-                ++$script_count;
-            }
-            
+            // Apply SQL upgrade scripts
+                $upgrade_hashes = $this->getDatabaseBuildSequenceFile()->getPhpOrSqlUpgradeHashesSince( $hash );
+                
+                foreach( $upgrade_hashes as $upgrade_hash ){
+                    
+                    // If this hash has an SQL upgrade script
+                        if( $this->getDatabaseBuildSequenceFile()->isUpgradeHash($upgrade_hash) ){
+                            $this->applyScript( $upgrade_hash, self::DELTA_TYPE_UPGRADE_SCRIPT );
+                            ++$script_count;
+                        }
+                    
+                    // If this hash has a php upgrade script
+                        if( $this->getDatabaseBuildSequenceFile()->isDataUpdateHash($upgrade_hash) ){
+                            $this->applyDataUpdate( $upgrade_hash );
+                            ++$script_count;
+                        }
+
+                }
+
         return $script_count;
         
     }
@@ -273,7 +288,7 @@ class DatabaseUpdater{
                 //try to find it in the sfAltumoPlugin folder too
                 $sf_altumo_database_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/../plugins/sfAltumoPlugin/data/' . $delta_type . 's/' . $delta_type . '_' . $hash . '.sql';
                 if( !file_exists($sf_altumo_database_filename) ){
-                    throw new \Exception('Script File ' . $database_filename . ' does not exist.');
+                    throw new \Exception('Script File "' . $database_filename . '" does not exist.');
                 }else{
                     $database_filename = $sf_altumo_database_filename;
                     $sf_altumo_delta = true;
@@ -306,6 +321,73 @@ class DatabaseUpdater{
                     throw new \Exception('Unknown delta type.');
                 
             }
+                
+        
+    }
+        
+    
+    /**
+    * Applies a data update 
+    * 
+    * A data update can perform operations at the application level. They have
+    * access to the same functionallity the application does. Data updates can 
+    * be used to modify data at the ORM level, or perform other operations
+    * conveniently from code.
+    * 
+    * @param string $hash                   //the commit hash of the delta
+    * 
+    * @throws \Exception
+    *   // if the hash for the commit where the data update file was added cannot be found.
+    */    
+    protected function applyDataUpdate( $hash ){
+        
+        // Remember the current position of the working tree.
+            $current_position = \Altumo\Git\Status::getCurrentBranch();
+            
+        
+        // Get the hash where the file was auto-moved to its folder by the build system
+            $autocommit_hash = \Altumo\Git\History::getCommitsAfterMatching( 
+                "^Autocommit\:\smoving.*" . $hash,
+                $hash
+            );
+        
+            if( count($autocommit_hash) != 1 ){
+                throw new \Exception( 'Unable to find an Autocommit for hash \"' . $hash . '\"' );
+            }
+            
+            $autocommit_hash = reset( array_keys($autocommit_hash) );
+
+
+        // Go to the commit where the data_update script was auto-committed
+            \Altumo\Git\WorkingTree::checkout( $autocommit_hash );
+            
+        // Update submodules
+            \Altumo\Git\WorkingTree::updateSubmodulesRecursively();
+            
+        // a submodule update would take place here too.
+
+                
+        
+        //determine the php script filename and ensure the file exists
+            $php_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/data_updates/' . 'data_update_' . $hash . '.php';
+           
+            if( !file_exists($php_filename) ){
+                throw new \Exception( 'Script File "' . $php_filename . '" does not exist.' );
+            }
+        
+            require_once( $php_filename );
+            
+            $data_update = new \sfAltumoPlugin\Deployment\DataUpdate();
+            
+            $data_update->run();
+          
+            
+        // return the tree to where it was before.   
+            \Altumo\Git\WorkingTree::checkout( $current_position );
+            
+        // Update submodules
+            \Altumo\Git\WorkingTree::updateSubmodulesRecursively();
+            
                 
         
     }

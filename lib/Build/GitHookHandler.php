@@ -101,7 +101,7 @@ class GitHookHandler{
     * Then, this method creates a new application "database build" if there is
     * a build to create:
     * 
-    * This method moves any "upgrade_script.sql", "drop.sql" or "snapshot.sql"
+    * This method moves any "upgrade_script.sql", "drop.sql", "snapshot.sql" or "data_update.php"
     * file that is being committed to the "data/new" directory to the
     * corresponding "data/upgrade_scripts", etc. directory and adds the upgrade,
     * drop or snapshot to the build sequence. Other environments running the
@@ -144,7 +144,6 @@ class GitHookHandler{
     * 
     */
     protected function createDatabaseDelta(){
-        
         $database_dir = $this->getDatabaseDirectory();
         //open the application build sequence for writing
             if( !$this->calledFromPlugin() ){
@@ -160,7 +159,8 @@ class GitHookHandler{
                 $last_commit_hash = \Altumo\Git\History::getLastCommitHash();
                 
             //check to see if there are any new scripts in the "new" folder  
-                $sql_files = $this->getFilesToMove( $last_commit_hash );                
+                $sql_files = $this->getFilesToMove( $last_commit_hash );     
+
                 if( empty($sql_files) ){
                     //no sql files to move
                     return;
@@ -172,38 +172,48 @@ class GitHookHandler{
                 $has_snapshot = false;
                 $has_drop = false;
                 $has_upgrade = false;
+                $has_data_update = false;
+                
+                
+                
                 
                 foreach( $sql_files as $sql_file ){
                     
                     //detach the extension */
-                        if( preg_match('%^(.*/)(.*?)(\\.sql)?$%im', $sql_file, $regs) ){
+                        if( preg_match('%^(.*/)(.*?)(\\.(sql|php))?$%im', $sql_file, $regs) ){
                             $file_path = $regs[1];
                             $file_stub = $regs[2];
                             $file_extension = $regs[3];
+                            $file_base_name = $file_stub . $file_extension;
                         }else{
                             throw new \sfCommandException( sprintf('Cannot find file with extension for "%s".', $sql_file) );
                         }
                         
                     //assemble the new filename                
-                        switch( $file_stub ){
+                        switch( $file_base_name ){
                             
-                            case 'drop':
+                            case 'drop.sql':
                                 $new_filename = $database_dir . '/drops/' . $file_stub . '_' . $last_commit_hash . $file_extension;
                                 $has_drop = true;
-                                break;
+                            break;
                             
-                            case 'upgrade_script':
+                            case 'upgrade_script.sql':
                                 $new_filename = $database_dir . '/upgrade_scripts/' . $file_stub . '_' . $last_commit_hash . $file_extension;
                                 $has_upgrade = true;
-                                break;
+                            break;
                             
-                            case 'snapshot':
+                            case 'data_update.php':
+                                $new_filename = $database_dir . '/data_updates/' . $file_stub . '_' . $last_commit_hash . $file_extension;
+                                $has_data_update = true;
+                            break;
+                            
+                            case 'snapshot.sql':
                                 $new_filename = $database_dir . '/snapshots/' . $file_stub . '_' . $last_commit_hash . $file_extension;
                                 $has_snapshot = true;
-                                break;
+                            break;
                                 
                             default:
-                                throw new \sfCommandException( sprintf('Error: unknown filetype (%s).', $file_stub) );
+                                throw new \sfCommandException( sprintf('Error: unknown filetype (%s).', $file_base_name) );
                             
                         }
                     
@@ -219,7 +229,7 @@ class GitHookHandler{
                     }
                 
             //update the build sequence log
-                $xml_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_drop, $has_snapshot );                
+                $xml_build_sequence->addChange( $last_commit_hash, $has_upgrade, $has_data_update, $has_drop, $has_snapshot );                
                 $xml_build_sequence->writeToFile();
                 $build_sequence_filename = $xml_build_sequence->getFilename();
                 $shell_command = "git add $build_sequence_filename";
@@ -267,7 +277,7 @@ class GitHookHandler{
                     
                     //add all of them, in order
                         foreach( $pending_deltas as $delta ){
-                            $xml_application_build_sequence->addChange( $delta, true, null, null, true );
+                            $xml_application_build_sequence->addChange( $delta, true, null, null, null, true );
                         }
                         
             }
@@ -389,6 +399,7 @@ class GitHookHandler{
         
     }
     
+    
         
     /**
     * Gets an array of sql files to move to the appropriate directories.
@@ -400,8 +411,7 @@ class GitHookHandler{
     protected function getFilesToMove( $commit_hash ){
           
         $database_dir = $this->getDatabaseDirectory();
-        $sql_files_in_filesystem = \Altumo\Utils\Finder::type('file')->name('*.sql')->in( $database_dir . '/new' );
-        
+        $sql_files_in_filesystem = \Altumo\Utils\Finder::type('file')->name('/\.(sql|php)$/')->in( $database_dir . '/new' );
         $sql_files_in_commit = $this->getNewDatabaseFilesByCommit( $commit_hash );
         
         $move_sql_files = array();
@@ -430,7 +440,9 @@ class GitHookHandler{
         $git_output = `$git_command`;
            
         $files = array();
-        preg_match_all( '%^(([MA])\\s+((.*?)data/new/(.*)\\.sql))?$%im', $git_output, $results, PREG_SET_ORDER );
+        preg_match_all( '%^(([MA])\\s+((.*?)data/new/(.*)\\.(sql|php)))?$%im', $git_output, $results, PREG_SET_ORDER );
+        
+        
         foreach( $results as $result ){
             if( array_key_exists(3,$result) ){
                 $files[] = $git_root_directory . '/' . $result[3];
