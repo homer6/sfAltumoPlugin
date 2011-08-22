@@ -211,7 +211,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     */
     public function getPhpOrSqlUpgradeHashesSince( $since_hash ){
         
-        return $this->getHashesSince( $since_hash, array( 'upgrade', 'data_update' ) );
+        return $this->getHashesSince( $since_hash, array( 'upgrade', 'data_update' ), false );
         
     }
     
@@ -311,7 +311,7 @@ class DatabaseBuildSequenceFile extends \Altumo\Xml\XmlFile{
     * 
     * @return array
     */
-    protected function getHashesSince( $since_hash, $attributes, $match_all_attributes ){
+    protected function getHashesSince( $since_hash, $attributes, $match_all_attributes = false ){
         
         $this->assertFileOpen();
         
