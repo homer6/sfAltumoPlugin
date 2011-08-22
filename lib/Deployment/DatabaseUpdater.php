@@ -375,11 +375,17 @@ class DatabaseUpdater{
                 throw new \Exception( 'Script File "' . $php_filename . '" does not exist.' );
             }
         
-            require_once( $php_filename );
+            $execute_update = function() use ( $php_filename ){
+        
+                require_once( $php_filename );
+                
+                $data_update = new DataUpdate();
+                
+                $data_update->run();
+                
+            };
             
-            $data_update = new \sfAltumoPlugin\Deployment\DataUpdate();
-            
-            $data_update->run();
+            $execute_update();
           
             
         // return the tree to where it was before.   
