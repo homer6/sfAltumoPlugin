@@ -357,16 +357,20 @@ class DatabaseUpdater{
             
             $autocommit_hash = reset( array_keys($autocommit_hash) );
 
+            
+        // remember current pwd
+            $old_pwd = getcwd();
+            
+        // Get working tree root path
+            $root_path = realpath( \sfConfig::get( 'sf_root_dir' ) . '/../../' );
 
         // Go to the commit where the data_update script was auto-committed
             \Altumo\Git\WorkingTree::checkout( $autocommit_hash );
             
         // Update submodules
+            chdir( $root_path );
             \Altumo\Git\WorkingTree::updateSubmodulesRecursively();
-            
-        // a submodule update would take place here too.
-
-                
+ 
         
         //determine the php script filename and ensure the file exists
             $php_filename =  $this->getDatabaseUpdaterConfigurationFile()->getDatabaseDirectory() . '/data_updates/' . 'data_update_' . $hash . '.php';
@@ -375,26 +379,25 @@ class DatabaseUpdater{
                 throw new \Exception( 'Script File "' . $php_filename . '" does not exist.' );
             }
         
-            $execute_update = function() use ( $php_filename ){
-        
-                require_once( $php_filename );
-                
-                $data_update = new DataUpdate();
-                
-                $data_update->run();
-                
-            };
+        // Call the altumo:apply-data-update in a separate process
+
+            $project_path = realpath( \sfConfig::get( 'sf_root_dir' ) );
             
-            $execute_update();
-          
+            chdir( $project_path );
             
-        // return the tree to where it was before.   
-            \Altumo\Git\WorkingTree::checkout( $current_position );
-            
-        // Update submodules
-            \Altumo\Git\WorkingTree::updateSubmodulesRecursively();
-            
+                $command = "./symfony altumo:apply-data-update {$hash}";
                 
+                // execute command
+                    \Altumo\Utils\Shell::runWithPipedOutput( $command );
+                
+                // return the tree to where it was before.   
+                    \Altumo\Git\WorkingTree::checkout( $current_position );
+                    
+                // Update submodules
+                    chdir( $root_path );
+                    \Altumo\Git\WorkingTree::updateSubmodulesRecursively();
+            
+             chdir( $old_pwd );   
         
     }
     

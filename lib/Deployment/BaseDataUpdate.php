@@ -21,7 +21,7 @@ namespace sfAltumoPlugin\Deployment;
 * SQL will be applied to the database first and then the data update code is 
 * executed.
 * 
-* @author Steve Sperandeo <steve.sperandeo@altumo.com>
+* @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
 class BaseDataUpdate implements \sfAltumoPlugin\Deployment\DataUpdateInterface{
  
@@ -29,7 +29,6 @@ class BaseDataUpdate implements \sfAltumoPlugin\Deployment\DataUpdateInterface{
     }
     
     public function run(){
-        echo "\n\nBASE\n\n";
     }
 
 }
