@@ -74,6 +74,11 @@ EOF;
         switch( $command ){
             
             case 'update':
+            
+                    if( \Altumo\Git\Status::hasChanges() ){
+                        throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update' );
+                    }
+            
                     $number_of_scripts_executed = $database_updater->update( $arguments );
                     
                 break;

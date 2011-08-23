@@ -340,7 +340,7 @@ class DatabaseUpdater{
     *   // if the hash for the commit where the data update file was added cannot be found.
     */    
     protected function applyDataUpdate( $hash ){
-        
+
         // Remember the current position of the working tree.
             $current_position = \Altumo\Git\Status::getCurrentBranch();
             
