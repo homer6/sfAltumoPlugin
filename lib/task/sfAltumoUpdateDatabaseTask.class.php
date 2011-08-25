@@ -34,7 +34,7 @@ class sfAltumoUpdateDatabaseTask extends sfAltumoBaseTask {
             new sfCommandOption('application', null, sfCommandOption::PARAMETER_OPTIONAL, 'The application name', null),
             new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
             new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel'),
-            new sfCommandOption('ignore-working-tree-changes', null, sfCommandOption::PARAMETER_OPTIONAL, 'Attempts to perform updates regardless of whether there are changes in the working tree.', null )
+            new sfCommandOption('ignore-working-tree-changes', null, sfCommandOption::PARAMETER_OPTIONAL, 'Attempts to perform updates regardless of whether there are changes in the working tree.', false )
         ));
 
         $this->name = 'update-database';
