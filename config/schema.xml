@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="propel" package="lib.model" defaultIdMethod="native">
 
+    <!-- Order of sections: Columns, Foreign Keys, Indexes, Uniques, Behaviors -->
+
+    
     <table name="country">
         
         <!-- Fixture representing a Country --> 
@@ -120,19 +123,35 @@
     <table name="user">
 
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-        <column name="user_id" type="integer" required="true" />
+        <column name="password_reset_key" type="varchar" required="false" size="16" />
+        <column name="sf_guard_user_id" type="integer" required="true" />
         <column name="contact_information_id" type="INTEGER" required="false" />
+        <column name="active" type="boolean" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
 
+        
         <foreign-key foreignTable="contact_information" onDelete="restrict">
             <reference local="contact_information_id" foreign="id" />
         </foreign-key>
 
         <foreign-key foreignTable="sf_guard_user" onDelete="cascade">
-            <reference local="user_id" foreign="id" />
-        </foreign-key>    
-
+            <reference local="sf_guard_user_id" foreign="id" />
+        </foreign-key>
+        
+        
+        <index>
+            <index-column name="active" />
+        </index>
+        
+        <unique>
+            <unique-column name="password_reset_key" />
+        </unique>
+        
+        <unique>
+            <unique-column name="sf_guard_user_id" />
+        </unique>
+        
     </table>
     
     
@@ -156,7 +175,6 @@
             <index-column name="client_ip_address" />
         </index>
         
-
         <index>
             <index-column name="time" />
         </index>
@@ -307,5 +325,6 @@
         </index>
 
     </table>
+        
 
 </database>
