@@ -31,6 +31,9 @@ class sfAltumoUpdateDatabaseTask extends sfAltumoBaseTask {
         
         $this->addOptions(array(
             //new sfCommandOption( 'database-directory', null, sfCommandOption::PARAMETER_REQUIRED, 'The database directory.', null )
+            new sfCommandOption('application', null, sfCommandOption::PARAMETER_OPTIONAL, 'The application name', null),
+            new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
+            new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel')
         ));
 
         $this->name = 'update-database';
@@ -48,6 +51,8 @@ EOF;
    */
     protected function execute( $arguments = array(), $options = array() ) {
 
+        $databaseManager = new sfDatabaseManager($this->configuration);
+        
         $database_dir = sfConfig::get( 'sf_data_dir' );
         $default_build_sequence_file = $database_dir . '/build-sequence.xml';
         $default_update_log_file = $database_dir . '/update-log.xml';
@@ -69,6 +74,11 @@ EOF;
         switch( $command ){
             
             case 'update':
+            
+                    if( \Altumo\Git\Status::hasChanges() ){
+                        throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update' );
+                    }
+            
                     $number_of_scripts_executed = $database_updater->update( $arguments );
                     
                 break;
