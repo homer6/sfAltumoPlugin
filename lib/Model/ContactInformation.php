@@ -21,7 +21,7 @@ class ContactInformation extends \BaseContactInformation {
     * @see State::getIsoCode()
     * 
     * @return mixed
-    *   // ISO code of State (string) or null if not set.
+    *   // Full ISO code of State (string) or null if not set.
     */
     public function getStateIsoCode(){
         
@@ -38,13 +38,31 @@ class ContactInformation extends \BaseContactInformation {
     * If state ( @see getState ) is set, return the state's iso short code
     * @see State::getIsoShortCode()
     * 
-    * @return mixed
-    *   // ISO code of State (string) or null if not set.
+    * @return string
+    *   // Short (2letter) ISO code of State (string) or null if not set.
     */
     public function getStateIsoShortCode(){
         
         if( $this->getState() ){
             return $this->getState()->getIsoShortCode();
+        }
+        
+        return null;
+        
+    }    
+    
+    
+    /**
+    * If state ( @see getState ) is set, return the country's name
+    * @see State::getCountry()::getName()
+    * 
+    * @return string
+    *   // Full country name
+    */
+    public function getCountryName(){
+        
+        if( $this->getState() ){
+            return $this->getState()->getCountry()->getName();
         }
         
         return null;
