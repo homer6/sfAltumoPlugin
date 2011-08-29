@@ -12,29 +12,19 @@
         <column name="name" type="VARCHAR" size="64" required="true" />
         <column name="iso_code" type="VARCHAR" size="12" required="true" />
         <column name="iso_short_code" type="VARCHAR" size="2" required="true" />
-        <column name="created_at" type="timestamp" />
-        <column name="updated_at" type="timestamp" />
         
         
         <index>
             <index-column name="name" />
         </index>
         
-        <index>
-            <index-column name="iso_short_code" />
-        </index>
-        
-        <index>
-            <index-column name="iso_code" />
-        </index>
-        
         
         <unique>
             <unique-column name="iso_short_code" />
-        </unique>        
+        </unique>
         
         <unique>
-            <unique-column name="iso_short_code" />
+            <unique-column name="iso_code" />
         </unique>
 
     </table>
