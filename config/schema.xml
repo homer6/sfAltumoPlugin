@@ -84,8 +84,9 @@
         <!-- Contact information for an entity. Can be associated to any object that is contactable -->
 
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
-        <column name="first_name" type="VARCHAR" size="64" />
-        <column name="last_name" type="VARCHAR" size="64" />
+        <column name="first_name" type="VARCHAR" size="64" required="false" />
+        <column name="last_name" type="VARCHAR" size="64" required="false" />
+        <column name="company_name" type="VARCHAR" size="128" required="false" />
         <column name="email_address" type="VARCHAR" size="150" />
         <column name="phone_main_number" type="VARCHAR" size="32"/>
         <column name="phone_other_number" type="VARCHAR" size="32"/>
