@@ -3,7 +3,7 @@
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'contact_information' table.
+ * Skeleton subclass for performing query and update operations on the 'contact' table.
  *
  * 
  *
@@ -16,6 +16,7 @@
 
 namespace sfAltumoPlugin\Model;
 
-class ContactInformationQuery extends \BaseContactInformationQuery {
+class ContactPeer extends \BaseContactPeer {
 
-} // ContactInformationQuery
+
+}
