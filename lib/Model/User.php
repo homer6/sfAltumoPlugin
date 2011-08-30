@@ -50,4 +50,4 @@ class User extends \BaseUser {
         
     }
 
-} // ContactInformation
+} // Contact

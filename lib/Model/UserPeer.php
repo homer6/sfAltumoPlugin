@@ -33,4 +33,4 @@ class UserPeer extends \BaseUserPeer {
 
     }
     
-} // ContactInformationPeer
+} // ContactPeer

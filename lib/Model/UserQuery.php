@@ -18,4 +18,4 @@ namespace sfAltumoPlugin\Model;
 
 class UserQuery extends \BaseUserQuery {
 
-} // ContactInformationQuery
+} // ContactQuery
