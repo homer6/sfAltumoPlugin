@@ -398,6 +398,8 @@ class DatabaseUpdater{
                     \Altumo\Git\WorkingTree::updateSubmodulesRecursively();
             
              chdir( $old_pwd );   
+             
+             $this->getDatabaseUpdateLogFile()->addDataUpdate( $hash );
         
     }
     
