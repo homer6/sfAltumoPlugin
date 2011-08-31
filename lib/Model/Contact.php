@@ -20,16 +20,14 @@ class Contact extends \BaseContact{
     
         
     /**
-    * If state ( @see getState ) is set, return the state's iso code
-    * @see State::getIsoCode()
+    * Return the states' ISO code (e.g. CA-BC), else null if state is not set.
     * 
-    * @return mixed
-    *   // Full ISO code of State (string) or null if not set.
+    * @return string
     */
     public function getStateIsoCode(){
         
-        if( $this->getState() ){
-            return $this->getState()->getIsoCode();
+        if( $state = $this->getState() ){
+            return $state->getIsoCode();
         }
         
         return null;
@@ -38,16 +36,14 @@ class Contact extends \BaseContact{
     
     
     /**
-    * If state ( @see getState ) is set, return the state's iso short code
-    * @see State::getIsoShortCode()
+    * Return the states' ISO code (e.g. BC), else null if state is not set.
     * 
     * @return string
-    *   // Short (2letter) ISO code of State (string) or null if not set.
     */
     public function getStateIsoShortCode(){
         
-        if( $this->getState() ){
-            return $this->getState()->getIsoShortCode();
+        if( $state = $this->getState() ){
+            return $state->getIsoShortCode();
         }
         
         return null;
@@ -56,21 +52,115 @@ class Contact extends \BaseContact{
     
     
     /**
-    * If state ( @see getState ) is set, return the country's name
-    * @see State::getCountry()::getName()
+    * Return the country's name (e.g. Canada), else null if state is not set.
     * 
     * @return string
-    *   // Full country name
     */
     public function getCountryName(){
         
-        if( $this->getState() ){
-            return $this->getState()->getCountry()->getName();
+        if( $state = $this->getState() ){
+            return $state->getCountry()->getName();
         }
         
         return null;
         
     }    
+    
+    
+    /**
+    * Get state full name (e.g. British Columbia). Returns null if state is not
+    * set.
+    * 
+    * @return string
+    */
+    public function getStateName(){
+        
+        if( $state = $this->getState() ){
+            return $state->getName();
+        }
+        
+        return null;
+        
+    }
+    
+    
+    /**
+    * Parses the Person's name and attempts to extract First, Middle and/or 
+    * Last name.
+    * 
+    * @param string $full_name 
+    *   // the full name to parse
+    * 
+    * @param string $get_part 
+    *   // (first_name|middle_name|last_name|null) if null, an array of parts 
+    *       will be returned.
+    * 
+    * @throws \Exception                    
+    *   // if $get_part is invalid
+    * 
+    * 
+    * @return string|array
+    */
+    protected static function parsePersonFullName( $full_name, $get_part = null ){
+
+        // Validate Input
+            if( !is_null($get_part) ){
+                $valid_parts = array( 'first_name', 'middle_name', 'last_name' );
+                if( !in_array($get_part, $valid_parts) ){
+                    throw new \Exception( 'parsePersonFullName expects get_part to be one of: ' . implode( ', ', $valid_parts)  );
+                }
+            }
+
+        // Split full name on spaces
+            $name_parts = explode( ' ', trim( $full_name ) );
+
+
+        // Parse name parts
+            switch( count( $name_parts ) ){
+
+                case 0:
+                    return null;
+                    break;
+
+                case 1:
+                    $parsed_name = array(
+                        'first_name' => $name_parts[0],
+                        'middle_name' => '',
+                        'last_name' => ''
+                    );
+                    break;
+
+                case 2:
+                    $parsed_name = array(
+                        'first_name' => $name_parts[0],
+                        'middle_name' => '',
+                        'last_name' => $name_parts[1]
+                    );
+                    break;
+
+                case 3:
+                    $parsed_name = array(
+                        'first_name' => $name_parts[0],
+                        'middle_name' => $name_parts[1],
+                        'last_name' => $name_parts[2]
+                    );
+                    break;
+
+                default:
+                    $parsed_name = array(
+                        'first_name' => $name_parts[0],
+                        'middle_name' => $name_parts[1],
+                        'last_name' => implode( ' ', array_slice( $name_parts, 2 ) )
+                    );
+            }
+        
+        if( !is_null( $get_part ) ){
+            return $parsed_name[$get_part];
+        } else {
+            return $parsed_name;
+        }
+        
+    }
     
 
 } 
