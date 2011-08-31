@@ -43,7 +43,7 @@
         <column name="updated_at" type="timestamp" />
 
         
-        <foreign-key name="fi_country_id" foreignTable="country" onDelete="cascade">
+        <foreign-key foreignTable="country" onDelete="cascade">
             <reference local="country_id" foreign="id" />
         </foreign-key>
 
@@ -69,8 +69,9 @@
         <!-- Contact information for an entity. Can be associated to any object that is contactable -->
     
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-        <column name="first_name" type="varchar" required="true" size="64" />
-        <column name="last_name" type="varchar" required="true" size="64" />
+        <column name="first_name" type="VARCHAR" size="64" required="false" />
+        <column name="last_name" type="VARCHAR" size="64" required="false" />
+        <column name="company_name" type="VARCHAR" size="128" required="false" />
         <column name="email_address" type="varchar" required="true" size="150" />
         <column name="phone_main_number" type="varchar" required="false" size="32" />
         <column name="phone_other_number" type="varchar" required="false" size="32" />
@@ -82,17 +83,12 @@
         <column name="zip_code" type="varchar" size="7" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
-        
-        
+
+
         <foreign-key foreignTable="state" onDelete="restrict">
             <reference local="state_id" foreign="id" />
         </foreign-key>
 
-        
-        <index name="index_full_name">
-            <index-column name="first_name" />
-            <index-column name="last_name" />
-        </index>
 
         <index name="index_email_address">
             <index-column name="email_address" />
@@ -122,11 +118,11 @@
         <column name="updated_at" type="timestamp" />
 
         
-        <foreign-key name="fi_contact_id" foreignTable="contact" onDelete="restrict">
+        <foreign-key foreignTable="contact" onDelete="restrict">
             <reference local="contact_id" foreign="id" />
         </foreign-key>
 
-        <foreign-key name="fi_sf_guard_user_id" foreignTable="sf_guard_user" onDelete="cascade">
+        <foreign-key foreignTable="sf_guard_user" onDelete="cascade">
             <reference local="sf_guard_user_id" foreign="id" />
         </foreign-key>
         
@@ -157,7 +153,7 @@
         <column name="user_id" required="false" type="INTEGER" />
         
 
-        <foreign-key name="fi_user_id" foreignTable="user" onDelete="cascade">
+        <foreign-key foreignTable="user" onDelete="cascade">
             <reference local="user_id" foreign="id" />
         </foreign-key>
         
@@ -189,7 +185,7 @@
         <column name="updated_at" type="timestamp" />
         
         
-        <foreign-key name="fi_session_id" foreignTable="session" onDelete="cascade">
+        <foreign-key foreignTable="session" onDelete="cascade">
             <reference local="session_id" foreign="id" />
         </foreign-key>
         
@@ -253,11 +249,11 @@
         <column name="updated_at" type="timestamp" />
         
         
-        <foreign-key name="fi_system_event_id" foreignTable="system_event" onDelete="cascade" onUpdate="cascade">
+        <foreign-key foreignTable="system_event" onDelete="cascade" onUpdate="cascade">
             <reference local="system_event_id" foreign="id" />
         </foreign-key>
         
-        <foreign-key name="fi_user_id" foreignTable="user" onDelete="cascade" onUpdate="cascade">
+        <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
             <reference local="user_id" foreign="id" />
         </foreign-key>
         
@@ -279,11 +275,11 @@
         <column name="updated_at" type="timestamp" />
         
         
-        <foreign-key name="fi_system_event_id" foreignTable="system_event" onDelete="cascade" onUpdate="cascade">
+        <foreign-key foreignTable="system_event" onDelete="cascade" onUpdate="cascade">
             <reference local="system_event_id" foreign="id" />
         </foreign-key>
         
-        <foreign-key name="fi_user_id" foreignTable="user" onDelete="cascade" onUpdate="cascade">
+        <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
             <reference local="user_id" foreign="id" />
         </foreign-key>
 
@@ -302,11 +298,11 @@
         <column name="updated_at" type="timestamp" />
         
         
-        <foreign-key name="fi_system_event_instance_id" foreignTable="system_event_instance" onDelete="cascade" onUpdate="cascade">
+        <foreign-key foreignTable="system_event_instance" onDelete="cascade" onUpdate="cascade">
             <reference local="system_event_instance_id" foreign="id" />
         </foreign-key>
         
-        <foreign-key name="fi_system_event_subscription_id" foreignTable="system_event_subscription" onDelete="cascade" onUpdate="cascade">
+        <foreign-key foreignTable="system_event_subscription" onDelete="cascade" onUpdate="cascade">
             <reference local="system_event_subscription_id" foreign="id" />
         </foreign-key>
         

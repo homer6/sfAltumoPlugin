@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Skeleton subclass for representing a row from the 'contact_information' table.
+ * Skeleton subclass for representing a row from the 'user' table.
  *
  * 
  *
@@ -50,4 +50,4 @@ class User extends \BaseUser {
         
     }
 
-} // ContactInformation
+} 

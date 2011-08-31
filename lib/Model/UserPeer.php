@@ -3,7 +3,7 @@
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'contact' table.
+ * Skeleton subclass for performing query and update operations on the 'user' table.
  *
  * 
  *
@@ -33,4 +33,4 @@ class UserPeer extends \BaseUserPeer {
 
     }
     
-} // ContactInformationPeer
+}

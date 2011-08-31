@@ -16,6 +16,7 @@
 
 namespace sfAltumoPlugin\Model;
 
-class UserQuery extends \BaseUserQuery {
+class ContactPeer extends \BaseContactPeer {
 
-} // ContactQuery
+
+}
