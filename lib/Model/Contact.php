@@ -18,6 +18,68 @@ namespace sfAltumoPlugin\Model;
 
 class Contact extends \BaseContact{
     
+    
+    /**
+    * Gets this contact's full name.
+    * 
+    */
+    public function __toString(){
+        
+        return $this->getFullName();
+        
+    }
+    
+    
+    /**
+    * Get Mailing Address including city and state in one line.
+    * 
+    * @return string
+    */
+    public function getMailingAddressFullOneLine(){
+        
+        return $this->getMailingAddress() . ', ' . $this->getCity() . ', ' . $this->getState()->getName();
+        
+    }    
+    
+
+    /**
+    * Sets this contact's state by state ISO code.
+    * 
+    * @param string $iso_code
+    * @throws \Exception                    //if ISO code does not exist
+    * @throws \Exception                    //if ISO code is not a non-empty 
+    *                                         string
+    */
+    public function setStateIsoCode( $iso_code ){
+        
+        $iso_code = \Altumo\Validation\Strings::assertNonEmptyString($iso_code);
+        $iso_code = strtoupper($iso_code);
+        
+        $state = \StatePeer::retrieveByCode($iso_code);
+        if( !$state ){
+            throw new \Exception( 'Unknown ISO code: ' . $iso_code );
+        }
+        $this->setState($state);
+        
+    }
+    
+    
+    /**
+    * Get state full name (e.g. British Columbia). Returns null if state is not
+    * set.
+    * 
+    * @return string
+    */
+    public function getStateName(){
+        
+        if( $state = $this->getState() ){
+            return $state->getName();
+        }
+        
+        return null;
+        
+    }
+    
         
     /**
     * Return the states' ISO code (e.g. CA-BC), else null if state is not set.
@@ -68,18 +130,74 @@ class Contact extends \BaseContact{
     
     
     /**
-    * Get state full name (e.g. British Columbia). Returns null if state is not
-    * set.
+    * Get Country
+    * 
+    * @return Country
+    */
+    public function getCountry(){
+        
+        return $this->getState()->getCountry();
+        
+    }
+    
+    
+    /**
+    * Get Country short iso code.
     * 
     * @return string
     */
-    public function getStateName(){
+    public function getCountryIsoShortCode(){
         
-        if( $state = $this->getState() ){
-            return $state->getName();
+        $country = $this->getCountry();
+        
+        if( !is_null( $country ) ){
+            return $country->getIsoShortCode();
         }
         
         return null;
+        
+    }
+
+    
+    /**
+    * Returns the person's full name in the format specified.
+    * 
+    * E.g. Reginald Smith
+    * %1$s = First ( Reginald )
+    * %2$s = Last ( Smith )
+    * %3$s = First initial ( R )
+    * %4$s = Last Initial ( S )
+    * 
+    * @param string $format
+    * @return string
+    */
+    public function getFullName( $format = '%1$s %2$s' ){
+        
+        $first_name = $this->getFirstName();
+        $last_name = $this->getLastName();
+        
+        return sprintf( $format, $first_name, $last_name, $first_name[0], $last_name[0] );
+        
+    }
+        
+    
+    /**
+    * Set Full Name. This will attempt to parse the full name into first 
+    * and last name.
+    * 
+    * @param string $full_name
+    */
+    public function setFullName( $full_name ){
+        
+        if( empty( $full_name ) ){
+            $this->setFirstName( null );
+            $this->setLastName( null );
+        }
+        
+        $parsed_full_name = self::parsePersonFullName( $full_name );
+        
+        $this->setFirstName( $parsed_full_name['first_name'] . ( empty( $parsed_full_name['middle_name'] ) ? '' : ' ' ) . $parsed_full_name['middle_name'] );
+        $this->setLastName( $parsed_full_name['last_name'] );
         
     }
     

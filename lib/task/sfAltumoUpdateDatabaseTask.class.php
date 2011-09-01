@@ -79,7 +79,7 @@ EOF;
                     $ignore_working_tree_changes = \Altumo\Validation\Booleans::assertLooseBoolean( $options['ignore-working-tree-changes'] );
             
                     if( \Altumo\Git\Status::hasChanges() && !$ignore_working_tree_changes ){
-                        throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update' );
+                        throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update or pass the ignore-working-tree-changes flag.' );
                     }
             
                     $number_of_scripts_executed = $database_updater->update( $arguments );

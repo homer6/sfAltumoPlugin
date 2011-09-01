@@ -18,4 +18,22 @@ namespace sfAltumoPlugin\Model;
 
 class SingleSignOnKeyPeer extends \BaseSingleSignOnKeyPeer {
 
-} // SingleSignOnKeyPeer
+    
+    /**
+    * Get by Secret
+    * 
+    * @param mixed $secret
+    * @return Reseller
+    */
+    public static function retrieveBySecret( $secret, $include_unused_only = false ){
+        
+        return \SingleSignOnKeyQuery::create()
+            ->_if( $include_unused_only )
+                ->filterByUsed( false )
+            ->_endif()
+            ->findOneBySecret( $secret );
+        
+    }
+    
+    
+}

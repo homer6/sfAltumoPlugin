@@ -18,6 +18,7 @@ namespace sfAltumoPlugin\Model;
 
 class StatePeer extends \BaseStatePeer {
 
+    
     /**
     * Find a State by name, and optionally filter by country.
     *
@@ -27,7 +28,7 @@ class StatePeer extends \BaseStatePeer {
     */
     public static function retrieveByName( $name, $country = null ){
         
-        return StateQuery::create()
+        return \StateQuery::create()
             ->filterByName( $name )
             ->_if( !is_null( $country ) )
                 ->filterByCountry( !is_null( $country ) ? $country : null )
@@ -46,7 +47,7 @@ class StatePeer extends \BaseStatePeer {
     */
     public static function retrieveByCode( $iso_code, $country = null ){
         
-        return StateQuery::create()
+        return \StateQuery::create()
             ->where( 'State.IsoCode LIKE ?', $iso_code )
             ->orWhere( 'State.IsoShortCode LIKE ?', $iso_code )
             ->_if( !is_null( $country ) )
@@ -55,5 +56,6 @@ class StatePeer extends \BaseStatePeer {
         ->findOne();
         
     }
+ 
     
-} // StatePeer
+}

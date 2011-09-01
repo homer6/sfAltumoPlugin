@@ -18,4 +18,17 @@ namespace sfAltumoPlugin\Model;
 
 class State extends \BaseState {
 
-} // State
+    
+    /**
+    * Gets this State's name as a string.
+    * 
+    * @return string
+    */
+    public function __toString(){
+        
+        return $this->getName();
+        
+    }
+
+    
+}
