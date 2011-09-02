@@ -16,7 +16,7 @@ abstract class BaseUserForm extends BaseFormPropel
     $this->setWidgets(array(
       'id'                     => new sfWidgetFormInputHidden(),
       'email'                  => new sfWidgetFormInputText(),
-      'contact_information_id' => new sfWidgetFormPropelChoice(array('model' => 'ContactInformation', 'add_empty' => true)),
+      'contact_id' => new sfWidgetFormPropelChoice(array('model' => 'Contact', 'add_empty' => true)),
       'salt'                   => new sfWidgetFormInputText(),
       'password'               => new sfWidgetFormInputText(),
       'password_reset_key'     => new sfWidgetFormInputText(),
@@ -28,7 +28,7 @@ abstract class BaseUserForm extends BaseFormPropel
     $this->setValidators(array(
       'id'                     => new sfValidatorPropelChoice(array('model' => 'User', 'column' => 'id', 'required' => false)),
       'email'                  => new sfValidatorString(array('max_length' => 128)),
-      'contact_information_id' => new sfValidatorPropelChoice(array('model' => 'ContactInformation', 'column' => 'id', 'required' => false)),
+      'contact_id' => new sfValidatorPropelChoice(array('model' => 'Contact', 'column' => 'id', 'required' => false)),
       'salt'                   => new sfValidatorString(array('max_length' => 128)),
       'password'               => new sfValidatorString(array('max_length' => 128)),
       'password_reset_key'     => new sfValidatorString(array('max_length' => 16, 'required' => false)),

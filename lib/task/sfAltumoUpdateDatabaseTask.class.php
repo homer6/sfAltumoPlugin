@@ -33,7 +33,8 @@ class sfAltumoUpdateDatabaseTask extends sfAltumoBaseTask {
             //new sfCommandOption( 'database-directory', null, sfCommandOption::PARAMETER_REQUIRED, 'The database directory.', null )
             new sfCommandOption('application', null, sfCommandOption::PARAMETER_OPTIONAL, 'The application name', null),
             new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
-            new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel')
+            new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel'),
+            new sfCommandOption('ignore-working-tree-changes', null, sfCommandOption::PARAMETER_OPTIONAL, 'Attempts to perform updates regardless of whether there are changes in the working tree.', false )
         ));
 
         $this->name = 'update-database';
@@ -75,8 +76,10 @@ EOF;
             
             case 'update':
             
-                    if( \Altumo\Git\Status::hasChanges() ){
-                        throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update' );
+                    $ignore_working_tree_changes = \Altumo\Validation\Booleans::assertLooseBoolean( $options['ignore-working-tree-changes'] );
+            
+                    if( \Altumo\Git\Status::hasChanges() && !$ignore_working_tree_changes ){
+                        throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update or pass the ignore-working-tree-changes flag.' );
                     }
             
                     $number_of_scripts_executed = $database_updater->update( $arguments );

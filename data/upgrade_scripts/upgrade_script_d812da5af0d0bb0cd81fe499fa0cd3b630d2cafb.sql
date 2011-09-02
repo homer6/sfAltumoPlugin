@@ -1,6 +1,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
  
-CREATE TABLE `user`
+CREATE TABLE IF NOT EXISTS `user`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(128)  NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `user`
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `session`
+CREATE TABLE IF NOT EXISTS `session`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `session_key` VARCHAR(32)  NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE `session`
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `single_sign_on_key`
+CREATE TABLE IF NOT EXISTS `single_sign_on_key`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `secret` VARCHAR(32)  NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE `single_sign_on_key`
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `system_event`
+CREATE TABLE IF NOT EXISTS `system_event`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(64)  NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE `system_event`
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `system_event_subscription`
+CREATE TABLE IF NOT EXISTS `system_event_subscription`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `system_event_id` INTEGER  NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE `system_event_subscription`
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `system_event_instance`
+CREATE TABLE IF NOT EXISTS `system_event_instance`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `system_event_id` INTEGER  NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE `system_event_instance`
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `system_event_instance_message`
+CREATE TABLE IF NOT EXISTS `system_event_instance_message`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
     `system_event_instance_id` INTEGER  NOT NULL,

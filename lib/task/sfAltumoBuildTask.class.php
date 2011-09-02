@@ -67,7 +67,7 @@ EOF;
         
         foreach( $commands as $command ){
             
-            `$command`;
+            \Altumo\Utils\Shell::runWithPipedOutput( $command );
             
         }
         

@@ -18,4 +18,14 @@ namespace sfAltumoPlugin\Model;
 
 class Country extends \BaseCountry {
 
-} // Country
+    
+    /**
+    * Gets this country's name as a string.
+    */
+    public function __toString(){
+        
+        return $this->getName();
+        
+    }
+    
+}

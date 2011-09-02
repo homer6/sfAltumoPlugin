@@ -18,6 +18,7 @@ namespace sfAltumoPlugin\Model;
 
 class SessionPeer extends \BaseSessionPeer {
 
+    
     /**
     * Retrieves a single Session by the provided session key
     *
@@ -31,5 +32,6 @@ class SessionPeer extends \BaseSessionPeer {
         ->findOne();
 
     }
+    
 
-} // SessionPeer
+}

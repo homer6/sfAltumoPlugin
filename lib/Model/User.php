@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Skeleton subclass for representing a row from the 'contact_information' table.
+ * Skeleton subclass for representing a row from the 'user' table.
  *
  * 
  *
@@ -27,8 +27,8 @@ class User extends \BaseUser {
     */
     public function getFullName( $format = "%s %s" ){
         
-        $first_name = $this->getContactInformation()->getFirstName();
-        $last_name = $this->getContactInformation()->getLastName();
+        $first_name = $this->getContact()->getFirstName();
+        $last_name = $this->getContact()->getLastName();
         
         return sprintf( $format, $first_name, $last_name );
     }
@@ -50,4 +50,4 @@ class User extends \BaseUser {
         
     }
 
-} // ContactInformation
+} 

@@ -66,6 +66,21 @@ class DatabaseUpdateLogFile extends \Altumo\Xml\XmlFile{
         $this->addLogEntryByType( $hash, 'Upgrade', $altumo_hash );
         
     }    
+        
+    
+    /**
+    * Adds a record of a data update.  This happens when a data update gets applied to an application
+    * 
+    * 
+    * @param string $hash
+    * 
+    * @throws \Exception                    //if this log file isn't open
+    */    
+    public function addDataUpdate( $hash ){
+        
+        $this->addLogEntryByType( $hash, 'DataUpdate', null );
+        
+    }    
     
     
     /**

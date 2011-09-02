@@ -18,4 +18,19 @@ namespace sfAltumoPlugin\Model;
 
 class SystemEventPeer extends \BaseSystemEventPeer {
 
-} // SystemEventPeer
+    
+    /**
+    * Gets a single SystemEvent by unique key.
+    * 
+    * @return SystemEvent
+    */
+    static public function retrieveByUniqueKey( $unique_key ){
+        
+        return \SystemEventQuery::create()
+                    ->filterByUniqueKey( $unique_key )
+                    ->findOne();
+        
+    }
+    
+    
+}
