@@ -28,7 +28,7 @@ class sfAltumoApplyDataUpdateTask extends sfAltumoBaseTask {
         parent::configure();
         
         $this->addArguments(array(
-            new sfCommandArgument( 'hash', sfCommandArgument::REQUIRED, 'hash of the script to apply.' )
+            new sfCommandArgument( 'hash', sfCommandArgument::REQUIRED, 'hash of the script to apply, or "new" to test uncommitted data_update.' )
         ));
         
         $this->addOptions(array(
@@ -52,16 +52,27 @@ EOF;
    * @see sfTask
    */
     protected function execute( $arguments = array(), $options = array() ) {
-        
+
         // Initialize Updated configuration
             $data_dir = sfConfig::get( 'sf_data_dir' );
 
         // Initialize database
             $databaseManager = new sfDatabaseManager($this->configuration);
-        
+
         // Find and include data_update script
             $hash = $arguments['hash'];
-            $script = $data_dir . '/data_updates/' . 'data_update_' . $hash . '.php';
+
+            // Run the uncommitted data_update (in the new folder) if it exists.
+                if( $hash == 'new' ){
+
+                    $script = $data_dir . '/new/' . 'data_update.php';
+
+                } else {
+
+                    $script = $data_dir . '/data_updates/' . 'data_update_' . $hash . '.php';
+
+                }
+                
             
             if( !is_readable( $script ) ){
                 throw new \Exception( "\"{$script}\" does not exist or is not readable." );
