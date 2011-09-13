@@ -251,7 +251,7 @@ class ApiRequest extends \sfWebRequest{
                 if( preg_match('/\\s*Basic\\s+(.*?)\\s*$/im', $api_key, $regs) ){
                     $api_key = $regs[1];
                     
-                    $api_user = ApiUserQuery::create()
+                    $api_user = \ApiUserQuery::create()
                                     ->filterByApiKey($api_key)
                                     ->filterByActive(true)
                                     ->findOne();
@@ -259,10 +259,10 @@ class ApiRequest extends \sfWebRequest{
                     if( !$api_user ){
                         throw new \Exception('Unknown or inactive API user.');
                     }
-                    if( 0 ) $api_user = new ApiUser();
+                    if( 0 ) $api_user = new \ApiUser();
                     $sf_guard_user = $api_user->getUser()->getsfGuardUser();
                     if( $sf_guard_user->getIsActive() ){
-                        sfContext::getInstance()->getUser()->signIn($sf_guard_user, false);
+                        \sfContext::getInstance()->getUser()->signIn( $sf_guard_user, false );
                     }else{
                         throw new \Exception('Unknown or inactive API user.');
                     }
@@ -280,7 +280,7 @@ class ApiRequest extends \sfWebRequest{
                               
                 $session_id = $this->getCookie( sfConfig::get('altumo_api_session_cookie_name', 'my_session_name'), null );
                 if( !is_null($session_id) ){
-                    $session = SessionPeer::retrieveBySessionKey($session_id);
+                    $session = \SessionPeer::retrieveBySessionKey($session_id);
                     if( !$session ){
                         throw new \Exception('Invalid session.'); 
                     }
@@ -295,7 +295,7 @@ class ApiRequest extends \sfWebRequest{
                     if( !$api_user->isActive() ){
                         throw new \Exception('Inactive API user.');
                     }else{
-                        sfContext::getInstance()->getUser()->signIn($user->getsfGuardUser(), false);
+                        \sfContext::getInstance()->getUser()->signIn($user->getsfGuardUser(), false);
                     }
                     
                 }else{
