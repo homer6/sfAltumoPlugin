@@ -22,28 +22,35 @@ namespace sfAltumoPlugin\Api;
 class ApiFieldMap{
         
     protected $request_field = null;
-    protected $required = null;
     protected $description = null;
     protected $model_accessor = null;
+    protected $flags = 0;
 
+    //If you add a flag here, the next number must be double the last (eg. 4)
+    const FLAG_REQUIRED = 1;
+    const FLAG_READONLY = 2;
+    
     
     /**
     * Constructor for this ApiFieldMap.
     * 
     * @param string $request_field
-    * @param boolean $required
+    * @param integer $flags                  //a combination of flags of this field
     * @param string $description
     * @param string $model_accessor
     * @return \sfAltumoPlugin\Api\ApiFieldMap
     */
-    public function __construct( $request_field, $required = true, $description = null, $model_accessor = null ){
+    public function __construct( $request_field, $flags = null, $description = null, $model_accessor = null ){
     
         if( !is_string($request_field) ){
             throw new \Exception( 'Request field must be a string.' );
         }
         
         $this->setRequestField( $request_field );
-        $this->setRequired( $required );
+        
+        if( !is_null($flags) ){
+            $this->setFlags( $flags );
+        }
                 
         if( !is_null($description) ){
             $this->setDescription( $description );
@@ -93,7 +100,7 @@ class ApiFieldMap{
     */
     public function setRequired( $required ){
     
-        $this->required = $required;
+        $this->setFlag( self::FLAG_REQUIRED, \Altumo\Validation\Booleans::assertLooseBoolean($required) );
         
     }
     
@@ -105,7 +112,31 @@ class ApiFieldMap{
     */
     public function isRequired(){
     
-        return $this->required;
+        return $this->testFlag( self::FLAG_REQUIRED );
+        
+    }
+        
+    
+    /**
+    * Setter for the read_only field on this \sfAltumoPlugin\Api\ApiFieldMap.
+    * 
+    * @param boolean $read_only
+    */
+    public function setReadOnly( $read_only ){
+    
+        $this->setFlag( self::FLAG_READONLY, \Altumo\Validation\Booleans::assertLooseBoolean($read_only) );
+        
+    }
+    
+    
+    /**
+    * Getter for the read_only field on this \sfAltumoPlugin\Api\ApiFieldMap.
+    * 
+    * @return boolean
+    */
+    public function isReadOnly(){
+    
+        return $this->testFlag( self::FLAG_READONLY );
         
     }
         
@@ -156,6 +187,34 @@ class ApiFieldMap{
         return $this->model_accessor;
         
     }
+
+    
+    /**
+    * Setter for the flags field on this \sfAltumoPlugin\Api\ApiFieldMap.
+    * 
+    * @param integer $flags
+    */
+    public function setFlags( $flags ){
+    
+        $flags = \Altumo\Validation\Numerics::assertUnsignedInteger( $flags );
+        
+        $this->flags = $flags;
+                        
+        $this->validateFlags();
+        
+    }
+    
+    
+    /**
+    * Getter for the flags field on this \sfAltumoPlugin\Api\ApiFieldMap.
+    * 
+    * @return integer
+    */
+    public function getFlags(){
+    
+        return $this->flags;
+        
+    }
         
 
     /**
@@ -174,6 +233,60 @@ class ApiFieldMap{
         );
     
     }
+    
+    
+    /**
+    * Determines if this flag is set within $this->flags.
+    * 
+    * @param integer $flag                  //one of the FLAG constants.
+    * 
+    * @return boolean
+    */
+    protected function testFlag( $flag ){
+
+        if( ($flag & $this->flags) == $flag ){
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
+    
+    
+    /**
+    * Determines if this flag is set within $this->flags.
+    * 
+    * @param integer $flag                  //one of the FLAG constants.
+    * @param boolean $enable                //whether to enable or disable
+    * 
+    * @return boolean
+    */
+    protected function setFlag( $flag, $enable ){
+        
+        if( $enable ){
+            $this->flags = $flag | $this->flags;
+        }else{
+            $this->flags = ~$flag & $this->flags;
+        }
+        
+        $this->validateFlags();
+        
+    }
+    
+    
+    /**
+    * Validates that the flags make sense.
+    * 
+    * @throws \Exception                    //if they don't
+    */
+    protected function validateFlags(){
+        
+        if( $this->isReadOnly() && $this->isRequired() ){
+            throw new \Exception( 'You can\'t have a field that is both required and readonly.' );
+        }
+                
+    }
+    
     
     
 }

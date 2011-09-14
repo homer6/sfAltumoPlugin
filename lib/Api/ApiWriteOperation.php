@@ -737,7 +737,12 @@ class ApiWriteOperation {
                     //try to apply the values in the $request_object to the $model_type accessors      
                         foreach( $field_maps as $field_map ){
                             
-                            //if( 0 ) $field_map = new \sfAltumoPlugin\Api\ApiFieldMap();
+                            if( 0 ) $field_map = new \sfAltumoPlugin\Api\ApiFieldMap();
+                            
+                            //skip if readonly
+                                if( $field_map->isReadOnly() ){
+                                    continue;
+                                }
                             
                             $field_key = $field_map->getRequestField();
                             if( array_key_exists( $field_key, $request_object ) ){
