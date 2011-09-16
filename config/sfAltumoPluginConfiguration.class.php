@@ -43,8 +43,6 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
             
             $loader->register();
             
-        // autoloader for swift
-            //require_once( __DIR__ . '/../lib/vendor/swiftmailer/lib/swift_required.php' );
             
         // Add altumo paths to sfConfig
             sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );
