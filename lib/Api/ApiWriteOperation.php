@@ -74,10 +74,12 @@ class ApiWriteOperation {
     *     modify_result callback with GET, POST and PUT. Also, in auto, the 
     *     $model object is guaranteed to be a model object.
     * 
-    * @param function $before_save( &$model, &$request_object, &$response )
+    * @param function $before_save( &$model, &$request_object, &$response, $remote_id )
     *   //Used in Automatic Mode. The function to call that is invoked just
     *     just before the model is saved (after all of the accessor have been
-    *     called).
+    *     called). You can attached an Error to the response with this remote_id
+    *     to prevent this model from being saved and output an appropriate error
+    *     message.
     * 
     * @param \ModelCriteria $query
     *   //The model Query that is used to look up an existing record for
@@ -156,7 +158,6 @@ class ApiWriteOperation {
             if( is_callable($modify_result) ){
                 $this->setModifyResult( $modify_result );
             }
-
             
         //before save
             if( is_callable($before_save) ){
@@ -376,16 +377,11 @@ class ApiWriteOperation {
     * @param string $model_name
     */
     public function setModelName( $model_name ){
-        
-        /*
-            //if no namespace specified, mark as global
-                if( substr($model_name, 0, 1) !== '\\' ){
+
+        //if no namespace specified, mark as global
+            if( substr($model_name, 0, 1) !== '\\' ){
                 $model_name = '\\' . $model_name;
             }
-        */
-        //some models (those that don't extend from sfAltumoPlugin) don't
-        //work with a global namespace "\" added to them..
-        //e.g. class_parents fails. (j)
 
         $this->model_name = $model_name;
         
@@ -588,15 +584,14 @@ class ApiWriteOperation {
             //Extract the results
                 $results = array();
                 foreach( $write_operation_results as $model ){
-                    
-                    /*
-                    Why is this a requirement? (j)                    
-                    if( !($model instanceof \stdClass) ){
-                        throw new \Exception( 'Process objects must return an array of \stdClass objects.' );
-                    }*/
-                    
+               
                     if( !is_object( $model ) ){
                         throw new \Exception( 'Process objects manually callback must return an array of objects.' );
+                    }
+                    
+                    //this is a requirement because these objects get passed directly to json_encode            
+                    if( !($model instanceof \stdClass) ){
+                        throw new \Exception( 'Process objects must return an array of \stdClass objects.' );
                     }
                     
                     $result_object = array();
@@ -685,8 +680,8 @@ class ApiWriteOperation {
                 $connection->beginTransaction();
                     
                     //validate the remote_id (it should always be set, this is just a sanity check)
-                        if( array_key_exists( 'remote_id', $request_object ) ){                            
-                            $remote_id = $request_object['remote_id'];                            
+                        if( array_key_exists( 'remote_id', $request_object ) ){
+                            $remote_id = $request_object['remote_id'];
                         }else{
                             throw new \Exception( 'Remote ID not found in record.' );
                         }
@@ -775,7 +770,7 @@ class ApiWriteOperation {
                         
                     //invoke the $before_save callback
                         if( !is_null($before_save) && is_callable($before_save) ){
-                            $before_save($new_model, $request_object, $response );
+                            $before_save($new_model, $request_object, $response, $remote_id );
                         }
                         
                     //if there were errors with this record, don't save it
