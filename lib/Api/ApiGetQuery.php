@@ -182,7 +182,7 @@ class ApiGetQuery{
     * Runs the queries that have been supplied and updates the 
     * ApiResponseBody within the ApiResponse.
     * 
-    */     
+    */    
     public function runQuery(){
         
         $query = $this->getQuery();
@@ -197,10 +197,10 @@ class ApiGetQuery{
         $results = array();
         if( $pager->getPageSize() > 0 ){
             $db_results = $query->find();
-            foreach( $db_results as $model ){                
-                $result_object = array();                                
+            foreach( $db_results as $model ){
+                $result_object = array();
                 $modify_result( $model, $result_object );
-                $results[] = $result_object;                
+                $results[] = $result_object;
             }
         }
         
