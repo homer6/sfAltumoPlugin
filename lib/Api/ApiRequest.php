@@ -136,6 +136,12 @@ class ApiRequest extends \sfWebRequest{
             
         }
         
+        //this allows a single object to be passed. this allows people that use the api
+        //to not have to wrap a single object in an array
+        if( !is_array($base_object_modifications[0]) ){
+            $base_object_modifications = array( $base_object_modifications );
+        }
+        
         //get the hightest supplied remote_id; also, check that none of the supplied
         //remote_ids are duplicates
             $remote_id = 0;
@@ -200,9 +206,9 @@ class ApiRequest extends \sfWebRequest{
         $object_ids = \Altumo\Validation\Arrays::sanitizeCsvArrayPostitiveInteger( $this->getParameter('ids', '') );
         $raw_message_body = $this->getMessageBodyData();
         
-        if( $method == 'PUT' && !empty( $object_ids ) ) {
+        if( $method == self::PUT && !empty($object_ids) ){
             
-            // If the body looks like an array of arrays, we'll assume it does not 
+            // If the body is not an array of arrays, we require expansion
                 if( !isset( $raw_message_body[0] ) || !is_array( $raw_message_body[0] ) ){
                     return true;
                 }

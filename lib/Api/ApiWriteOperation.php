@@ -11,6 +11,8 @@
  
 namespace sfAltumoPlugin\Api;
 
+
+
 /**
 * This class represents an API request designed to write records (models).
 * 
@@ -74,7 +76,8 @@ class ApiWriteOperation {
     *     modify_result callback with GET, POST and PUT. Also, in auto, the 
     *     $model object is guaranteed to be a model object.
     * 
-    * @param function $before_save( &$model, &$request_object, &$response, $remote_id )
+    * @param function $before_save( &$model, &$request_object, &$response, 
+    *     $remote_id ) 
     *   //Used in Automatic Mode. The function to call that is invoked just
     *     just before the model is saved (after all of the accessor have been
     *     called). You can attached an Error to the response with this remote_id
@@ -122,8 +125,6 @@ class ApiWriteOperation {
     *   //Used in Manual Mode. The function to call in order to perform a manual
     *     write operation. Must return an array of saved Models or stdObjects.
     *     $objects is an array of stdObjects that is the request body.
-    *     This function gets executed within a database transaction. If an
-    *     exception is thrown, the entire operation is rolled back.
     * 
     * @param function $before_setters( &$model, &$request_object, &$response )
     *   //Used in Automatic Mode. The function to call that is invoked just
@@ -372,17 +373,17 @@ class ApiWriteOperation {
     
     /**
     * Setter for the model_name field on this ApiWriteOperation.
-    * Adds a global namespace if no namespace is specified.
+    * Adds a global namespace if no namespace is specified; therefore, the 
+    * provided namespace MUST be absolute and not relative.
     * 
     * @param string $model_name
     */
     public function setModelName( $model_name ){
-
+    
         //if no namespace specified, mark as global
-            if( substr($model_name, 0, 1) !== '\\' ){
-                $model_name = '\\' . $model_name;
-            }
-
+        if( substr($model_name, 0, 1) !== '\\' ){
+            $model_name = '\\' . $model_name;
+        }
         $this->model_name = $model_name;
         
     }
@@ -506,24 +507,22 @@ class ApiWriteOperation {
     */
     public function run(){
                 
-        $modify_result = $this->getModifyResult();        
+        $modify_result = $this->getModifyResult();
         $request_message_body = $this->getRequest()->getMessageBody();
         $response = $this->getResponse();
-
         
         if( $this->isAutomatic() ){
-
+            
             //Execute write operation
-                $write_operation_results = $this->saveGenericModels( $request_message_body );
+                $write_operation_results = $this->saveGenericModels($request_message_body);
                 if( !is_array($write_operation_results) ){
                     throw new \Exception( 'Write operations result must be an array.' );
                 }
                 
             //Extract the results
                 $results = array();
-
                 foreach( $write_operation_results as $model ){
-                    if( !($model instanceof BaseObject) ){
+                    if( !($model instanceof \BaseObject) ){
                         throw new \Exception( 'Process objects must return an array of Model objects.' );
                     }
                     $result_object = array();
@@ -545,61 +544,28 @@ class ApiWriteOperation {
                 
             
         }else if( $this->isManual() ){
-
+            
             //Execute the manual write operation
                 $process_objects_manually = $this->getProcessObjectsManually();
-                
                 if( is_callable($process_objects_manually) ){
-
-                    // Use a transaction for the write operations
-                        $peer = eval( 'return new ' . $this->getModelName() . 'Peer();' );
-
-                        try {
-                            
-                            $connection = \Propel::getConnection( $peer::DATABASE_NAME, \Propel::CONNECTION_WRITE );
-                            $connection->beginTransaction();
-                        
-                            $write_operation_results = $process_objects_manually( $response, $request_message_body );
-                            
-                            $connection->commit();
-                            
-                        } catch( \Exception $e ){
-                            
-                            $connection->rollBack();
-                            
-                            throw $e;
-                            
-                        }
-                        
-                    
+                    $write_operation_results = $process_objects_manually( $response, $request_message_body );                    
                     if( !is_array( $write_operation_results ) ){
-                        throw new \Exception( 'Process objects manually callback must return an array (of objects).' );
+                        throw new \Exception( 'Process objects manually callback must return an array of saved Models or stdObjects.' );
                     }
-                    
                 }else{
                     throw new \Exception( 'If ApiWriteOperation is in manual mode, process objects callback must be defined.' );
                 }
 
-
             //Extract the results
                 $results = array();
                 foreach( $write_operation_results as $model ){
-               
-                    if( !is_object( $model ) ){
-                        throw new \Exception( 'Process objects manually callback must return an array of objects.' );
+                    if( !($model instanceof \stdClass) && !($model instanceof \BaseObject) ){
+                        throw new \Exception( 'Process objects must return an array of \stdClass objects or \BaseObject.' );
                     }
-                    
-                    //this is a requirement because these objects get passed directly to json_encode            
-                    if( !($model instanceof \stdClass) ){
-                        throw new \Exception( 'Process objects must return an array of \stdClass objects.' );
-                    }
-                    
                     $result_object = array();
-                    
-                    if( is_callable( $modify_result ) ){
+                    if( is_callable($modify_result) ){
                         $modify_result( $model, $result_object );
                     }
-                    
                     $results[] = $result_object;
                 }
             
@@ -648,7 +614,7 @@ class ApiWriteOperation {
             }
         
         //validate the $model_type and get the peer and query classes.
-            if( !in_array('BaseObject', class_parents($model_type ))){
+            if( !in_array('BaseObject', class_parents($model_type)) ){
                 throw new \Exception('Model Type must be an existing propel model class.');
             }
             
@@ -671,7 +637,7 @@ class ApiWriteOperation {
 
                 
         $returned_models = array();
-
+        
         foreach( $request_objects as $request_object ){
 
             try{
@@ -680,8 +646,8 @@ class ApiWriteOperation {
                 $connection->beginTransaction();
                     
                     //validate the remote_id (it should always be set, this is just a sanity check)
-                        if( array_key_exists( 'remote_id', $request_object ) ){
-                            $remote_id = $request_object['remote_id'];
+                        if( array_key_exists( 'remote_id', $request_object ) ){                            
+                            $remote_id = $request_object['remote_id'];                            
                         }else{
                             throw new \Exception( 'Remote ID not found in record.' );
                         }
@@ -732,12 +698,7 @@ class ApiWriteOperation {
                     //try to apply the values in the $request_object to the $model_type accessors      
                         foreach( $field_maps as $field_map ){
                             
-                            if( 0 ) $field_map = new \sfAltumoPlugin\Api\ApiFieldMap();
-                            
-                            //skip if readonly
-                                if( $field_map->isReadOnly() ){
-                                    continue;
-                                }
+                            //if( 0 ) $field_map = new \sfAltumoPlugin\Api\ApiFieldMap();
                             
                             $field_key = $field_map->getRequestField();
                             if( array_key_exists( $field_key, $request_object ) ){
@@ -882,4 +843,3 @@ class ApiWriteOperation {
     
     
 }
-    
