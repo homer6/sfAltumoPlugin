@@ -24,6 +24,7 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
 
         // Include the Altumo loader.
             //require_once( dirname(__FILE__) . '/../lib/vendor/altumo/source/php/loader.php' );
+
         
         //set default timezone
             date_default_timezone_set( 'America/Los_Angeles' );
@@ -41,8 +42,10 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
             ));
             
             $loader->register();
-
-
+            
+        // autoloader for swift
+            //require_once( __DIR__ . '/../lib/vendor/swiftmailer/lib/swift_required.php' );
+            
         // Add altumo paths to sfConfig
             sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );
             sfConfig::set( 'altumo_javascript_lib_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/lib/javascript' );
@@ -51,6 +54,7 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
         // Add altumo Api Settings            
             sfConfig::set( 'altumo_api_session_cookie_name', 'api_session' );
         
+
         /**
         * Upon execution, add the Altumo global web assets to the response
         * on every request.
