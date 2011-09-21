@@ -18,6 +18,7 @@ namespace sfAltumoPlugin\Model;
 
 class UserPeer extends \BaseUserPeer {
 
+    
     /** 
     * @param mixed $username
     * 
@@ -32,5 +33,34 @@ class UserPeer extends \BaseUserPeer {
         ->findOne();
 
     }
+        
+   
+    /**
+    * Determines whether the provided $email_address is available to be used. 
+    * This is a case-insensitive match.
+    * 
+    * @param string $email_address
+    * @throws \Exception                    //if email address format is invalid
+    * @return boolean
+    */
+    public static function testAvailableEmailAddress( $email_address, $exception_message = null ){
+        
+        $email_address = \Altumo\Validation\Emails::assertEmailAddress( $email_address, $exception_message );
+        $email_address = strtolower( $email_address );
+        
+        $count = UserQuery::create()
+                    ->usesfGuardUserQuery()
+                        ->filterByUsername( $email_address )
+                    ->endUse()
+                ->count();
+        
+        if( $count === 0 ){
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
+    
     
 }
