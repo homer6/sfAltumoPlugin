@@ -738,14 +738,19 @@ class ApiWriteOperation {
                         if( $response->hasErrorsForRemoteId($remote_id) ){
                             $connection->rollBack();
                         }else{
-                            $new_model->save();
-                            $connection->commit();
-                            $returned_models[] = $new_model;
+                            try{
+                                $new_model->save();
+                                $connection->commit();
+                                $returned_models[] = $new_model;
+                            }catch( \Exception $e ){
+                                $response->addError( $e->getMessage(), $remote_id );
+                                //throw $e;
+                            }
                         }
                 
             }catch( Exception $e ){
                 $connection->rollBack();
-                throw $e;
+                //throw $e;
             }
         
         }
