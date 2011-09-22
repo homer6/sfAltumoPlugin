@@ -253,15 +253,18 @@ class ApiResponse extends \sfWebResponse{
 
 
     /**
-    * Adds this exception to this response as an ApiError.
+    * Adds this exception to this response as an ApiError, if debugging is 
+    * enabled.
     * 
     * @param \Exception $exception
     */
     public function addException( $exception ){
         
         $this->setStatusCode( '403' ); //forbidden
-        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
-        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
+        if( \sfConfig::get('sf_debug', false) ){
+            $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
+            $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
+        }
         
     }
     
