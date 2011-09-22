@@ -37,7 +37,10 @@ class ApiFieldMap{
     * @param string $request_field
     * @param integer $flags                  //a combination of flags of this field
     * @param string $description
-    * @param string $model_accessor
+    * @param string $model_accessor          
+    *   //eg. provide: "CountryByCountryCode" and it will become 
+    *     "getCountryByCountryCode" and "setCountryByCountryCode"
+    *                                           
     * @return \sfAltumoPlugin\Api\ApiFieldMap
     */
     public function __construct( $request_field, $flags = null, $description = null, $model_accessor = null ){
