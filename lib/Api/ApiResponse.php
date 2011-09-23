@@ -226,11 +226,17 @@ class ApiResponse extends \sfWebResponse{
     * @param integer $remote_id             //Optional - defaults to null.  Is 
     *                                         ignored if $error is an ApiError
     * 
+    * @param \sfAltumoPlugin\Api\ApiFieldMap $field_map
+    *                                       //Optional - if set, this passes 
+    *                                         the field name onto the error 
+    *                                         result
+    * 
+    * 
     * @throws Exception                     // if $error isn't an 
     *                                         \sfAltumoPlugin\Api\ApiError 
     *                                         object or string
     */
-    public function addError( $error, $remote_id = null ){
+    public function addError( $error, $remote_id = null, $field_map = null ){
     
         if( !( $error instanceof \sfAltumoPlugin\Api\ApiError ) ){
             if( !is_string($error) ){
@@ -244,7 +250,7 @@ class ApiResponse extends \sfWebResponse{
                         $remote_id = null;
                     }
                 }
-                $error = new \sfAltumoPlugin\Api\ApiError( $error, $remote_id );
+                $error = new \sfAltumoPlugin\Api\ApiError( $error, $remote_id, $field_map );
             }
         }
         $this->errors[] = $error;
