@@ -226,10 +226,10 @@ class ApiResponse extends \sfWebResponse{
     * @param integer $remote_id             //Optional - defaults to null.  Is 
     *                                         ignored if $error is an ApiError
     * 
-    * @param \sfAltumoPlugin\Api\ApiFieldMap $field_map
+    * @param \sfAltumoPlugin\Api\ApiFieldMap|string $field_map
     *                                       //Optional - if set, this passes 
     *                                         the field name onto the error 
-    *                                         result
+    *                                         result. This can be a string too.
     * 
     * 
     * @throws Exception                     // if $error isn't an 

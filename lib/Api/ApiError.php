@@ -34,7 +34,7 @@ class ApiError{
     * @param integer $remote_id 
     *   //optional - defaults to null
     * 
-    * @param \sfAltumoPlugin\Api\ApiFieldMap $remote_id 
+    * @param \sfAltumoPlugin\Api\ApiFieldMap|string $remote_id 
     *   //optional - defaults to null
     * 
     * @return \sfAltumoPlugin\Api\ApiError
@@ -43,6 +43,9 @@ class ApiError{
     
         $this->setRemoteId( $remote_id );
         $this->setMessage( $message );
+        if( is_string($field_map) ){
+            $field_map = new \sfAltumoPlugin\Api\ApiFieldMap( $field_map );
+        }
         $this->setFieldMap( $field_map );
      
     }        
