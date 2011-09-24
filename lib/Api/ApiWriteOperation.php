@@ -514,7 +514,7 @@ class ApiWriteOperation {
         if( $this->isAutomatic() ){
             
             //Execute write operation
-                $write_operation_results = $this->saveGenericModels($request_message_body);
+                $write_operation_results = $this->saveGenericModels( $request_message_body );
                 if( !is_array($write_operation_results) ){
                     throw new \Exception( 'Write operations result must be an array.' );
                 }
@@ -522,24 +522,17 @@ class ApiWriteOperation {
             //Extract the results
                 $results = array();
                 foreach( $write_operation_results as $model ){
+                    
                     if( !($model instanceof \BaseObject) ){
                         throw new \Exception( 'Process objects must return an array of Model objects.' );
                     }
                     $result_object = array();
-                    /*
-                    foreach( $this->getFieldMaps() as $field_map ){
-                        //if( 0 ) $field_map = new \sfAltumoPlugin\Api\ApiFieldMap();
-                        $field_name = $field_map->getRequestField();
-                        $accessor_method = 'get' . $field_map->getModelAccessor();
-                        if( !method_exists($model, $accessor_method) ){
-                            throw new \Exception('Accessor method does not exist: ' . $accessor_method );
-                        }
-                        $result_object[$field_name] = call_user_func_array( array($model, $accessor_method), array() );                        
-                    }*/
+
                     if( is_callable($modify_result) ){
                         $modify_result( $model, $result_object );
                     }
                     $results[] = $result_object;
+                    
                 }
                 
             
@@ -549,7 +542,7 @@ class ApiWriteOperation {
                 $process_objects_manually = $this->getProcessObjectsManually();
                 if( is_callable($process_objects_manually) ){
                     $write_operation_results = $process_objects_manually( $response, $request_message_body );                    
-                    if( !is_array( $write_operation_results ) ){
+                    if( !is_array($write_operation_results) ){
                         throw new \Exception( 'Process objects manually callback must return an array of saved Models or stdObjects.' );
                     }
                 }else{

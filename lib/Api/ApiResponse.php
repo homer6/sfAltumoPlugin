@@ -267,8 +267,8 @@ class ApiResponse extends \sfWebResponse{
     public function addException( $exception ){
         
         $this->setStatusCode( '403' ); //forbidden
-        if( \sfConfig::get('sf_debug', false) ){
-            $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
+        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
+        if( \sfConfig::get('sf_debug', false) ){            
             $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
         }
         
