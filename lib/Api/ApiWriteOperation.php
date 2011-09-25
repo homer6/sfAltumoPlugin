@@ -664,7 +664,9 @@ class ApiWriteOperation {
                                         continue;
                                     }
 
-                                    $new_model = $this->getQuery()
+                                    $current_query = clone $this->query;
+                                    
+                                    $new_model = $current_query
                                             ->filterById( $id )
                                             ->findOne();
                                     
@@ -727,7 +729,7 @@ class ApiWriteOperation {
                         
                     //invoke the $before_save callback
                         if( !is_null($before_save) && is_callable($before_save) ){
-                            $before_save($new_model, $request_object, $response, $remote_id );
+                            $before_save( $new_model, $request_object, $response, $remote_id, $update );
                         }
                         
                     //if there were errors with this record, don't save it
@@ -795,6 +797,7 @@ class ApiWriteOperation {
     *   //an array of $type objects (models)
     */
     static public function callObjectSetters( $update, $response, $model, &$field_maps, &$request_object, $remote_id = null ){
+
         
         foreach( $field_maps as $field_map ){
             
