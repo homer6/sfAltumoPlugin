@@ -836,7 +836,7 @@ class ApiWriteOperation {
             //invoke the setter and attach error, if there is one
                 try{
                     call_user_func_array( array($model, $setter_method), array($request_object[$field_key]) );                    
-                }catch( Exception $e ){
+                }catch( \Exception $e ){
                     $response->addError( $e->getMessage(), $remote_id, $field_map );
                 }
             
