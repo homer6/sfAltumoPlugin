@@ -514,7 +514,7 @@ class ApiWriteOperation {
         if( $this->isAutomatic() ){
             
             //Execute write operation
-                $write_operation_results = $this->saveGenericModels($request_message_body);
+                $write_operation_results = $this->saveGenericModels( $request_message_body );
                 if( !is_array($write_operation_results) ){
                     throw new \Exception( 'Write operations result must be an array.' );
                 }
@@ -522,24 +522,17 @@ class ApiWriteOperation {
             //Extract the results
                 $results = array();
                 foreach( $write_operation_results as $model ){
+                    
                     if( !($model instanceof \BaseObject) ){
                         throw new \Exception( 'Process objects must return an array of Model objects.' );
                     }
                     $result_object = array();
-                    /*
-                    foreach( $this->getFieldMaps() as $field_map ){
-                        //if( 0 ) $field_map = new \sfAltumoPlugin\Api\ApiFieldMap();
-                        $field_name = $field_map->getRequestField();
-                        $accessor_method = 'get' . $field_map->getModelAccessor();
-                        if( !method_exists($model, $accessor_method) ){
-                            throw new \Exception('Accessor method does not exist: ' . $accessor_method );
-                        }
-                        $result_object[$field_name] = call_user_func_array( array($model, $accessor_method), array() );                        
-                    }*/
+
                     if( is_callable($modify_result) ){
                         $modify_result( $model, $result_object );
                     }
                     $results[] = $result_object;
+                    
                 }
                 
             
@@ -549,7 +542,7 @@ class ApiWriteOperation {
                 $process_objects_manually = $this->getProcessObjectsManually();
                 if( is_callable($process_objects_manually) ){
                     $write_operation_results = $process_objects_manually( $response, $request_message_body );                    
-                    if( !is_array( $write_operation_results ) ){
+                    if( !is_array($write_operation_results) ){
                         throw new \Exception( 'Process objects manually callback must return an array of saved Models or stdObjects.' );
                     }
                 }else{
@@ -638,6 +631,7 @@ class ApiWriteOperation {
                 
         $returned_models = array();
         
+        
         foreach( $request_objects as $request_object ){
 
             try{
@@ -655,31 +649,35 @@ class ApiWriteOperation {
                     //if this is an update (PUT) write operation, as opposed to a create (POST)
                         if( $update ){
                             
+                            $id_field_map = new \sfAltumoPlugin\Api\ApiFieldMap( 'id', null, 'ID' );
+                            
                             //get the object by id
                                 if( array_key_exists( 'id', $request_object ) ){
                                     
-                                    $id = $request_object['id'];
+                                    $id = $request_object['id'];                                    
                                     
                                     try{
                                         $id = \Altumo\Validation\Numerics::assertPositiveInteger( $id );                                
                                     }catch( Exception $e ){
-                                        $response->addError( 'An id was passed that is not a positive integer.' );
+                                        $response->addError( 'An id was passed that is not a positive integer.', $remote_id, $id_field_map );
                                         $connection->rollBack();
                                         continue;
                                     }
 
-                                    $new_model = $this->getQuery()
+                                    $current_query = clone $this->query;
+                                    
+                                    $new_model = $current_query
                                             ->filterById( $id )
                                             ->findOne();
                                     
                                     if( !$new_model ){
-                                        $response->addError( 'Object with the id: ' . $id . ' could not be found.' );
+                                        $response->addError( 'Object with the id: ' . $id . ' could not be found.', $remote_id, $id_field_map );
                                         $connection->rollBack();
                                         continue;
                                     }
                                     
                                 }else{
-                                    $response->addError( 'There was a record sent that doesn\'t have an id.');
+                                    $response->addError( 'There was a record sent that doesn\'t have an id.', $remote_id, $id_field_map );
                                     $connection->rollBack();
                                     continue;
                                 }
@@ -713,14 +711,14 @@ class ApiWriteOperation {
                                     call_user_func_array( array($new_model, $method), array( $request_object[$field_key] ) );
                                 }catch( \Exception $e ){
                                     //catch the exception and add it to the error list if the field contain an invalid value
-                                    $response->addError( $field_map->getDescription() . ': '. $e->getMessage(), $remote_id );
+                                    $response->addError( $field_map->getDescription() . ': '. $e->getMessage(), $remote_id, $field_map );
                                 }
                                 
                             }else{
                                 
                                 if( $field_map->isRequired() ){
                                     if( !$update ){
-                                        $response->addError( $field_map->getDescription() . ' is required.', $remote_id );
+                                        $response->addError( $field_map->getDescription() . ' is required.', $remote_id, $field_map );
                                     }
                                 }
                                 
@@ -731,7 +729,7 @@ class ApiWriteOperation {
                         
                     //invoke the $before_save callback
                         if( !is_null($before_save) && is_callable($before_save) ){
-                            $before_save($new_model, $request_object, $response, $remote_id );
+                            $before_save( $new_model, $request_object, $response, $remote_id, $update );
                         }
                         
                     //if there were errors with this record, don't save it
@@ -799,29 +797,17 @@ class ApiWriteOperation {
     *   //an array of $type objects (models)
     */
     static public function callObjectSetters( $update, $response, $model, &$field_maps, &$request_object, $remote_id = null ){
+
         
         foreach( $field_maps as $field_map ){
             
             //validate the accessor
                 $accessor_suffix = $field_map->getModelAccessor();
                 $setter_method = 'set' . $accessor_suffix;
+                $getter_method = 'get' . $accessor_suffix;
                 if( !method_exists($model, $setter_method) ){
                     continue; //skip it if method doesn't exist
                     throw new \Exception('Accessor method does not exist: ' . $setter_method );
-                }
-
-            //validate the field
-                $field_key = $field_map->getRequestField();                
-                if( !array_key_exists($field_key, $request_object) ){
-                    if( !$update ){
-                        if( $field_map->isRequired() ){
-                            throw new \Exception('Field does not exist: ' . $field_key );
-                        }else{
-                            continue;
-                        }
-                    }else{
-                        continue;
-                    }
                 }
                 
             //validate the remote_id
@@ -833,13 +819,25 @@ class ApiWriteOperation {
                     }
                 }else{
                     $remote_id = \Altumo\Validation\Numerics::assertPositiveInteger($remote_id);
+                }                
+
+            //validate that the field exists in the request
+            //don't worry about the field not being there if this is an update
+                $field_key = $field_map->getRequestField();
+                if( !array_key_exists($field_key, $request_object) ){
+                    if( !$update ){
+                        if( $field_map->isRequired() ){
+                            $response->addError( 'Field does not exist: ' . $field_map->getDescription(), $remote_id, $field_map );
+                        }
+                    }
+                    continue;
                 }
                 
-            //invoke the setter (attach error)
+            //invoke the setter and attach error, if there is one
                 try{
                     call_user_func_array( array($model, $setter_method), array($request_object[$field_key]) );                    
                 }catch( Exception $e ){
-                    $response->addError( $e->getMessage(), $remote_id );
+                    $response->addError( $e->getMessage(), $remote_id, $field_map );
                 }
             
         }

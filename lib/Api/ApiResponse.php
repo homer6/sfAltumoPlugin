@@ -226,11 +226,17 @@ class ApiResponse extends \sfWebResponse{
     * @param integer $remote_id             //Optional - defaults to null.  Is 
     *                                         ignored if $error is an ApiError
     * 
+    * @param \sfAltumoPlugin\Api\ApiFieldMap|string $field_map
+    *                                       //Optional - if set, this passes 
+    *                                         the field name onto the error 
+    *                                         result. This can be a string too.
+    * 
+    * 
     * @throws Exception                     // if $error isn't an 
     *                                         \sfAltumoPlugin\Api\ApiError 
     *                                         object or string
     */
-    public function addError( $error, $remote_id = null ){
+    public function addError( $error, $remote_id = null, $field_map = null ){
     
         if( !( $error instanceof \sfAltumoPlugin\Api\ApiError ) ){
             if( !is_string($error) ){
@@ -244,7 +250,7 @@ class ApiResponse extends \sfWebResponse{
                         $remote_id = null;
                     }
                 }
-                $error = new \sfAltumoPlugin\Api\ApiError( $error, $remote_id );
+                $error = new \sfAltumoPlugin\Api\ApiError( $error, $remote_id, $field_map );
             }
         }
         $this->errors[] = $error;
@@ -253,7 +259,8 @@ class ApiResponse extends \sfWebResponse{
 
 
     /**
-    * Adds this exception to this response as an ApiError.
+    * Adds this exception to this response as an ApiError, if debugging is 
+    * enabled.
     * 
     * @param \Exception $exception
     */
@@ -261,7 +268,9 @@ class ApiResponse extends \sfWebResponse{
         
         $this->setStatusCode( '403' ); //forbidden
         $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getMessage() ) );
-        $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
+        if( \sfConfig::get('sf_debug', false) ){            
+            $this->addError( new \sfAltumoPlugin\Api\ApiError( $exception->getTraceAsString() ) );
+        }
         
     }
     

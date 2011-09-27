@@ -136,8 +136,12 @@ class Contact extends \BaseContact{
     */
     public function getCountry(){
         
-        return $this->getState()->getCountry();
+        if( $state = $this->getState() ){
+            return $state->getCountry();
+        }
         
+        return null;
+                
     }
     
     
