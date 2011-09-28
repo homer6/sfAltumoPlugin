@@ -18,4 +18,8 @@ namespace sfAltumoPlugin\Model;
 
 class SystemEventSubscriptionPeer extends \BaseSystemEventSubscriptionPeer {
 
-} // SystemEventSubscriptionPeer
+    
+
+    
+    
+}

@@ -53,6 +53,18 @@ class ApiRequest extends \sfWebRequest{
     
     
     /**
+    * Gets all HTTP request headers.
+    * 
+    * @return array
+    */
+    public function getHttpRequestHeaders(){
+        
+        return $this->getIncomingHttpRequest()->getHeaders();
+                
+    }
+    
+    
+    /**
     * Gets the HTTP Request message body.
     * 
     * @return string
@@ -189,6 +201,7 @@ class ApiRequest extends \sfWebRequest{
 
     }
 
+    
     /**
     * Returns true if:
     * 
@@ -235,6 +248,7 @@ class ApiRequest extends \sfWebRequest{
     public function getMessageBodyData(){
         
         $message_body = $this->getIncomingHttpRequest()->getMessageBody();
+        
         if( !is_string($message_body) || empty($message_body) ){
             throw new \Exception('Please include a message body.');
         }
@@ -259,7 +273,7 @@ class ApiRequest extends \sfWebRequest{
         
         //authenticate via the API key, if provided
             $api_key = $this->getHttpRequestHeader( 'Authorization', null );
-
+            
             if( !is_null($api_key) ){
                 
                 if( preg_match('/\\s*Basic\\s+(.*?)\\s*$/im', $api_key, $regs) ){
