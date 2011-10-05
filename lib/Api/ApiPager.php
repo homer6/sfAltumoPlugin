@@ -111,8 +111,8 @@ class ApiPager{
         }catch( \Exception $e ){
             $page_size = 30;
         }
-        if( $page_size > 100 ){
-            $page_size = 100;
+        if( $page_size > 1000 ){
+            $page_size = 1000;
         }
         
         $this->page_size = $page_size;
