@@ -37,7 +37,15 @@ class Contact extends \BaseContact{
     */
     public function getMailingAddressFullOneLine(){
         
-        return $this->getMailingAddress() . ', ' . $this->getCity() . ', ' . $this->getState()->getName();
+        $state = $this->getState();
+        
+        $address = $this->getMailingAddress() . ', ' . $this->getCity();
+        
+        if( !is_null($state) ) {
+            $address .= ', ' . $state->getName();
+        }
+        
+        return $address;
         
     }    
     

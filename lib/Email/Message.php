@@ -169,7 +169,10 @@ class Message{
     */
     public function setFrom( $from, $name = null ){
         
-        $from = \Altumo\Validation\Emails::assertEmailAddress( $from );
+        $from = \Altumo\Validation\Emails::assertEmailAddress( 
+            $from,
+            '"' . $from . '" is not a valid email address for setFrom()'
+        );
         
         if( !is_null($name) ){
             \Altumo\Validation\Strings::assertNonEmptyString( $name );
@@ -208,7 +211,10 @@ class Message{
     */
     public function setReplyTo( $reply_to, $name = null ){
 
-        $reply_to = \Altumo\Validation\Emails::assertEmailAddress( $reply_to );
+        $reply_to = \Altumo\Validation\Emails::assertEmailAddress( 
+            $reply_to,
+            '"' . $reply_to . '" is not a valid email address for setReplyTo()'
+        );
 
         if( !is_null($name) ){
             \Altumo\Validation\Strings::assertNonEmptyString( $name );
@@ -245,7 +251,10 @@ class Message{
     */
     public function setTo( $email_address, $name = null ){
     
-        $email_address = \Altumo\Validation\Emails::assertEmailAddress( $email_address );
+        $email_address = \Altumo\Validation\Emails::assertEmailAddress( 
+            $email_address,
+            '"' . $email_address . '" is not a valid email address for setTo()'
+        );
         
         if( !is_null($name) ){
             \Altumo\Validation\Strings::assertNonEmptyString( $name );
@@ -282,7 +291,10 @@ class Message{
     */
     public function setCc( $email_address, $name = null ){
     
-        $email_address = \Altumo\Validation\Emails::assertEmailAddress( $email_address );
+        $email_address = \Altumo\Validation\Emails::assertEmailAddress( 
+            $email_address,
+            '"' . $email_address . '" is not a valid email address for setCc()'
+        );
         
         if( !is_null($name) ){
             \Altumo\Validation\Strings::assertNonEmptyString( $name );
@@ -319,7 +331,10 @@ class Message{
     */
     public function setBcc( $email_address, $name = null ){
     
-        $email_address = \Altumo\Validation\Emails::assertEmailAddress( $email_address );
+        $email_address = \Altumo\Validation\Emails::assertEmailAddress( 
+            $email_address,
+            '"' . $email_address . '" is not a valid email address for setBcc()'
+        );
         
         if( !is_null($name) ){
             \Altumo\Validation\Strings::assertNonEmptyString( $name );
