@@ -244,6 +244,7 @@
         <column name="system_event_id" type="integer" required="true" />
         <column name="user_id" type="integer" required="true" />
         <column name="remote_url" type="varchar" size="255" />
+        <column name="authorization_token" type="varchar" size="255" />
         <column name="enabled" type="boolean" required="true" default="1" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />

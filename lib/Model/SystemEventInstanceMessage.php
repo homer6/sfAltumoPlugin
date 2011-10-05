@@ -37,11 +37,12 @@ class SystemEventInstanceMessage extends \BaseSystemEventInstanceMessage {
         try{
             //send the http post request
                 $request = new \Altumo\Http\OutgoingHttpRequest( $this->getSystemEventSubscription()->getRemoteUrl() );
-                $request->setVerifySslPeer( true );
+                $request->setVerifySslPeer( false );
                 $request->setRequestMethod( \Altumo\Http\OutgoingHttpRequest::HTTP_METHOD_POST );
                 $request->setMessageBody( $this->getSystemEventInstance()->getMessage() );
                 $request->setHeaders(array( 
-                    'Accept' => 'application/json'
+                    'Accept' => 'application/json',
+                    'X-Authorization-Token' => $this->getSystemEventSubscription()->getAuthorizationToken()
                 ));
                 $http_response_message = $request->sendAndGetResponseMessage();
                     

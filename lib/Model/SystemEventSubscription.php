@@ -123,6 +123,20 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
         }
         
     }
+        
+    
+    /**
+    * Setter for the authorization_token field on this SystemEventSubscription.
+    * 
+    * @param string $authorization_token
+    * @return SystemEventSubscription
+    */
+    public function setAuthorizationToken( $authorization_token ){
+    
+        return parent::setAuthorizationToken( \Altumo\Validation\Strings::assertStringAndLength($authorization_token, 10, 255) );
+        
+    }
+
     
     
 } 
