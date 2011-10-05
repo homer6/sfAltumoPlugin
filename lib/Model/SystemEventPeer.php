@@ -85,6 +85,9 @@ class SystemEventPeer extends \BaseSystemEventPeer {
                 }
             }else{
                 $user = \sfContext::getInstance()->getUser()->getUser();
+                if( !$user ){
+                    throw new \Exception( 'User must be logged in or you must provide a user_id to triggerError()' );
+                }
                 $user_id = $user->getId();
             }
             
