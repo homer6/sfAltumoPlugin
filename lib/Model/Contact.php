@@ -208,8 +208,17 @@ class Contact extends \BaseContact{
         
         $parsed_full_name = self::parsePersonFullName( $full_name );
         
-        $this->setFirstName( $parsed_full_name['first_name'] . ( empty( $parsed_full_name['middle_name'] ) ? '' : ' ' ) . $parsed_full_name['middle_name'] );
-        $this->setLastName( $parsed_full_name['last_name'] );
+        if( strlen( $parsed_full_name['first_name'] ) > 0 ){
+            
+            $this->setFirstName( $parsed_full_name['first_name'] . ( empty( $parsed_full_name['middle_name'] ) ? '' : ' ' ) . $parsed_full_name['middle_name'] );
+            
+        }
+        
+        if( strlen( $parsed_full_name['last_name'] ) > 0 ){
+            
+            $this->setLastName( $parsed_full_name['last_name'] );
+            
+        }
         
     }
     
