@@ -263,6 +263,72 @@ class DatabaseUpdater{
     
     
     /**
+    * Returns true only if there are some data updates waiting to be executed
+    * the next time the database is updated.
+    * 
+    * The implementation of this function copies almost everything from 
+    * self::update(). I was reluctant to change that function at this point, but:
+    * 
+    * TODO: Refactor this and update() so that copied code is broken into functions.
+    * 
+    * @return boolean
+    */
+    public function hasUpcomingDataUpdates(){
+        //get the latest applied hash in the application update log
+            $last_applied_script = $this->getDatabaseUpdateLogFile()->getLastLogEntry();
+            if( is_null($last_applied_script) ){
+                $last_applied_type = null;
+                $last_applied_hash = null;
+            }else{
+                $last_applied_type = strtolower($last_applied_script->getName());
+                $last_applied_hash = $last_applied_script->xpath('attribute::hash');
+            }
+            
+        //if empty or if the last command was a drop, assume empty and apply the latest snapshot and all subsequent upgrades
+        //else, apply all the unapplied upgrades
+            if( is_null( $last_applied_hash ) || $last_applied_type == self::DELTA_TYPE_DROP ){
+                
+                $snapshot_hash = $this->getDatabaseBuildSequenceFile()->getLastestSnapshotHash();
+                if( !$snapshot_hash ){
+                    try{
+                        $first_upgrade_hash = $this->getDatabaseBuildSequenceFile()->getFirstUpgrade();
+                        $hash = $first_upgrade_hash;
+                    }catch( \Exception $e ){
+                        throw new \Exception('Your build sequence is empty. No work to be done.');
+                    }
+                }else{
+                    $hash = $snapshot_hash;
+                }
+                
+            }else{
+                
+                $hash = $last_applied_hash;
+                
+            }
+            
+            // Apply SQL upgrade scripts
+                $upgrade_hashes = $this->getDatabaseBuildSequenceFile()->getPhpOrSqlUpgradeHashesSince( $hash );
+                
+                foreach( $upgrade_hashes as $upgrade_hash ){
+                    
+                    // If this hash has an SQL upgrade script
+                        /*if( $this->getDatabaseBuildSequenceFile()->isUpgradeHash($upgrade_hash) ){
+                            $this->applyScript( $upgrade_hash, self::DELTA_TYPE_UPGRADE_SCRIPT );
+                            ++$script_count;
+                        }*/
+                    
+                    // If this hash has a php upgrade script
+                        if( $this->getDatabaseBuildSequenceFile()->isDataUpdateHash($upgrade_hash) ){
+                            return true;
+                        }
+
+                }
+                
+            return false;
+    }
+    
+    
+    /**
     * Applies a drop, snapshot or upgrade script to the current database.
     * 
     * @param string $hash                   //the commit hash of the delta

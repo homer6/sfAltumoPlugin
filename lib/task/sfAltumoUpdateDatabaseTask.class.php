@@ -75,10 +75,12 @@ EOF;
         switch( $command ){
             
             case 'update':
-            
+
                     $ignore_working_tree_changes = \Altumo\Validation\Booleans::assertLooseBoolean( $options['ignore-working-tree-changes'] );
             
-                    if( \Altumo\Git\Status::hasChanges() && !$ignore_working_tree_changes ){
+                    $has_upcoming_data_updates = $database_updater->hasUpcomingDataUpdates();
+            
+                    if( $has_upcoming_data_updates && \Altumo\Git\Status::hasChanges() && !$ignore_working_tree_changes ){
                         throw new \Exception( 'Your working tree currently has changes. You must commit or stage these before performing an update or pass the ignore-working-tree-changes flag.' );
                     }
             
