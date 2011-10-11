@@ -36,4 +36,17 @@ class SingleSignOnKeyPeer extends \BaseSingleSignOnKeyPeer {
     }
     
     
+    /**
+    * Removes all SingleSignOnKeys that have expired or have been used.
+    * 
+    */
+    static public function removeAllInvalidSingleSignOnKeys(){
+        
+        \SingleSignOnKeyQuery::create()
+                            ->filterByValid( false )
+                            ->delete();
+
+    }
+    
+    
 }
