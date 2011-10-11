@@ -180,6 +180,7 @@
         <column name="secret" type="varchar" required="true" size="32" />
         <column name="used" type="boolean" required="true" default="" />
         <column name="session_id" type="integer" required="false" />
+        <column name="user_id" type="integer" required="true" />
         <column name="valid_for_minutes" type="integer" required="true" default="1440" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
@@ -187,6 +188,10 @@
         
         <foreign-key foreignTable="session" onDelete="cascade">
             <reference local="session_id" foreign="id" />
+        </foreign-key>
+        
+        <foreign-key foreignTable="user" onDelete="cascade">
+            <reference local="user_id" foreign="id" />
         </foreign-key>
         
         
