@@ -274,7 +274,7 @@ class ApiRequest extends \sfWebRequest{
         
         //require SSL, if applicable
             if( \sfConfig::get( 'app_api_require_ssl', true ) ){
-                if( $_SERVER["HTTPS"] != 'on' ){
+                if( $_SERVER['SERVER_PORT'] != 443 ){
                     throw new \Exception( 'HTTPS is required.' );
                 }
             }
