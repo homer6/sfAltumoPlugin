@@ -18,4 +18,25 @@ namespace sfAltumoPlugin\Model;
 
 class SystemEventInstanceMessagePeer extends \BaseSystemEventInstanceMessagePeer {
 
-} // SystemEventInstanceMessagePeer
+    
+    /**
+    * Sends all of the SystemEventMessages that were not received.
+    * 
+    * 
+    */
+    static public function sendUnsentSystemEventInstanceMessages(){
+        
+        $messages = \SystemEventInstanceMessageQuery::create()
+                            ->filterByReceived( false )
+                            ->find();
+                            
+        foreach( $messages as $message ){
+            try{
+                $message->send();
+            }catch( \Exception $e ){}
+        }
+        
+    }
+    
+    
+}
