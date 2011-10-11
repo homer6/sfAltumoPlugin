@@ -31,7 +31,7 @@ class ApiRequest extends \sfWebRequest{
     */
     public function __construct( \sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array() ){
         
-        $this->initialize($dispatcher, $parameters, $attributes, $options);
+        $this->initialize( $dispatcher, $parameters, $attributes, $options );
         $this->setIncomingHttpRequest( new \Altumo\Http\IncomingHttpRequest() );
         
     }
@@ -271,6 +271,15 @@ class ApiRequest extends \sfWebRequest{
     */
     public function authenticate(){
         
+        
+        //require SSL, if applicable
+            if( \sfConfig::get( 'app_api_require_ssl', true ) ){
+                if( $_SERVER["HTTPS"] != 'on' ){
+                    throw new \Exception( 'HTTPS is required.' );
+                }
+            }
+        
+        
         //authenticate via the API key, if provided
             $api_key = $this->getHttpRequestHeader( 'Authorization', null );
             
@@ -332,8 +341,8 @@ class ApiRequest extends \sfWebRequest{
                 
             }
             
-        //successful validation
-            
+        //successful authentication
+                        
     }
     
     
