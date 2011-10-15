@@ -47,6 +47,38 @@ class Contact extends \BaseContact{
         
         return $address;
         
+    }        
+    
+    
+    /**
+    * Get Mailing Address including city and state in multiple lines using
+    * html formatting.
+    * 
+    * @return string
+    */
+    public function getMailingAddressFullHtml(){
+        
+        $state = $this->getState();
+        $city = $this->getCity();
+        $zip = $this->getZipCode();
+        
+        $address = $this->getMailingAddress();
+        
+        if( strlen($city) ){
+            $address .= '<br />' . $city;
+        }        
+        
+        if( !is_null($state) ){
+            $address .= (strlen($city)?', ':'') . $state->getName();
+            $address .= '<br />' . $state->getCountry()->getName();
+        }
+        
+        if( strlen($zip) ){
+            $address .= (strlen($address)?' - ':'') . $zip;
+        }
+
+        return $address;
+        
     }    
     
 
