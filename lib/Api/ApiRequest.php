@@ -274,7 +274,7 @@ class ApiRequest extends \sfWebRequest{
         
         //require SSL, if applicable
             if( \sfConfig::get( 'app_api_require_ssl', true ) ){
-                if( \Altumo\Http\IncomingHttpRequest::isSecure() ){
+                if( !\Altumo\Http\IncomingHttpRequest::isSecure() ){
                     throw new \Exception( 'HTTPS is required.' );
                 }
             }

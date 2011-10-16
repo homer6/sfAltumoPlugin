@@ -19,7 +19,7 @@ namespace sfAltumoPlugin\Filters;
 * To enable, add the following to factories.yml (usually at the top)
 * 
 * secure:
-*   class: \\sfAltumoPlugin\\Filters\\Https
+*   class: \sfAltumoPlugin\Filters\Https
 * 
 * @author Steve Sperandeo <steve.sperandeo@altumo.com>
 */
