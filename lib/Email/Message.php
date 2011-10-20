@@ -43,7 +43,9 @@ namespace sfAltumoPlugin\Email;
 */
 class Message{
 
-    protected $swift_message = null;
+    const TRANSPORT_SECURITY_SCHEME_SSL = 'ssl';
+    const TRANSPORT_SECURITY_SCHEME_TLS = 'tls';
+
     protected $subject = null;
     protected $from = null;
     protected $reply_to = null;
@@ -55,6 +57,7 @@ class Message{
     protected $partial_variables = array();
     protected $attachments = array();
     protected $content_parts = array();
+    protected $swift_transport = null;
 
 
     /**
@@ -63,23 +66,141 @@ class Message{
     * 
     * @return \sfAltumoPlugin\Email\Message
     */
-    public function __construct(){
+    public function __construct( $smtp_server = null, $smtp_port = null, $smtp_security_scheme = null, $smtp_user = null, $smtp_passowrd = null ){
+
+        $this->initialize( $smtp_server, $smtp_port, $smtp_security_scheme, $smtp_user, $smtp_passowrd );
+
+    }
+
+
+    /**
+    * Initializes the Message object. Pre-sets all required variables
+    * 
+    * // Parameters for this functions can be specified by:
+    *   - app_mailer_smtp_server
+    *   - app_mailer_smtp_port
+    *   - app_mailer_smtp_security_scheme
+    *   - app_mailer_smtp_user
+    *   - app_mailer_smtp_password
+    * 
+    * They can be individually overridden by passing in parameters.
+    * 
+    * If all of them are null, the system's default mail transport is used.
+    * 
+    * 
+    * @param string $smtp_server            // host name or ip of the smtp server to use
+    * @param int $smtp_port                 // port for the smtp server
+    * @param string $smtp_security_scheme   // encryption scheme 
+    *                                       // - self::TRANSPORT_SECURITY_SCHEME_SSL
+    *                                       // - self::TRANSPORT_SECURITY_SCHEME_TLS
+    * @param mixed $smtp_username           // username for the smtp server
+    * @param mixed $smtp_passowrd           // password for the smtp server
+    * 
+    * @return \Swift_Transport
+    */
+    protected function initialize( $smtp_server = null, $smtp_port = null, $smtp_security_scheme = null, $smtp_username = null, $smtp_passowrd = null ){
+
+        if( is_null($smtp_server) ){
+            
+            $smtp_server = \sfConfig::get( 'app_mailer_smtp_server', null );
+            
+        } 
         
-        $this->initialize();
+        if( is_null($smtp_port) ){
+            
+            $smtp_port = \sfConfig::get( 'app_mailer_smtp_port', null );
+            
+        } 
         
+        if( is_null($smtp_security_scheme) ){
+            
+            $smtp_security_scheme = \sfConfig::get( 'app_mailer_smtp_security_scheme', null );
+            
+        }      
+          
+        if( is_null($smtp_username) ){
+            
+            $smtp_username = \sfConfig::get( 'app_mailer_smtp_user', null );
+            
+        }        
+        
+        if( is_null($smtp_passowrd) ){
+            
+            $smtp_passowrd = \sfConfig::get( 'app_mailer_smtp_password', null );
+            
+        }
+        
+        
+        if( !is_null($smtp_server) || !is_null($smtp_port) || !is_null($smtp_security_scheme) || !is_null($smtp_user) || !is_null($smtp_passowrd) ){
+            
+            if( !is_null($smtp_server) ){
+                
+                $smtp_server = \Altumo\Validation\Strings::assertNonEmptyString( $smtp_server );
+                
+            }
+            
+            if( !is_null($smtp_port) ){
+                
+                $smtp_port = \Altumo\Validation\Numerics::assertPositiveInteger( $smtp_port );
+                
+            }
+            
+            if( !is_null($smtp_security_scheme) ){
+                
+                if( !in_array( $smtp_security_scheme,
+                    array(
+                        self::TRANSPORT_SECURITY_SCHEME_SSL,
+                        self::TRANSPORT_SECURITY_SCHEME_TLS
+                    )
+                )){
+                    
+                    throw new Exception( 'Invalid email transport security scheme.' );
+                    
+                }
+                
+            }
+            
+            if( !is_null($smtp_username) ){
+                
+                $smtp_username = \Altumo\Validation\Strings::assertString( $smtp_username );
+                
+            }
+            
+            if( !is_null($smtp_passowrd) ){
+                
+                $smtp_passowrd = \Altumo\Validation\Strings::assertString( $smtp_passowrd );
+                
+            }
+            
+            $this->setSwiftTransport(
+                \Swift_SmtpTransport::newInstance(
+                    $smtp_server, 
+                    $smtp_port, 
+                    $smtp_security_scheme
+                )->setUsername( $smtp_username )
+                 ->setPassword( $smtp_passowrd )
+            );
+
+        } else {
+            
+            $this->setSwiftTransport( new \Swift_MailTransport() );
+            
+        }
+        
+        return $this->getSwiftTransport();
+
     }
     
     
     /**
-    * Initializes the Message object. Pre-sets all required variables
+    * Get a new \Swift_Message instance.
     * 
-    * 
-    * @return void
+    * @return \Swift_Message
     */
-    protected function initialize(){
-        
-        $this->setSwiftMessage( \Swift_Message::newInstance() );
-        
+    protected function getSwiftMessage(){
+    
+        return \Swift_Message::newInstance();
+    
     }
     
     
@@ -87,13 +208,13 @@ class Message{
     * Setter for the $swift_message parameter of this Message
     * 
     * 
-    * @param mixed $swift_message
+    * @param mixed $swift_transport
     * 
     * @return void
     */
-    protected function setSwiftMessage( $swift_message ){
+    protected function setSwiftTransport( $swift_transport ){
     
-        $this->swift_message = $swift_message;
+        $this->swift_transport = $swift_transport;
     
     }    
     
@@ -101,14 +222,11 @@ class Message{
     /**
     * Getter for the $swift_message parameter of this Message
     * 
-    * 
-    * @param mixed $swift_message
-    * 
-    * @return \Swift_Message
+    * @return \Swift_Transport
     */
-    protected function getSwiftMessage(){
+    protected function getSwiftTransport(){
     
-        return $this->swift_message;
+        return $this->swift_transport;
     
     }
     
@@ -599,33 +717,9 @@ class Message{
     * 
     * @return \Swift_Mailer
     */
-    protected function getPreparedSwiftMailer( $host = null, $port = null, $username = null, $password = null){
-        
-        if( !is_null( $host ) ){
+    protected function getPreparedSwiftMailer(){
 
-            $host = \Altumo\Validation\Strings::assertNonEmptyString( 
-                $host, 
-                'Invalid mail server host' 
-            );
-
-            if( !is_null($port) ){
-                $port = \Altumo\Validation\Numerics::assertPositiveInteger( 
-                    $port,
-                    'Invalid mail server port'
-                );
-            } else {
-                $port = 25;
-            }
-
-            $transport = Swift_SmtpTransport::newInstance( $host, $port )
-                ->setUsername( $username )
-                ->setPassword( $password );
-
-        } else {
-            $transport = new \Swift_MailTransport();
-        }
-
-        return \Swift_Mailer::newInstance( $transport );
+        return \Swift_Mailer::newInstance( $this->getSwiftTransport() );
 
     }
     
@@ -647,6 +741,5 @@ class Message{
         );
 
     }
-
 
 }
