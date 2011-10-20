@@ -229,6 +229,8 @@ class Contact extends \BaseContact{
     * Set Full Name. This will attempt to parse the full name into first 
     * and last name.
     * 
+    * // TODO: Modify this to use \Altumo\Utils\PersonName
+    * 
     * @param string $full_name
     */
     public function setFullName( $full_name ){
@@ -258,6 +260,9 @@ class Contact extends \BaseContact{
     /**
     * Parses the Person's name and attempts to extract First, Middle and/or 
     * Last name.
+    * 
+    * // TODO: Make this use \Altumo\Utils\PersonName
+    * 
     * 
     * @param string $full_name 
     *   // the full name to parse
