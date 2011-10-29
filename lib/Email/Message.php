@@ -58,6 +58,7 @@ class Message{
     protected $attachments = array();
     protected $content_parts = array();
     protected $swift_transport = null;
+    protected $enabled = true;
 
 
     /**
@@ -187,6 +188,8 @@ class Message{
             
         }
         
+        $this->setEnabled( \sfConfig::get('app_mailer_enabled', false) );
+        
         return $this->getSwiftTransport();
 
     }
@@ -270,6 +273,36 @@ class Message{
     protected function getSubject(){
     
         return $this->subject;
+        
+    }    
+    
+    
+    /**
+    * Sets the subject of this email Message
+    * 
+    * 
+    * @param bool $enabled
+    * 
+    * @return \sfAltumoPlugin\Email\Message
+    */
+    protected function setEnabled( $enabled ){
+
+        $this->enabled = \Altumo\Validation\Booleans::assertLooseBoolean( $enabled );
+        
+        return $this;
+        
+    }
+    
+    
+    /**
+    * Get the subject of this email Message
+    * 
+    * 
+    * @return string
+    */
+    protected function getEnabled(){
+    
+        return $this->enabled;
         
     }
         
@@ -735,6 +768,11 @@ class Message{
     */
     public function send( &$failed_recipients = null ){
 
+        if( !$this->getEnabled() ){
+            return array();
+        }
+        
+        
         return $this->getPreparedSwiftMailer()->send( 
             $this->getPreparedSwiftMessage(),
             $failed_recipients
