@@ -20,15 +20,14 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
 
     
     /**
-    * Tries to send the notification to the remote system. If a response could
-    * not be confirmed, the message remains queued and will be resent with 
-    * the system event cron until received.
-    * 
+    * Saves this notification to the database so it can be sent to the remote 
+    * system later. If a response could not be confirmed, the message remains 
+    * queued and will be resent with the system event cron until received.
     * 
     * @param SystemEventInstance $system_event_instance
     * @return SystemEventInstanceMessage
     */
-    public function sendSystemEventNotification( $system_event_instance ){
+    public function saveSystemEventNotification( $system_event_instance ){
         
         $system_event_instance_message = new \SystemEventInstanceMessage();
         $system_event_instance_message->setSystemEventInstance($system_event_instance);
@@ -38,7 +37,7 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
         //try to sent the notification, mark as sent if successful.
         try{
             
-            $system_event_instance_message->send();
+            //this is handled by the cron now
             
         }catch( \Exception $e ){
             
