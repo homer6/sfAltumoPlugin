@@ -12,6 +12,7 @@
         <column name="name" type="VARCHAR" size="64" required="true" />
         <column name="iso_code" type="VARCHAR" size="12" required="true" />
         <column name="iso_short_code" type="VARCHAR" size="2" required="true" />
+        <column name="demonym" type="VARCHAR" size="128" required="true" />
         
         
         <index name="index_name">
