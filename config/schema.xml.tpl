@@ -13,11 +13,17 @@
         <column name="iso_code" type="VARCHAR" size="12" required="true" />
         <column name="iso_short_code" type="VARCHAR" size="2" required="true" />
         <column name="demonym" type="VARCHAR" size="128" required="true" />
+        <column name="default_currency_id" type="INTEGER" required="false" />
         
         
         <index name="index_name">
             <index-column name="name" />
         </index>
+        
+
+        <foreign-key foreignTable="currency" onDelete="cascade">
+            <reference local="default_currency_id" foreign="id" />
+        </foreign-key>
         
         
         <unique name="unique_iso_short_code">
@@ -30,7 +36,19 @@
 
     </table>
 
+    
+    <table name="currency">
 
+        <!-- Fixture representing a monetary currency. -->
+
+        <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="name" type="VARCHAR" required="true" size="64" />
+        <column name="iso_code" type="VARCHAR" required="true" size="3" />
+        <column name="iso_number" type="VARCHAR" required="true" size="3" />
+
+    </table>
+    
+    
     <table name="state">
 
         <!-- Fixture representing a State or Country political subdivision --> 

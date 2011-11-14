@@ -157,3 +157,72 @@ VALUES
     ( 'Suth Island',   'NZ-S',   'S',  @new_zealand );
     
 SET @@foreign_key_checks = 1;
+
+
+
+
+SET @@foreign_key_checks = 0;
+
+
+
+-- -----------------------------------------------------------------------------
+-- create table currency
+CREATE TABLE `currency` (
+    `id` int(11) NOT NULL auto_increment,
+    `name` varchar(64) NOT NULL,
+    `iso_code` varchar(3) NOT NULL,
+    `iso_number` varchar(3) NOT NULL,
+    PRIMARY KEY  ( `id` )
+)
+ENGINE = InnoDB
+CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci
+AUTO_INCREMENT = 1
+ROW_FORMAT = Compact
+;
+
+
+
+-- -----------------------------------------------------------------------------
+-- create table add FK to currency from country
+DROP TABLE IF EXISTS `_temp_country`;
+
+CREATE TABLE `_temp_country` (
+    `id` int(11) NOT NULL auto_increment,
+    `name` varchar(64) NOT NULL,
+    `iso_code` varchar(12) NOT NULL,
+    `iso_short_code` varchar(2) NOT NULL,
+    `demonym` varchar(128) NOT NULL,
+    `default_currency_id` int(11) default NULL,
+    KEY `country_FI_1` ( `default_currency_id` ),
+    KEY `index_name` ( `name` ),
+    PRIMARY KEY  ( `id` ),
+    UNIQUE INDEX `unique_iso_code` ( `iso_code` ),
+    UNIQUE INDEX `unique_iso_short_code` ( `iso_short_code` )
+)
+ENGINE = InnoDB
+CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci
+AUTO_INCREMENT = 5
+ROW_FORMAT = Compact
+;
+
+INSERT INTO `_temp_country`
+( `demonym`, `id`, `iso_code`, `iso_short_code`, `name` )
+SELECT
+`demonym`, `id`, `iso_code`, `iso_short_code`, `name`
+FROM `country`;
+
+DROP TABLE `country`;
+
+ALTER TABLE `_temp_country` RENAME `country`;
+
+ALTER TABLE `country` ADD CONSTRAINT `country_FK_1`
+    FOREIGN KEY ( `default_currency_id` ) REFERENCES `currency` ( `id` ) ON DELETE CASCADE;
+
+    
+    
+    
+    
+    
+SET @@foreign_key_checks = 1;
