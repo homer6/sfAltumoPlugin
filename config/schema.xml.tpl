@@ -28,6 +28,18 @@
         </unique>
 
     </table>
+    
+    
+    <table name="currency">
+
+        <!-- Fixture representing a monetary currency. -->
+
+        <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="name" type="VARCHAR" required="true" size="64" />
+        <column name="iso_code" type="VARCHAR" required="true" size="3" />
+        <column name="iso_number" type="VARCHAR" required="true" size="3" />
+
+    </table>
 
 
     <table name="state">
