@@ -220,7 +220,7 @@ class Contact extends \BaseContact{
         $first_name = $this->getFirstName();
         $last_name = $this->getLastName();
         
-        return sprintf( $format, $first_name, $last_name, $first_name[0], $last_name[0] );
+        return sprintf( $format, $first_name, $last_name, substr($first_name,0,1), substr($last_name,0,1) );
         
     }
         

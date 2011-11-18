@@ -106,7 +106,7 @@ class SystemEventPeer extends \BaseSystemEventPeer {
         
         //notify each of the subscribers
             foreach( $system_event_subscriptions as $system_event_subscription ){
-                $system_event_subscription->sendSystemEventNotification( $system_event_instance );
+                $system_event_subscription->saveSystemEventNotification( $system_event_instance );
             }
         
     }

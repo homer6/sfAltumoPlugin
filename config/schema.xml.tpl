@@ -12,11 +12,18 @@
         <column name="name" type="VARCHAR" size="64" required="true" />
         <column name="iso_code" type="VARCHAR" size="12" required="true" />
         <column name="iso_short_code" type="VARCHAR" size="2" required="true" />
+        <column name="demonym" type="VARCHAR" size="128" required="true" />
+        <column name="default_currency_id" type="INTEGER" required="false" />
         
         
         <index name="index_name">
             <index-column name="name" />
         </index>
+        
+
+        <foreign-key foreignTable="currency" onDelete="cascade">
+            <reference local="default_currency_id" foreign="id" />
+        </foreign-key>
         
         
         <unique name="unique_iso_short_code">
@@ -41,7 +48,19 @@
 
     </table>
 
+    
+    <table name="currency">
 
+        <!-- Fixture representing a monetary currency. -->
+
+        <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="name" type="VARCHAR" required="true" size="64" />
+        <column name="iso_code" type="VARCHAR" required="true" size="3" />
+        <column name="iso_number" type="VARCHAR" required="true" size="3" />
+
+    </table>
+    
+    
     <table name="state">
 
         <!-- Fixture representing a State or Country political subdivision --> 
@@ -49,7 +68,7 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
         <column name="name" type="VARCHAR" size="64" required="true" />
         <column name="iso_code" type="VARCHAR" size="12" required="true" />
-        <column name="iso_short_code" type="VARCHAR" size="2" required="true" />
+        <column name="iso_short_code" type="VARCHAR" size="4" required="true" />
         <column name="country_id" type="INTEGER" required="true" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
@@ -65,7 +84,8 @@
         </index>
         
         
-        <unique name="unique_iso_short_code">
+        <unique name="unique_country_iso_short_code">
+            <unique-column name="country_id" />
             <unique-column name="iso_short_code" />
         </unique>
         

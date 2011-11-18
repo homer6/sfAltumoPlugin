@@ -56,6 +56,52 @@ class StatePeer extends \BaseStatePeer {
         ->findOne();
         
     }
+    
+    /**
+    * Returns a multidimentional array of State where the top level are 
+    * Country names and the bottom level are State objects
+    * 
+    * e.g.
+    * 
+    * array(
+    *   'Canada' => array(
+    *     0 => State    // Alberta
+    *     1 => State    // British Columbia
+    * ...
+    * 
+    * @param StateQuery $query  // optional StateQuery to filter results
+    * @return array
+    */
+    public static function retrieveStatesGroupByCountry( $query = null ){
+        
+        if( !is_null($query) ){
+            
+            \Altumo\Validation\Objects::assertObjectClass( $query, 'StateQuery' );
+            
+        } else {
+            
+            $query = StateQuery::create();
+            
+        }
+        
+        $result = array();
+        
+        $all_states = $query
+            ->useCountryQuery()
+                ->addAscendingOrderByColumn( CountryPeer::NAME )
+            ->endUse()
+            ->addAscendingOrderByColumn( StatePeer::NAME )
+        ->find();
+        
+        foreach( $all_states as $state ){
+            
+            $result[$state->getCountry()->getName()][] = $state;
+            
+        }
+        
+        return $result;
+        
+    }
  
     
 }

@@ -35,6 +35,27 @@ class User extends \BaseUser {
     
     
     /**
+    * Gets the user's first name and first character of their last name.
+    * eg.
+    *   John R.
+    * 
+    * @return string
+    */
+    public function getFirstNameLastInitial(){
+        
+        $first_name = $this->getContact()->getFirstName();
+        $last_name = $this->getContact()->getLastName();
+        
+        if( empty($last_name) ){
+            return $first_name;
+        }else{
+            return $first_name . ' ' . substr( $last_name, 0, 1 ) . '.';
+        }
+
+    }
+    
+    
+    /**
     * Whether this User is active.
     * 
     * @see sfGuardUser::getIsActive
