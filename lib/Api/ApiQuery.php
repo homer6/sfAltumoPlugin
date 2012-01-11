@@ -39,5 +39,27 @@ interface ApiQuery{
     * @return integer
     */
     public function count();
+
     
+    /**
+     * Sets the maximum number of rows to be retrieved by this query.
+     * 
+     * @param integer $limit
+     * 
+     * @return \sfAltumoPlugin\Api\ApiQuery Returns self.
+     */
+	public function setLimit($limit);
+	
+	
+	/**
+	 * Sets the offset of rows to be retrieved by this query.
+	 * 
+	 * @param integer $offset
+	 * 
+	 * @return \sfAltumoPlugin\Api\ApiQuery Returns self.
+	 */
+	public function setOffset($offset);
+    
+	
 }
+  
