@@ -41,6 +41,7 @@ class ApiWriteOperation {
     protected $model_name = null;
     protected $field_maps = null;
     protected $before_save = null;
+    protected $after_save = null;
     protected $query = null;
     protected $before_setters = null;
     
@@ -136,7 +137,7 @@ class ApiWriteOperation {
     * 
     * @return \sfAltumoPlugin\Api\ApiWriteOperation
     */
-    public function __construct( $request, $response, $body_name, $field_maps, $update = false, $modify_result = null, $before_save = null, $query = null, $model_name = null, $mode = self::MODE_AUTOMATIC, $process_objects_manually = null, $before_setters = null ){    
+    public function __construct( $request, $response, $body_name, $field_maps, $update = false, $modify_result = null, $before_save = null, $query = null, $model_name = null, $mode = self::MODE_AUTOMATIC, $process_objects_manually = null, $before_setters = null, $after_save = null ){    
         
         //request
             $this->setRequest( $request );
@@ -164,6 +165,11 @@ class ApiWriteOperation {
             if( is_callable($before_save) ){
                 $this->setBeforeSave( $before_save );
             }
+            
+        // after save
+        	if( is_callable($after_save) ){
+        		$this->setAfterSave( $after_save );
+        	}
             
         //query
             $this->setQuery( $query );
@@ -337,6 +343,28 @@ class ApiWriteOperation {
         
     }
         
+
+    /**
+    * Setter for the after_save field on this ApiWriteOperation.
+    * 
+    * @param function( &$model ) $after_save
+    */
+    public function setAfterSave( $after_save ){
+    
+        $this->after_save = $after_save;
+        
+    }
+    
+    
+    /**
+     * Getter for the after_save field on this ApiWriteOperation
+     */
+    public function getAfterSave(){
+    	
+    	return $this->after_save;
+
+    }
+    
     
     /**
     * Setter for the query field on this ApiWriteOperation.
@@ -594,6 +622,7 @@ class ApiWriteOperation {
         $response = $this->getResponse();
         $model_type = $this->getModelName();
         $before_save = $this->getBeforeSave();
+        $after_save = $this->getAfterSave();
         $update = $this->isUpdate();
         
         //validate $request_objects
@@ -628,6 +657,13 @@ class ApiWriteOperation {
                 }
             }
 
+		//validate $after_save
+            if( !is_null($after_save) ){
+                if( !is_callable($after_save) ){
+                    throw new \Exception('If provided, the after_save callback must be a function.');
+                }
+            }
+            
                 
         $returned_models = array();
         
@@ -739,6 +775,12 @@ class ApiWriteOperation {
                             try{
                                 $new_model->save();
                                 $connection->commit();
+                                
+                                //invoke the $after_save callback
+                        			if( !is_null($after_save) && is_callable($after_save) ){
+                            			$after_save( $new_model, $request_object, $response, $remote_id, $update );
+                        			}
+                                
                                 $returned_models[] = $new_model;
                             }catch( \Exception $e ){
                                 $response->addError( $e->getMessage(), $remote_id );
@@ -846,3 +888,4 @@ class ApiWriteOperation {
     
     
 }
+
