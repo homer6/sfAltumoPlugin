@@ -47,7 +47,7 @@ class ApiGetQuery{
     
         $pager = new \sfAltumoPlugin\Api\ApiPager( true, $request );
         $response_body = new \sfAltumoPlugin\Api\ApiResponseBody( array(), $body_name, $pager );
-        $response->setResponseBody($response_body);
+        $response->setResponseBody( $response_body );
         
         $this->setRequest( $request );
         $this->setResponse( $response );
@@ -192,8 +192,7 @@ class ApiGetQuery{
         $count_query = clone $query;
         $pager->setTotalResults( $count_query->count() );
         $pager->decorateQuery( $query );
-        $limit = $query->getLimit();
-        
+       
         $results = array();
         if( $pager->getPageSize() > 0 ){
             $db_results = $query->find();
