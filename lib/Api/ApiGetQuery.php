@@ -188,19 +188,27 @@ class ApiGetQuery{
         $query = $this->getQuery();
         $pager = $this->getPager();
         $modify_result = $this->getModifyResult();
-        
-        $count_query = clone $query;
-        $pager->setTotalResults( $count_query->count() );
-        $pager->decorateQuery( $query );
-       
+
+        // set default number of results so that we don't output NULL as 
+        // total_results if there are errors
+        $pager->setTotalResults( 0 );
         $results = array();
-        if( $pager->getPageSize() > 0 ){
-            $db_results = $query->find();
-            foreach( $db_results as $model ){
-                $result_object = array();
-                $modify_result( $model, $result_object );
-                $results[] = $result_object;
-            }
+        
+        if( !$this->getResponse()->hasErrors() ){
+        	
+   	        $count_query = clone $query;
+	        $pager->setTotalResults( $count_query->count() );
+    	    $pager->decorateQuery( $query );
+        
+	        if( $pager->getPageSize() > 0 ){
+	            $db_results = $query->find();
+	            foreach( $db_results as $model ){
+	                $result_object = array();
+	                $modify_result( $model, $result_object );
+	                $results[] = $result_object;
+	            }
+	        }
+	        
         }
         
         $api_response_body = $this->getResponse()->getResponseBody();
@@ -210,3 +218,4 @@ class ApiGetQuery{
     
     
 }
+
