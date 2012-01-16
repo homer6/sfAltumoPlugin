@@ -74,7 +74,7 @@ class Contact extends \BaseContact{
         }
         
         if( strlen($zip) ){
-            $address .= (strlen($address)?' - ':'') . $zip;
+            $address .= (strlen($address)?' - ':'') . strtoupper( trim($zip) );
         }
 
         return $address;

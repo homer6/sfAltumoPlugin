@@ -20,7 +20,9 @@ class UserPeer extends \BaseUserPeer {
 
     
     /** 
-    * @param mixed $username
+    * Find a User by username.
+    * 
+    * @param string $username
     * 
     * @return User
     */
