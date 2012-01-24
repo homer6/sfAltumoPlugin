@@ -782,9 +782,13 @@ class ApiWriteOperation {
                         			}
                                 
                                 $returned_models[] = $new_model;
+
                             }catch( \Exception $e ){
-                                $response->addError( $e->getMessage(), $remote_id );
+                                
+				$response->addError( $e->getMessage(), $remote_id );
+				$connection->rollBack();
                                 //throw $e;
+
                             }
                         }
                 
