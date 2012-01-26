@@ -38,10 +38,15 @@ Installation - Existing Project
   - ./symfony altumo:build
 
 
+ApiRequest Caveat
+-----------------
 
+The ApiRequest class contains (in function authenticate()) the following line:
 
+   `\sfContext::getInstance()->getUser()->signIn( $sf_guard_user, false );`
 
+This line assumes that the object returned by getUser() implements method
+`signIn`. The standard class myUser however does not implement that method,
+so the project has to contain a class of that name that implements it in order
+to be able to use standard API authentication.
 
-
-
- 
