@@ -54,53 +54,24 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
         
 
         /**
-        * Upon execution, add the Altumo global web assets to the response
-        * on every request.
+        * Execute any commands that the plugin needs when the framework loads, but
+        * before an action is executed.
         * 
-        * include_javascripts() and include_stylesheets() can then be called
-        * from the layout to generate the html include code.
+        * Note: this is here because it was used before to load JS and CSS, but
+        * that was relocated to Frontend\Controller
         */
+
+        /*
         $this->dispatcher->connect(
             'context.load_factories', 
             function(){
                 
-                $context = sfContext::getInstance();
-                $response = $context->getResponse();
-                $request = $context->getRequest();
+                // this code gets execute when the framework loads.
                 
-                $protocol = $request->isSecure() ? 'https' : 'http';
-                
-                
-                
-                $javascripts = array();
-                
-                // Include jQuery
-                    $javascripts[] = 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js';   
-        
-                // Include Crockford's JSON library
-                    $javascripts[] = '/altumo/js/lib/vendor/douglascrockford/json2.js';
-                
-                // Include Closure
-                    $javascripts[] = '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js';
-                
-                // If this is a development environment, add the deps file generated
-                // by closure to tell the library where to include javascripts from.
-                    if( !in_array( $context->getConfiguration()->getEnvironment(), array( 'prod', 'production', 'testing', 'staging' ) ) ){
-                        $javascripts[] = '/js/app-deps.js';
-                    }
-                    
-                // Include Altumo core
-                    //disabled - WIP
-                    //$javascripts[] = '/altumo/js/src/core/Altumo.js';
-                
-                
-                // Add javascripts to the response
-                    foreach( $javascripts as $javascript ){
-                        $response->addJavascript( $javascript );
-                    }
             }
         );
-        
+        */
+
     }
 
 }

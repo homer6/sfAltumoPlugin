@@ -56,12 +56,21 @@ EOF;
     * @returns array           // of string (paths)
     */
     static public function getSchemaFilePaths(){
+        
+        $plugin_schema_path = __DIR__ . '/../../config/schema.xml';
+        
+        if( !is_readable($plugin_schema_path) ){
+            
+            $plugin_schema_path = __DIR__ . '/../../../../config/sfAltumoPlugin.schema.xml'; 
+            
+        }
+        
         return array(
             // app's schema
                 __DIR__ . '/../../../../config/schema.xml',   
                 
             // sfAltumoPlugin's schema
-                __DIR__ . '/../../config/schema.xml'
+                $plugin_schema_path
         );
     }
 
