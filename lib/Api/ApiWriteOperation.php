@@ -147,12 +147,14 @@ class ApiWriteOperation {
             $response->setResponseBody( $response_body );
             $this->setResponse( $response );
 
-        //field maps        
-            if( !is_array($field_maps) ){
-                throw new \Exception('Field maps must be an array of ApiFieldMap objects.');
-            }        
-            $this->setFieldMaps( $field_maps );
-        
+        //field maps
+        	if ( ! is_null ($field_maps) ) {        
+	            if( ! is_array($field_maps) ){
+	                throw new \Exception('Field maps must be an array of ApiFieldMap objects.');
+	            }        
+	            $this->setFieldMaps( $field_maps );
+        	}
+            
         //update
             $this->setUpdate( $update );
         
@@ -782,13 +784,9 @@ class ApiWriteOperation {
                         			}
                                 
                                 $returned_models[] = $new_model;
-
                             }catch( \Exception $e ){
-                                
-				$response->addError( $e->getMessage(), $remote_id );
-				$connection->rollBack();
+                                $response->addError( $e->getMessage(), $remote_id );
                                 //throw $e;
-
                             }
                         }
                 
@@ -892,4 +890,5 @@ class ApiWriteOperation {
     
     
 }
+
 
