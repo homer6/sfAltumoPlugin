@@ -48,6 +48,7 @@ class App{
 
     protected $namespace = null;
     protected $namespace_heap = array();
+    protected $api_route = null;
     protected $config = null;
 
 
@@ -58,13 +59,17 @@ class App{
     *   // Frontend application namespace. Can contain sub-namespaces
     *   // e.g. myApp or myApp.adminPanel
     * 
+    * @param string $api_route
+    *   // The root url for the frontend to communicate with i.e. the API.
+    *   // e.g. /api
+    *  
     * @param array $config
     *   // A set of key-value pairs that will be made available to the application
     *   // globally via the .config namespace.
     * 
     * @return \sfAltumoPlugin\Frontend\App
     */
-    public static function create( $namespace, $config = null ){
+    public static function create( $namespace, $api_route = '/api', $config = null ){
         
         if( !is_null( $config ) && !is_array($config) ){
             throw new \Exception( '$config is expected to be an array.' );
@@ -78,6 +83,8 @@ class App{
             foreach( $config as $key => $value ){
                 $app->addConfigItem( $key, $value );
             }
+            
+        $app->setApiRoute( $api_route );
         
         return $app;
         
@@ -106,14 +113,29 @@ class App{
     * frontend app via the .config namespace.
     * 
     * @param string $key
+    *   // a unique key for this config item
+    * 
+    * @param string $namespace
+    *   // a namespace (e.g. myApp.config). 
+    *   // defaults to getNamespace().'.config'
+    *   
     * @param mixed $value
+    *   // value for the config item. 
     * 
     * @return \sfAltumoPlugin\Frontend\App
     *   // $this
     */
-    public function addConfigItem( $key, $value ){
+    public function addConfigItem( $key, $value, $namespace = null ){
+        
+        if( is_null($namespace) ){
+            $namespace = $this->getNamespace() . '.config';
+        }
+        
+        $this->declareNamespace( $namespace );
         
         $key = \Altumo\Validation\Strings::assertNonEmptyString( $key );
+        
+        $key = $namespace . '.' . $key;
         
         $this->getConfig()->$key = $value;
         
@@ -128,13 +150,42 @@ class App{
     * 
     * @return array
     */
-    protected function getConfig(){
+    protected function &getConfig(){
         
         if( is_null($this->config) ){
             $this->config = new \stdClass();
         }
         
         return $this->config;
+        
+    }    
+    
+    
+    /**
+    * Sets the root url of the Api that the frontend will be using.
+    * @return App
+    *   // this App.
+    */
+    public function setApiRoute( $url ){
+        
+        $url = \Altumo\Validation\Strings::assertNonEmptyString( $url );
+        
+        $this->api_route = $url;
+        
+        $this->addConfigItem( 'api_route', $url, 'altumo.config' );
+        
+        return $this;
+        
+    }    
+    
+    
+    /**
+    * Returns the root url of the Api that the frontend will be using.
+    * @return string
+    */
+    public function getApiRoute(){
+
+        return $this->api_route;
         
     }
 
@@ -151,7 +202,7 @@ class App{
     * @return App
     *   // this App.
     */
-    protected function addToNamespaceHeap( $namespace ){
+    protected function declareNamespace( $namespace ){
         
         $this->namespace_heap[ $namespace ] = null;
         
@@ -209,26 +260,35 @@ class App{
     */
     protected function setNamespace( $namespace ){
 
-        $this->resetNamespaceHeap();
+        // clean up namespace before use
+            $this->resetNamespaceHeap();
         
-        $this->namespace = \Altumo\Validation\Strings::assertNonEmptyString(
-            $namespace,
-            '$namespace must be a non-empty string' 
-        );
+        // validate app namespace
+            $this->namespace = \Altumo\Validation\Strings::assertNonEmptyString(
+                $namespace,
+                '$namespace must be a non-empty string' 
+            );
         
-        $sub_namespaces = array(
-            'model',
-            'view',
-            'context'
-        );
+        // add default app sub-namespaces
+            $sub_namespaces = array(
+                'model',
+                'view',
+                'app',
+                'config'
+            );
         
-        $this->addToNamespaceHeap( $this->namespace );
+        // add main app namespace to the heap
+            $this->declareNamespace( $this->namespace );
         
-        foreach( $sub_namespaces as $sub_namespace ){
-            
-            $this->addToNamespaceHeap( $this->namespace . '.' . $sub_namespace );
-            
-        }
+        // add sub-namespaces to the heap
+            foreach( $sub_namespaces as $sub_namespace ){
+                
+                $this->declareNamespace( $this->namespace . '.' . $sub_namespace );
+                
+            }
+        
+        // add altumo namespaces to the heap
+            $this->declareNamespace( 'altumo.app.App' );
         
         return $this;
         
@@ -268,10 +328,10 @@ class App{
             $javascripts['closure-base']    = '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js';
                             
         // Underscore
-            $javascripts['underscore']      = '/sfAltumoPlugin/js/lib/vendor/underscore/underscore-1.3.0-min.js';
+            $javascripts['underscore']      = '/sfAltumoPlugin/js/lib/vendor/underscore/underscore-1.3.1-min.js';
                                                 
         // Backbone
-            $javascripts['backbone']        = '/sfAltumoPlugin/js/lib/vendor/backbone/backbone-0.5.3-min.js';
+            $javascripts['backbone']        = '/sfAltumoPlugin/js/lib/vendor/backbone/backbone-0.9.0-min.js';
                     
         foreach( $javascripts as $javascript ){
             
@@ -323,7 +383,7 @@ class App{
     * @return string
     *   // javascript code.
     */
-    protected function declareNamespaces(){
+    protected function printNamespaceDeclarations(){
         
         $unique_namespaces = array();
         $output = '';
@@ -370,8 +430,13 @@ class App{
     */
     protected function declareConfig(){
 
-        $output = $this->getNamespace() . '.config = ' .
-            json_encode( $this->getConfig() );
+        $output = '';
+        
+        foreach( $this->getConfig() as $key => $value ){
+            
+            $output .= $key . '=' . json_encode( $value ) . ';';
+            
+        }
         
         return $output;
 
@@ -395,7 +460,7 @@ class App{
             ->loadFrontendApp();
 
         return
-            $this->declareNamespaces() . "\n" .
+            $this->printNamespaceDeclarations() . "\n" .
             $this->declareConfig();
         
     }
