@@ -202,7 +202,7 @@ class App{
     * @return App
     *   // this App.
     */
-    protected function declareNamespace( $namespace ){
+    public function declareNamespace( $namespace ){
         
         $this->namespace_heap[ $namespace ] = null;
         
