@@ -137,7 +137,7 @@ class ApiWriteOperation {
     * 
     * @return \sfAltumoPlugin\Api\ApiWriteOperation
     */
-    public function __construct( $request, $response, $body_name, $field_maps, $update = false, $modify_result = null, $before_save = null, $query = null, $model_name = null, $mode = self::MODE_AUTOMATIC, $process_objects_manually = null, $before_setters = null, $after_save = null ){    
+    public function __construct( $request, $response, $body_name, $field_maps=array(), $update = false, $modify_result = null, $before_save = null, $query = null, $model_name = null, $mode = self::MODE_AUTOMATIC, $process_objects_manually = null, $before_setters = null, $after_save = null ){    
         
         //request
             $this->setRequest( $request );
@@ -148,12 +148,10 @@ class ApiWriteOperation {
             $this->setResponse( $response );
 
         //field maps
-        	if ( ! is_null ($field_maps) ) {        
-	            if( ! is_array($field_maps) ){
-	                throw new \Exception('Field maps must be an array of ApiFieldMap objects.');
-	            }        
-	            $this->setFieldMaps( $field_maps );
-        	}
+			if( ! is_array($field_maps) ){
+				throw new \Exception('Field maps must be an array of ApiFieldMap objects.');
+			}        
+	        $this->setFieldMaps( $field_maps );
             
         //update
             $this->setUpdate( $update );
@@ -890,5 +888,6 @@ class ApiWriteOperation {
     
     
 }
+
 
 
