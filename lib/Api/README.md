@@ -1,3 +1,9 @@
+Purpose
+-------
+
+I've created this document to recapitulate the list and order of activities executed when method ApiWriteOperation->run() is invoked.
+
+
 API Write Operation Sequence
 ----------------------------
 
