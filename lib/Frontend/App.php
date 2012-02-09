@@ -331,7 +331,7 @@ class App{
             $javascripts['underscore']      = '/sfAltumoPlugin/js/lib/vendor/underscore/underscore-1.3.1-min.js';
                                                 
         // Backbone
-            $javascripts['backbone']        = '/sfAltumoPlugin/js/lib/vendor/backbone/backbone-0.9.0-min.js';
+            $javascripts['backbone']        = '/sfAltumoPlugin/js/lib/vendor/backbone/backbone-0.9.1-min.js';
                     
         foreach( $javascripts as $javascript ){
             
