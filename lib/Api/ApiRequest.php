@@ -315,7 +315,7 @@ class ApiRequest extends \sfWebRequest{
         //try to authenticate via the session, if the api key was not provided
             if( is_null($api_key) ){
                               
-                $session_id = $this->getCookie( sfConfig::get('altumo_api_session_cookie_name', 'my_session_name'), null );
+                $session_id = $this->getCookie( \sfConfig::get('altumo_api_session_cookie_name', 'my_session_name'), null );
                 if( !is_null($session_id) ){
                     $session = \SessionPeer::retrieveBySessionKey($session_id);
                     if( !$session ){
@@ -325,6 +325,7 @@ class ApiRequest extends \sfWebRequest{
                     if( !$user ){
                         throw new \Exception('Invalid session.'); 
                     }
+
                     if( !$user->hasApiUser() ){
                         throw new \Exception('Invalid session.');
                     }

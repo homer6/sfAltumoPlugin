@@ -48,9 +48,10 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
             sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );
             sfConfig::set( 'altumo_javascript_lib_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/lib/javascript' );
             sfConfig::set( 'altumo_javascript_src_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/source/javascript' );
+
             
-        // Add altumo Api Settings            
-            sfConfig::set( 'altumo_api_session_cookie_name', 'api_session' );
+        // Add altumo Api Settings (Add this in your api app's config)       
+            //sfConfig::set( 'altumo_api_session_cookie_name',  'api_session' );
         
 
         /**
