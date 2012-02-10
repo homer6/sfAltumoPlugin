@@ -273,12 +273,7 @@ class ApiRequest extends \sfWebRequest{
         
         
         //require SSL, if applicable
-            if( \sfConfig::get( 'app_api_require_ssl', true ) ){
-                if( !\Altumo\Http\IncomingHttpRequest::isSecure() ){
-                    throw new \Exception( 'HTTPS is required.' );
-                }
-            }
-        
+            $this->assertSslApiRequest();
         
         //authenticate via the API key, if provided
             $api_key = $this->getHttpRequestHeader( 'Authorization', null );
@@ -346,6 +341,27 @@ class ApiRequest extends \sfWebRequest{
                         
     }
     
+    
+    /**
+    * Throws an exception if SSL is required for API requests.
+    * 
+    * @throws Exception 
+    * @return void
+    */
+    protected function assertSslApiRequest(){
+        
+        //require SSL, if applicable
+        if( \sfConfig::get( 'app_api_require_ssl', true ) ){
+            
+            if( !\Altumo\Http\IncomingHttpRequest::isSecure() ){
+                
+                throw new \Exception( 'HTTPS is required.' );
+                
+            }
+            
+        }
+        
+    }
     
     
     /**
