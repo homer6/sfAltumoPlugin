@@ -273,12 +273,7 @@ class ApiRequest extends \sfWebRequest{
         
         
         //require SSL, if applicable
-            if( \sfConfig::get( 'app_api_require_ssl', true ) ){
-                if( !\Altumo\Http\IncomingHttpRequest::isSecure() ){
-                    throw new \Exception( 'HTTPS is required.' );
-                }
-            }
-        
+            $this->assertSslApiRequest();
         
         //authenticate via the API key, if provided
             $api_key = $this->getHttpRequestHeader( 'Authorization', null );
@@ -315,7 +310,7 @@ class ApiRequest extends \sfWebRequest{
         //try to authenticate via the session, if the api key was not provided
             if( is_null($api_key) ){
                               
-                $session_id = $this->getCookie( sfConfig::get('altumo_api_session_cookie_name', 'my_session_name'), null );
+                $session_id = $this->getCookie( \sfConfig::get('altumo_api_session_cookie_name', 'my_session_name'), null );
                 if( !is_null($session_id) ){
                     $session = \SessionPeer::retrieveBySessionKey($session_id);
                     if( !$session ){
@@ -325,6 +320,7 @@ class ApiRequest extends \sfWebRequest{
                     if( !$user ){
                         throw new \Exception('Invalid session.'); 
                     }
+
                     if( !$user->hasApiUser() ){
                         throw new \Exception('Invalid session.');
                     }
@@ -345,6 +341,27 @@ class ApiRequest extends \sfWebRequest{
                         
     }
     
+    
+    /**
+    * Throws an exception if SSL is required for API requests.
+    * 
+    * @throws Exception 
+    * @return void
+    */
+    protected function assertSslApiRequest(){
+        
+        //require SSL, if applicable
+        if( \sfConfig::get( 'app_api_require_ssl', true ) ){
+            
+            if( !\Altumo\Http\IncomingHttpRequest::isSecure() ){
+                
+                throw new \Exception( 'HTTPS is required.' );
+                
+            }
+            
+        }
+        
+    }
     
     
     /**
