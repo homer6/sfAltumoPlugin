@@ -676,7 +676,7 @@ class ApiWriteOperation {
                 $connection->beginTransaction();
                     
                     //validate the remote_id (it should always be set, this is just a sanity check)
-                        if( array_key_exists( 'remote_id', $request_object ) ){                            
+                        if( is_array($request_object) && array_key_exists( 'remote_id', $request_object ) ){                            
                             $remote_id = $request_object['remote_id'];                            
                         }else{
                             throw new \Exception( 'Remote ID not found in record.' );
