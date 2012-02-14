@@ -216,13 +216,19 @@ class ApiRequest extends \sfWebRequest{
     protected function messageBodyRequiresExpansion(){
         
         $method = $this->getMethod();
+        
         try{
-            $object_ids = \Altumo\Validation\Arrays::sanitizeCsvArrayPostitiveInteger( $this->getParameter('ids', '') );            
+            
+            $object_ids = \Altumo\Validation\Arrays::sanitizeCsvArrayPostitiveInteger( $this->getParameter('ids', '') );         
+               
         }catch( \Exception $e ){
+            
             $id_field_map = new \sfAltumoPlugin\Api\ApiFieldMap( 'id', null, 'ID' );
             $response = \sfContext::getInstance()->getResponse();
-            $response->addError( 'The primary key of the object you\'re trying to update was not set or was not a commas-separated list of integers.', $remote_id, $id_field_map );
+            $response->addError( 'The primary key of the object you\'re trying to update was not set or was not a comma-separated list of integers.', null, $id_field_map );
+            
             throw $e;
+            
         }
         
         $raw_message_body = $this->getMessageBodyData();
