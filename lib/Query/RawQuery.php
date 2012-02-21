@@ -55,7 +55,7 @@ abstract class RawQuery {
 	 * @return RawQuery Returns itself
 	 */
 	public function setOffset( $offset ){
-		$this->offset = \Altumo\Validation\Numerics::assertInteger( $limit );
+		$this->offset = \Altumo\Validation\Numerics::assertInteger( $offset );
 		
 		return $this;
 	}
