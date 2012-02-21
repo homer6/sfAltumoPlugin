@@ -150,7 +150,7 @@ class ApiRequest extends \sfWebRequest{
         
         //this allows a single object to be passed. this allows people that use the api
         //to not have to wrap a single object in an array
-        if( !is_array($base_object_modifications[0]) ){
+        if( isset($base_object_modifications[0]) && !is_array($base_object_modifications[0]) ){
             $base_object_modifications = array( $base_object_modifications );
         }
         
@@ -160,7 +160,7 @@ class ApiRequest extends \sfWebRequest{
             $used_remote_ids = array();
             foreach( $base_object_modifications as $index => $object ){
                 
-                if( array_key_exists('remote_id', $object) ){
+                if( is_array($object) && array_key_exists('remote_id', $object) ){
                     
                     $current_remote_id = $object['remote_id'];
                     
@@ -189,7 +189,7 @@ class ApiRequest extends \sfWebRequest{
         //ensure remote_id integers are present; set them if they aren't        
             foreach( $base_object_modifications as $index => &$object ){
                 
-                if( !array_key_exists('remote_id', $object) ){
+                if( is_array($object) && !array_key_exists('remote_id', $object) ){
                     $remote_id++;
                     $object['remote_id'] = $remote_id;
                 }
@@ -216,13 +216,19 @@ class ApiRequest extends \sfWebRequest{
     protected function messageBodyRequiresExpansion(){
         
         $method = $this->getMethod();
+        
         try{
-            $object_ids = \Altumo\Validation\Arrays::sanitizeCsvArrayPostitiveInteger( $this->getParameter('ids', '') );            
+            
+            $object_ids = \Altumo\Validation\Arrays::sanitizeCsvArrayPostitiveInteger( $this->getParameter('ids', '') );         
+               
         }catch( \Exception $e ){
+            
             $id_field_map = new \sfAltumoPlugin\Api\ApiFieldMap( 'id', null, 'ID' );
             $response = \sfContext::getInstance()->getResponse();
-            $response->addError( 'The primary key of the object you\'re trying to update was not set or was not a commas-separated list of integers.', $remote_id, $id_field_map );
+            $response->addError( 'The primary key of the object you\'re trying to update was not set or was not a comma-separated list of integers.', null, $id_field_map );
+            
             throw $e;
+            
         }
         
         $raw_message_body = $this->getMessageBodyData();

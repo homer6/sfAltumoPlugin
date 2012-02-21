@@ -1,17 +1,24 @@
 <?php
+
 /*
-* This file is part of the sfAltumoPlugin library.
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * This file is part of the sfAltumoPlugin library.
+ *
+ * (c) Steve Sperandeo <steve.sperandeo@altumo.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace sfAltumoPlugin\Query;
 
-abstract class RawQuery
-{ 
 
-	
+/**
+* This class represents [.. WIP ..]
+* 
+* @author karlvonbahnhof <https://github.com/karlvonbahnhof>
+*/
+abstract class RawQuery { 
+
 	/**
 	 * @var integer
 	 */
@@ -30,11 +37,11 @@ abstract class RawQuery
 	 * 
 	 * @param integer $limit
 	 * 
-	 * @return BaseRawQuery Returns itself
+	 * @return RawQuery Returns itself
 	 */
-	public function setLimit( $limit )
-	{
-		$this->limit = $limit;
+	public function setLimit( $limit ){
+
+		$this->limit = \Altumo\Validation\Numerics::assertInteger( $limit );
 		
 		return $this;
 	}
@@ -45,11 +52,10 @@ abstract class RawQuery
 	 * 
 	 * @param integer $offset
 	 * 
-	 * @return BaseRawQuery Returns itself
+	 * @return RawQuery Returns itself
 	 */
-	public function setOffset( $offset )
-	{
-		$this->offset = $offset;
+	public function setOffset( $offset ){
+		$this->offset = \Altumo\Validation\Numerics::assertInteger( $limit );
 		
 		return $this;
 	}
@@ -60,9 +66,10 @@ abstract class RawQuery
 	 * 
 	 * @return integer
 	 */
-	public function getLimit()
-	{
+	public function getLimit(){
+        
 		return $this->limit;
+        
 	}
 	
 	
@@ -71,9 +78,10 @@ abstract class RawQuery
 	 * 
 	 * @return integer
 	 */
-	public function getOffset()
-	{
+	public function getOffset(){
+        
 		return $this->offset;
+        
 	}
 	
 
@@ -97,45 +105,76 @@ abstract class RawQuery
 	 * Runs a select query with optional bindings and returns data
 	 *  
 	 * @param string $query
+     *      // what does this query look like?
+     * 
 	 * @param array $bindings
+     *      // what does this array look like?
+     * 
 	 * @param integer $return_type
+     *      // what are the options?
 	 * 
 	 * @return array
+     *      // what's the array keyed like? what are the values?
 	 */	
-	protected function runSelectQuery( $query, $bindings = array(), $return_type = PDO::FETCH_ASSOC )
-	{
+	protected function runSelectQuery( $query, $bindings = array(), $return_type = PDO::FETCH_ASSOC ){
+
+        // validate query
+            $query = \Altumo\Validation\Strings::assertNonEmptyString( $query );
+        
+        // ensure $bindings is an array
+            if( !is_array($bindings) ){
+                throw new \Exception( '$bindings is expected to be an Array' );
+            }
+        
+        // validate $return_type if possible
+            // ....
+        
+        
 		$connection = $this->getConnection();
 		
-		$statement = $connection->prepare($query);
+		$statement = $connection->prepare( $query );
 	
-		$statement->execute($bindings);
+		$statement->execute( $bindings );
 		
-		$rows = $statement->fetchAll($return_type);
+		$rows = $statement->fetchAll( $return_type );
 		
 		return $rows;
+        
 	}
 		
 	
-	/**
-	 * @return PDO
-	 */
-	protected function getConnection()
-	{
-		return Propel::getConnection();  
+    /**
+    * Describe me
+    * 
+    * @return PDO
+    */
+	protected function getConnection(){
+
+		return Propel::getConnection();
+
 	}
 
-	
 
-	/**
-	 * @param array $statements
-	 * 
-	 * @return string
-	 */
-	protected function concatenateStatementsWithAnd( $statements )
-	{
-		if ( count($statements) == 0 ) return '1';
+    /**
+    * Describe me
+    * 
+    * @param array $statements
+    *   // ....
+    * 
+    * @return string
+    *   // ....
+    */
+	protected function concatenateStatementsWithAnd( $statements ){
+        
+        // ensure $statements is an array
+            if( !is_array($statements) ){
+                throw new \Exception( '$statements is expected to be an Array' );
+            }
+        
+		if( count($statements) == 0 ) return '1';
 		
-		return join(' AND ', $statements);
+		return join( ' AND ', $statements );
+        
 	}
 	
 }
