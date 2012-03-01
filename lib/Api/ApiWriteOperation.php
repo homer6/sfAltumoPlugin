@@ -25,6 +25,8 @@ namespace sfAltumoPlugin\Api;
 *      to make minor tweaks, if necessary. This mode relies on exceptions being
 *      thrown within the model accessors for error messages and validation.
 *      You will then have to build the $result with the modify_result callback.
+*      If an exception is thrown during the creation/update of an object,
+*      that one object will get rolled back (but not the entire set of objects).
 *  
 *   2) Manual: To write an API method that doesn't correspond with a Propel 
 *      model, you can provide the $process_objects_manually callback to do
@@ -130,7 +132,11 @@ class ApiWriteOperation {
     * @param function $before_setters( &$model, &$request_object, &$response )
     *   //Used in Automatic Mode. The function to call that is invoked just
     *     after the model is created (before all of the accessor have been
-    *     called). This will only be invoked if this is a create (POST).
+    *     called). This will only be invoked if this is a create (POST).    
+    * 
+    * @param function $after_save( $new_model, $request_object, $response, $remote_id, $update )
+    *   //Used in Automatic Mode. The function to call that is invoked just after the model is saved.
+    *     Any exception thrown will cause the entire operation to be rolled-back.
     * 
     * @throws \Exception
     *   //if $field_maps is not an array
@@ -774,23 +780,29 @@ class ApiWriteOperation {
                         }else{
                             try{
                                 $new_model->save();
-                                $connection->commit();
                                 
                                 //invoke the $after_save callback
                         			if( !is_null($after_save) && is_callable($after_save) ){
                             			$after_save( $new_model, $request_object, $response, $remote_id, $update );
                         			}
                                 
+                                //intentionally commit after $after_save for atomicity
+                                    $connection->commit();
+
                                 $returned_models[] = $new_model;
+                                
                             }catch( \Exception $e ){
+                                
+                                // exceptions thrown from $after_save will roll back the entire request.
+                                    $connection->rollBack();
+                                 
                                 $response->addError( $e->getMessage(), $remote_id );
-                                //throw $e;
+                                
                             }
                         }
                 
             }catch( Exception $e ){
                 $connection->rollBack();
-                //throw $e;
             }
         
         }
