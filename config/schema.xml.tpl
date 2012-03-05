@@ -268,22 +268,25 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="system_event_id" type="integer" required="true" />
         <column name="user_id" type="integer" required="true" />
+        <column name="type" type="enum" valueSet="request,email" required="true" default="request" />
         <column name="remote_url" type="varchar" size="255" />
+        <column name="subject" type="varchar" size="255" required="false" />
+        <column name="template" type="varchar" size="128" required="false" />
         <column name="authorization_token" type="varchar" size="255" />
         <column name="enabled" type="boolean" required="true" default="1" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
-        
-        
+
+
         <foreign-key foreignTable="system_event" onDelete="cascade" onUpdate="cascade">
             <reference local="system_event_id" foreign="id" />
         </foreign-key>
-        
+
         <foreign-key foreignTable="user" onDelete="cascade" onUpdate="cascade">
             <reference local="user_id" foreign="id" />
         </foreign-key>
-        
-        
+
+
         <index name="index_enabled">
             <index-column name="enabled" />
         </index>
