@@ -4,3 +4,6 @@
 [submodule "lib/vendor/swiftmailer"]
 	path = lib/vendor/swiftmailer
 	url = https://github.com/swiftmailer/swiftmailer.git
+[submodule "lib/vendor/aws"]
+	path = lib/vendor/aws
+	url = git://github.com/amazonwebservices/aws-sdk-for-php.git

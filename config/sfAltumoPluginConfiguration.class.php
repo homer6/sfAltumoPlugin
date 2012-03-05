@@ -48,7 +48,48 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
             sfConfig::set( 'altumo_plugin_dir', realpath( dirname(__FILE__) . '/../' ) );
             sfConfig::set( 'altumo_javascript_lib_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/lib/javascript' );
             sfConfig::set( 'altumo_javascript_src_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/source/javascript' );
+    
+        // Set credentials for AWS
+            $aws_configuration = sfConfig::get( 'sf_sfAltumoPlugin_aws', array('enable'=>false) );
+        
+            if( $aws_configuration['enable'] ){
+                
+                CFCredentials::set(array(
 
+                    'default' => array(
+
+                        // Amazon Web Services Key. Found in the AWS Security Credentials. You can also pass
+                        // this value as the first parameter to a service constructor.
+                        'key' => $aws_configuration['key'],
+
+                        // Amazon Web Services Secret Key. Found in the AWS Security Credentials. You can also
+                        // pass this value as the second parameter to a service constructor.
+                        'secret' => $aws_configuration['secret'],
+
+                        // This option allows you to configure a preferred storage type to use for caching by
+                        // default. This can be changed later using the set_cache_config() method.
+                        //
+                        // Valid values are: `apc`, `xcache`, or a file system path such as `./cache` or
+                        // `/tmp/cache/`.
+                        'default_cache_config' => '',
+
+                        // Determines which Cerificate Authority file to use.
+                        //
+                        // A value of boolean `false` will use the Certificate Authority file available on the
+                        // system. A value of boolean `true` will use the Certificate Authority provided by the
+                        // SDK. Passing a file system path to a Certificate Authority file (chmodded to `0755`)
+                        // will use that.
+                        //
+                        // Leave this set to `false` if you're not sure.
+                        'certificate_authority' => false
+                    ),
+
+                    // Specify a default credential set to use if there are more than one.
+                    '@default' => 'default'
+                ));
+
+            }
+            
             
         // Add altumo Api Settings (Add this in your api app's config)       
             //sfConfig::set( 'altumo_api_session_cookie_name',  'api_session' );
