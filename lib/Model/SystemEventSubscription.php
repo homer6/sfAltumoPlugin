@@ -218,8 +218,23 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
     	
     	parent::save($con);
     }
+    
+    
+    /**
+    * (non-PHPdoc)
+    * @see BaseSystemEventSubscription::setEnabled()
+    *
+    * @throws \Exception if value fails to validate
+    */
+    public function setEnabled( $v ) {
+    
+    	return parent::setEnabled(
+    	\Altumo\Validation\Booleans::assertLooseBoolean( $v )
+    	);
+    }
 
     
     
 } 
+
 
