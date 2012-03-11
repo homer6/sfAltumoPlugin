@@ -13,7 +13,7 @@
  * 
  * @package    sfAltumoPlugin
  * @subpackage config
- * @author Juan Jaramillo <steve.sperandeo@altumo.com>
+ * @author Juan Jaramillo <juan.jaramillo@altumo.com>
  */
 class sfAltumoPluginConfiguration extends sfPluginConfiguration {
     
@@ -29,7 +29,7 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
         //set default timezone
             date_default_timezone_set( 'America/Los_Angeles' );
 
-        //symfony 2 autoloader (for classes within namespaces)
+        //symfony 2 autoloader (for classes with namespaces only)
             
             $altumo_php_source_path = __DIR__ . '/../lib/vendor/altumo/source/php';
 

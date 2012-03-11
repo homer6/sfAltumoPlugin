@@ -1,0 +1,4 @@
+autoload:
+  querypath:
+    path:           %SF_PLUGINS_DIR%/sfAltumoPlugin/lib/vendor/querypath/src
+    recursive:      on
