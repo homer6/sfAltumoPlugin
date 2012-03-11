@@ -39,6 +39,9 @@ namespace sfAltumoPlugin\Email;
 *    // $failed_recipients will be populated with any failed recipients
 *    ->send( $failed_recipients )
 * 
+* IMPORTANT: Make sure app_mailer_enabled is set to true
+* 
+* 
 * @author Juan Jaramillo <juan.jaramillo@altumo.com>
 */
 class Message{
@@ -58,6 +61,7 @@ class Message{
     protected $attachments = array();
     protected $content_parts = array();
     protected $swift_transport = null;
+    protected $testing_mode_reroute_to_email = null;
     protected $enabled = true;
 
 
@@ -83,23 +87,29 @@ class Message{
     *   - app_mailer_smtp_security_scheme
     *   - app_mailer_smtp_user
     *   - app_mailer_smtp_password
+    *   - app_mailer_reroute_to
     * 
     * They can be individually overridden by passing in parameters.
     * 
     * If all of them are null, the system's default mail transport is used.
     * 
     * 
-    * @param string $smtp_server            // host name or ip of the smtp server to use
-    * @param int $smtp_port                 // port for the smtp server
-    * @param string $smtp_security_scheme   // encryption scheme 
-    *                                       // - self::TRANSPORT_SECURITY_SCHEME_SSL
-    *                                       // - self::TRANSPORT_SECURITY_SCHEME_TLS
-    * @param mixed $smtp_username           // username for the smtp server
-    * @param mixed $smtp_passowrd           // password for the smtp server
+    * @param string $smtp_server                    // host name or ip of the smtp server to use
+    * @param int $smtp_port                         // port for the smtp server
+    * @param string $smtp_security_scheme           // encryption scheme 
+    *                                               // - self::TRANSPORT_SECURITY_SCHEME_SSL
+    *                                               // - self::TRANSPORT_SECURITY_SCHEME_TLS
+    * @param mixed $smtp_username                   // username for the smtp server
+    * @param mixed $smtp_passowrd                   // password for the smtp server
+    * @param mixed $testing_mode_reroute_to_email   // reroute this message to a
+    *                                               // different email address
+    *                                               // instead of sending it to
+    *                                               // the recipients.
+    *                                               // (for testing purposes)
     * 
     * @return \Swift_Transport
     */
-    protected function initialize( $smtp_server = null, $smtp_port = null, $smtp_security_scheme = null, $smtp_username = null, $smtp_passowrd = null ){
+    protected function initialize( $smtp_server = null, $smtp_port = null, $smtp_security_scheme = null, $smtp_username = null, $smtp_passowrd = null, $testing_mode_reroute_to_email = null ){
 
         if( is_null($smtp_server) ){
             
@@ -130,9 +140,15 @@ class Message{
             $smtp_passowrd = \sfConfig::get( 'app_mailer_smtp_password', null );
             
         }
+             
+        if( is_null($testing_mode_reroute_to_email) ){
+            
+            $testing_mode_reroute_to_email = \sfConfig::get( 'app_mailer_reroute_to', null );
+            
+        }
         
         
-        if( !is_null($smtp_server) || !is_null($smtp_port) || !is_null($smtp_security_scheme) || !is_null($smtp_user) || !is_null($smtp_passowrd) ){
+        if( !is_null($smtp_server) || !is_null($smtp_port) || !is_null($smtp_security_scheme) || !is_null($smtp_username) || !is_null($smtp_passowrd) ){
             
             if( !is_null($smtp_server) ){
                 
@@ -184,9 +200,16 @@ class Message{
 
         } else {
             
-            $this->setSwiftTransport( new \Swift_MailTransport() );
+            $this->setSwiftTransport( \Swift_SmtpTransport::newInstance() );
             
         }
+        
+        // enable testing mode if required.
+            if( !is_null($testing_mode_reroute_to_email) ){
+                
+                $this->setTestingModeRerouteToEmail( $testing_mode_reroute_to_email );
+                
+            }
         
         $this->setEnabled( \sfConfig::get('app_mailer_enabled', false) );
         
@@ -713,14 +736,33 @@ class Message{
             
         \sfContext::getInstance()->getConfiguration()->loadHelpers( 'Partial' );
 
-
-        $swift_message = $this->getSwiftMessage()
-            ->setFrom( $this->getFrom() )
-            ->setReplyTo( $this->getReplyTo() )
-            ->setTo( $this->getToRecipients() )
-            ->setCc( $this->getCcRecipients() )
-            ->setBcc( $this->getBccRecipients() )
-            ->setSubject( $this->getSubject() );
+        // create SwiftMessage instance
+            $swift_message = $this->getSwiftMessage()
+                ->setFrom( $this->getFrom() )
+                ->setReplyTo( $this->getReplyTo() )
+                ->setSubject( $this->getSubject() );
+        
+        // if in testing mode, reroute message
+            if( $this->hasTestingModeRerouteToEmail() ){
+                
+                $swift_message
+                    ->setTo( $this->getTestingModeRerouteToEmail() )
+                    ->setSubject( 
+                        $this->getSubject() .
+                        ' [' . 
+                        $this->getRecipientsDescription() .
+                        ']'
+                    );
+                
+        // set recipients normally
+            } else {
+                
+                $swift_message
+                    ->setTo( $this->getToRecipients() )
+                    ->setCc( $this->getCcRecipients() )
+                    ->setBcc( $this->getBccRecipients() );
+                
+            }
             
         if( $this->getHtmlPartial() != null ){
             $swift_message
@@ -758,6 +800,77 @@ class Message{
     
     
     /**
+    * Enables testing mode, which means this Message will NOT be sent to the
+    * recipients specified by "To", "CC", "BCC". This Message will be sent to
+    * $reroute_emails_to instead, with a modified subject showing the original 
+    * recipients.
+    * 
+    * @param string $reroute_emails_to
+    *   // email address to reroute message to.
+    * 
+    * @return \sfAltumoPlugin\Email\Message
+    */
+    public function setTestingModeRerouteToEmail( $reroute_emails_to ){
+
+        $this->testing_mode_reroute_to_email = \Altumo\Validation\Emails::assertEmailAddress(
+            $reroute_emails_to,
+            '$reroute_emails_to expects an email address.'
+        );
+
+        return $this;
+
+    }
+
+
+    /**
+    * Get the address to which this message should be rerouted to if in testing
+    * mode. 
+    * 
+    * @return string
+    *   // email address
+    */
+    protected function getTestingModeRerouteToEmail(){
+ 
+        return $this->testing_mode_reroute_to_email;
+
+    }
+
+
+    /**
+    * Whether this message has testing mode enabled 
+    * (i.e. a reroute address is present.)
+    * 
+    * @return \sfAltumoPlugin\Email\Message
+    */
+    protected function hasTestingModeRerouteToEmail(){
+ 
+        return $this->getTestingModeRerouteToEmail() !== null;
+
+    }
+
+ 
+    /**
+    * Returns a list of recipients.
+    * 
+    * e.g.
+    * "Peter Griffin <pea.tear@griffin.com>, Jack Smith <jack@smith.com>"
+    * 
+    * @return string
+    */
+    protected function getRecipientsDescription(){
+ 
+        $all_recipients = array_merge(
+            $this->getToRecipients(),
+            $this->getCcRecipients(),
+            $this->getBccRecipients()
+        );
+
+        return implode( ', ', array_keys($all_recipients) );
+
+    }
+
+
+    /**
     * Send this Message
     * 
     * @param mixed $failed_recipients   
@@ -771,7 +884,7 @@ class Message{
         if( !$this->getEnabled() ){
             return array();
         }
-        
+ 
         
         return $this->getPreparedSwiftMailer()->send( 
             $this->getPreparedSwiftMessage(),
