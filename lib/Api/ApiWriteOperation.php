@@ -801,8 +801,11 @@ class ApiWriteOperation {
                             }
                         }
                 
-            }catch( Exception $e ){
+            }catch( \Exception $e ){
+
                 $connection->rollBack();
+		$response->addError( $e->getMessage(), $remote_id );
+
             }
         
         }
