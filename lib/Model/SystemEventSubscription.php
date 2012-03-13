@@ -208,6 +208,12 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
     		// validate remote url as email
     		$this->assertEmailValid( $this->getRemoteUrl() );
     		
+    		// make sure template is set
+    		\Altumo\Validation\Strings::assertNonEmptyString( $this->getTemplate(), "A template must be set for email subscriptions." );
+    		
+    		// make sure subject is set
+    		\Altumo\Validation\Strings::assertNonEmptyString( $this->getSubject(), "A subject must be set for email subscriptions." );
+    		
     	} elseif ( $this->isRequestSubscription() ) {
     		// if subscription is for a request,
     		
