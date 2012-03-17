@@ -49,7 +49,17 @@ class sfAltumoPluginConfiguration extends sfPluginConfiguration {
             sfConfig::set( 'altumo_javascript_lib_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/lib/javascript' );
             sfConfig::set( 'altumo_javascript_src_dir', sfConfig::get( 'altumo_plugin_dir' ) . '/lib/vendor/altumo/source/javascript' );
     
-        // Set credentials for AWS
+       
+        /**
+        * If the AWS module is enabled, set credentials for sdk
+        * 
+        * To enable, add a section to settings.yml, like so:
+        *   sfAltumoPlugin:
+        *      aws:
+        *        enable: true
+        *        key: "MY_AWS_KE_HERE"
+        *        secret: "MY_AWS_SECRET_HERE" 
+        */
             $aws_configuration = sfConfig::get( 'sf_sfAltumoPlugin_aws', array('enable'=>false) );
         
             if( $aws_configuration['enable'] ){

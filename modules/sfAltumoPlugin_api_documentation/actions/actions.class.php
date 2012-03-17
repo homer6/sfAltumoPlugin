@@ -17,6 +17,9 @@ class sfAltumoPlugin_api_documentationActions extends sfActions {
     */
     public function preExecute(){
         
+        $expected_username = sfConfig::get( 'sf_sfAltumoPlugin_api_documentation_username', 'api' );
+        $expected_password = sfConfig::get( 'sf_api_documentation_password', 'api' );
+        
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             
             header('WWW-Authenticate: Basic realm="My Realm"');
@@ -26,7 +29,7 @@ class sfAltumoPlugin_api_documentationActions extends sfActions {
             
         } else {
             
-            if( $_SERVER['PHP_AUTH_USER'] != "api" || $_SERVER['PHP_AUTH_PW'] != "apple26" ){
+            if( $_SERVER['PHP_AUTH_USER'] != $expected_username || $_SERVER['PHP_AUTH_PW'] != $expected_password ){
                 echo 'Unable to authenticate';
                 exit;
             }
