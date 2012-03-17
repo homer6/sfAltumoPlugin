@@ -162,7 +162,7 @@
 }
 
 .text_block li {
-    list-style-image: url('/images/silk/bullet_blue.png') ;
+    list-style-image: url('/sfAltumoPlugin/images/silk/bullet_blue.png') ;
     list-style-position: outside;
     list-style-type:circle;
     
