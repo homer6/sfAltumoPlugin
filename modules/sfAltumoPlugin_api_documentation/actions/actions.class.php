@@ -17,8 +17,8 @@ class sfAltumoPlugin_api_documentationActions extends sfActions {
     */
     public function preExecute(){
         
-        $expected_username = sfConfig::get( 'sf_sfAltumoPlugin_api_documentation_username', 'api' );
-        $expected_password = sfConfig::get( 'sf_api_documentation_password', 'api' );
+        $expected_username = sfConfig::get( 'app_api_documentation_username', 'api' );
+        $expected_password = sfConfig::get( 'app_api_documentation_password', 'api' );
         
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             
