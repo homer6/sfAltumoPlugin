@@ -33,7 +33,7 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
         $system_event_instance_message->setSystemEventInstance($system_event_instance);
         $system_event_instance_message->setSystemEventSubscription($this);
         $system_event_instance_message->save();
-        
+
         //try to sent the notification, mark as sent if successful.
         try{
             
@@ -46,7 +46,6 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
         }
         
         return $system_event_instance_message;
-        
     }
         
     
@@ -59,33 +58,70 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
     * @return SystemEventSubscription       //The current object (for fluent 
     *                                         API support)
     */
-    public function setRemoteUrl( $remote_url ){
-        
-        try{
-            $url = new \Altumo\String\Url($remote_url);                        
-        }catch( \Exception $e ){
-            throw new \Exception( 'Malformed remote URL.' );
-        }
-        
-        $valid = true;
-        $scheme = $url->getScheme();
-        
-        if( $scheme == 'ftp' ){
-            throw new \Exception( 'FTP event callbacks are not supported.' );
-            $valid = false;
-        }
-        
-        if( $scheme == 'http' ){
-            throw new \Exception( 'HTTP event callbacks are not supported. Please ensure that it is HTTPS for the current URL.' );
-            $valid = false;
-        }
-        
-        if( $valid ){
-            return parent::setRemoteUrl($remote_url);
-        }else{
-            return $this;
-        }
-        
+    public function setRemoteUrl( $remote_url ) {
+		
+    	return parent::setRemoteUrl(
+    		is_null( $remote_url )
+    			? $remote_url
+    			: \Altumo\Validation\Strings::assertStringAndLength( $remote_url, null, 255 )
+    	);
+    	    	
+    }
+    
+    
+    /**
+     * @param string $email
+     * 
+     * @return string
+     * 
+     * @throws \Exception if value fails to validate
+     */
+    protected function assertEmailValid($email) {
+    
+    	return \Altumo\Validation\Emails::assertEmailAddress($email);
+    }
+    
+    
+    /**
+     * @param string $remote_url
+     * 
+     * @return string
+     * 
+     * @throws \Exception if value fails to validate
+     */
+    protected function assertRemoteUrlValid($remote_url) {
+    	
+    	/*
+    	 * Check syntax
+    	 */
+    	
+    	try{
+    		
+    		$url = new \Altumo\String\Url($remote_url);
+    		
+    	}catch( \Exception $e ){
+    		
+    		throw new \Exception( 'Malformed remote URL.' );
+    		
+    	}
+    	
+    	
+    	/*
+    	 * check protocol, don't allow ftp or http
+    	 */
+    	
+    	$scheme = $url->getScheme();
+    	 
+    	if( $scheme == 'ftp' ){
+    		throw new \Exception( 'FTP event callbacks are not supported.' );
+    	}
+    	 
+    	if( $scheme == 'http' ){
+    		throw new \Exception( 'HTTP event callbacks are not supported. Please ensure that it is HTTPS for the current URL.' );
+    	}
+    	
+    	
+    	return $remote_url;
     }
     
     
@@ -135,7 +171,76 @@ class SystemEventSubscription extends \BaseSystemEventSubscription {
         return parent::setAuthorizationToken( \Altumo\Validation\Strings::assertStringAndLength($authorization_token, 10, 255) );
         
     }
+    
+    
+    /**
+    * Returns true if this subscription is for sending an email, false if not
+    *
+    * @return bool
+    */
+    public function isEmailSubscription() {
+    
+    	return ( $this->getType() == 'email' );
+    }
+    
+    
+    /**
+     * Returns true if this subscription is for making a HTTP request,
+     * false if not
+     *
+     * @return bool
+     */
+    public function isRequestSubscription() {
+    
+    	return ( $this->getType() == 'request' );
+    }
+    
+    
+    /**
+     * (non-PHPdoc)
+     * @see BaseSystemEventSubscription::save()
+     */
+    public function save( PropelPDO $con = null )
+    {
+    	if ($this->isEmailSubscription() ) {
+    		// if subscription is for email,
+    		
+    		// validate remote url as email
+    		$this->assertEmailValid( $this->getRemoteUrl() );
+    		
+    		// make sure template is set
+    		\Altumo\Validation\Strings::assertNonEmptyString( $this->getTemplate(), "A template must be set for email subscriptions." );
+    		
+    		// make sure subject is set
+    		\Altumo\Validation\Strings::assertNonEmptyString( $this->getSubject(), "A subject must be set for email subscriptions." );
+    		
+    	} elseif ( $this->isRequestSubscription() ) {
+    		// if subscription is for a request,
+    		
+    		// validate remote url as url
+    		$this->assertRemoteUrlValid( $this->getRemoteUrl() );
+    		
+    	}
+    	
+    	parent::save($con);
+    }
+    
+    
+    /**
+    * (non-PHPdoc)
+    * @see BaseSystemEventSubscription::setEnabled()
+    *
+    * @throws \Exception if value fails to validate
+    */
+    public function setEnabled( $v ) {
+    
+    	return parent::setEnabled(
+    	\Altumo\Validation\Booleans::assertLooseBoolean( $v )
+    	);
+    }
 
     
     
 } 
+
+

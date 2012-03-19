@@ -84,7 +84,7 @@ class SystemEventPeer extends \BaseSystemEventPeer {
                     throw new \Exception( 'Unknown User.' );
                 }
             }else{
-                $user = \sfContext::getInstance()->getUser()->getUser();
+                $user = \sfContext::getInstance()->getUser()->getProfile();
                 if( !$user ){
                     throw new \Exception( 'User must be logged in or you must provide a user_id to triggerError()' );
                 }
