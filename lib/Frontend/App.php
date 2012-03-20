@@ -322,16 +322,16 @@ class App{
             $javascripts['jquery']          = '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js';   
 
         // Crockford's JSON library (used by backbone)
-            $javascripts['json2']           = '/altumo/js/lib/vendor/douglascrockford/json2.js';
+            $javascripts['json2']           = '/sfAltumoPlugin/js/altumo/vendor/douglascrockford/json2.js';
         
         // Google Closure Base (for dependency management)
-            $javascripts['closure-base']    = '/altumo/js/lib/vendor/google/closure-library/closure/goog/base.js';
+            $javascripts['closure-base']    = '/sfAltumoPlugin/js/altumo/vendor/google/closure-library/closure/goog/base.js';
                             
         // Underscore
-            $javascripts['underscore']      = '/sfAltumoPlugin/js/lib/vendor/underscore/underscore-1.3.1-min.js';
+            $javascripts['underscore']      = '/sfAltumoPlugin/js/altumo/vendor/underscore/underscore-1.3.1-min.js';
                                                 
         // Backbone
-            $javascripts['backbone']        = '/sfAltumoPlugin/js/lib/vendor/backbone/backbone-0.9.1-min.js';
+            $javascripts['backbone']        = '/sfAltumoPlugin/js/altumo/vendor/backbone/backbone-0.9.1-min.js';
                     
         foreach( $javascripts as $javascript ){
             
