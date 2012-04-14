@@ -148,9 +148,12 @@ class ApiRequest extends \sfWebRequest{
             
         }
         
-        //this allows a single object to be passed. this allows people that use the api
-        //to not have to wrap a single object in an array
-        if( isset($base_object_modifications[0]) && !is_array($base_object_modifications[0]) ){
+        // This allows a single object to be passed. Peope who use the API
+        // to post/put a single object don't have to wrap it in an array
+        $base_object_keys = array_keys( $base_object_modifications );
+        // if the first index is not numerical, 
+        if ( ! empty($base_object_keys) && $base_object_keys[0] !== 0 ) {
+            // wrap modifications in another array
             $base_object_modifications = array( $base_object_modifications );
         }
         
