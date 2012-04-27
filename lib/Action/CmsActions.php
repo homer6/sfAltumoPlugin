@@ -60,17 +60,4 @@ class CmsActions extends BaseActions {
         
     }
 
-
-    /**
-    * Enables the Cms editor.
-    */
-    public function enableCmsEditor(){
-        
-        $this->getResponse()->addJavascript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js' );
-        $this->getResponse()->addJavascript( '/sfAltumoPlugin/js/lib/vendor/altEdit/jquery-altEdit.js' );
-        
-        $this->getResponse()->addStylesheet( '/sfAltumoPlugin/js/lib/vendor/altEdit/css/altEdit.css' );
-        
-    }
-
 }
