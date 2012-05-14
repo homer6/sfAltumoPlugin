@@ -113,4 +113,24 @@ class modelSessionStorage extends sfPDOSessionStorage {
         
         return $session;
     }
+    
+    
+    /**
+     * Deletes old sessions
+     * 
+     * (non-PHPdoc)
+     * @see sfPDOSessionStorage::sessionGC()
+     */
+    public function sessionGC( $lifetime ) {
+    	
+    	\Altumo\Validation\Numerics::assertPositiveInteger(
+    		$lifetime,
+    		'$lifetime expects a positive integer'
+    	);
+    	
+    	SessionPeer::deleteGarbageCollectible( $lifetime );
+    	
+    	return true;
+    }   
+    
 }

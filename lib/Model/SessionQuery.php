@@ -17,5 +17,25 @@
 namespace sfAltumoPlugin\Model;
 
 class SessionQuery extends \BaseSessionQuery {
+	
+	
+	/**
+	 * @param int $lifetime
+	 *
+	 * @throws \Exception if $lifetime doesn't validate
+	 *
+	 * @return SessionQuery
+	 */
+	public function filterByGarbageCollectible( $lifetime )
+	{
+		\Altumo\Validation\Numerics::assertPositiveInteger(
+				$lifetime,
+				'$lifetime expects a positive integer'
+		);
+	
+		return $this->filterByTime( time() - $lifetime, \Criteria::LESS_THAN );
+	}
+		
 
 } // SessionQuery
+

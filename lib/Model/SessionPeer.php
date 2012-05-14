@@ -33,5 +33,56 @@ class SessionPeer extends \BaseSessionPeer {
 
     }
     
+    
+    /**
+     * Deletes session rows older than $lifetime
+     * 
+     * @param int $lifetime
+     * 
+     * @throws \Exception if $lifetime doesn't validate
+     * 
+     * @return bool True on success
+     */
+    public static function deleteGarbageCollectible( $lifetime ) {
+    	
+    	\Altumo\Validation\Numerics::assertPositiveInteger(
+    		$lifetime,
+    		'$lifetime expects a positive integer'
+    	);
+    	
+    	SessionQuery::create()
+    		->filterByGarbageCollectible( $lifetime )
+    		->delete()
+    	;
+    	
+    	return true;
+    }
+    
+    
+    /**
+     * Returns number of session rows older than $lifetime (and therefore
+     * ready for deletion by SessionPeer::deleteGarbageCollectible()
+     * 
+     * @param int $lifetime
+     * 
+     * @throws \Exception if $lifetime doesn't validate
+     * 
+     * @return int
+     */
+    public static function countGarbageCollectible( $lifetime ) {
+    	
+    	\Altumo\Validation\Numerics::assertPositiveInteger(
+    		$lifetime,
+    		'$lifetime expects a positive integer'
+    	);
+    	
+    	return SessionQuery::create()
+    		->filterByGarbageCollectible( $lifetime )
+    		->count()
+    	;
+    	
+    }
+    
 
 }
+
