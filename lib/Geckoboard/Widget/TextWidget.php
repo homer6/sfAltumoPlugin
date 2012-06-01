@@ -4,7 +4,7 @@
 namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
-class TextWidget extends \Geckoboard\Widget\AbstractWidget
+class TextWidget extends \sfAltumoPlugin\Geckoboard\Widget\AbstractWidget
 {
 
 	const TYPE_NONE = 0;
@@ -33,7 +33,7 @@ class TextWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @throws \Exception if maximum number of items reached
 	 * 
-	 * @return \Geckoboard\Widget\TextWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\TextWidget
 	 */
 	public function addItem($text, $type = self::TYPE_NONE)
 	{

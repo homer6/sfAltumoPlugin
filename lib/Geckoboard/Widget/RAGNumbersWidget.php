@@ -4,7 +4,7 @@
 namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
-class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
+class RAGNumbersWidget extends \sfAltumoPlugin\Geckoboard\Widget\AbstractWidget
 {
 	
 	/**
@@ -45,7 +45,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @param double $value
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setRedValue( $value )
 	{
@@ -59,7 +59,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setRedText( $text )
 	{
@@ -75,7 +75,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @param double $value
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setRed( $value, $text )
 	{
@@ -91,7 +91,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @param double $value
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setGreenValue( $value )
 	{
@@ -106,7 +106,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 *
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setGreenText( $text )
 	{
@@ -122,7 +122,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @param double $value
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setGreen( $value, $text )
 	{
@@ -138,7 +138,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 *
 	 * @param double $value
 	 *
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setAmberValue( $value )
 	{
@@ -153,7 +153,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 *
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setAmberText( $text )
 	{
@@ -169,7 +169,7 @@ class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @param double $value
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\RAGNumbersWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\RAGNumbersWidget
 	 */
 	public function setAmber($value, $text)
 	{

@@ -4,7 +4,7 @@
 namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
-class FunnelWidget extends \Geckoboard\Widget\AbstractWidget
+class FunnelWidget extends \sfAltumoPlugin\Geckoboard\Widget\AbstractWidget
 {
 	
 	protected $items = array();
@@ -21,7 +21,7 @@ class FunnelWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @throws \Exception if $value doesn't validate
 	 * @throws \Exception if $label doesn't validate
 	 * 
-	 * @return \Geckoboard\Widget\FunnelWidget 
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\FunnelWidget 
 	 */
 	public function addItem( $value, $label )
 	{
@@ -59,7 +59,7 @@ class FunnelWidget extends \Geckoboard\Widget\AbstractWidget
 	* 
 	* @throws \Exception if value doesn't validate
 	* 
-	* @return \Geckoboard\Widget\FunnelWidget
+	* @return \sfAltumoPlugin\Geckoboard\Widget\FunnelWidget
 	*/
 	public function setReverse( $reverse = true )
 	{
@@ -87,7 +87,7 @@ class FunnelWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @param bool $enabled
 	 * 
-	 * @return \Geckoboard\Widget\FunnelWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\FunnelWidget
 	 * 
 	 * @throws \Exception if value doesn't validate
 	 */

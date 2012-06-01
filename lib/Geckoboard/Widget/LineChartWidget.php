@@ -4,7 +4,7 @@
 namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
-class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
+class LineChartWidget extends \sfAltumoPlugin\Geckoboard\Widget\AbstractWidget
 {
 	
 	protected $items = array();
@@ -15,7 +15,7 @@ class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param double $value
 	 * 
-	 * @return \Geckoboard\Widget\LineChartWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\LineChartWidget
 	 * 
 	 * @throws \Exception if item fails to validate
 	 */
@@ -30,7 +30,7 @@ class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param double[] $values Array of numerical values
 	 *
-	 * @return \Geckoboard\Widget\LineChartWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\LineChartWidget
 	 * 
 	 * @throws \Exception if any item fails to validate
 	 */
@@ -47,7 +47,7 @@ class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param string[] $descriptors
 	 * 
-	 * @return \Geckoboard\Widget\LineChartWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\LineChartWidget
 	 * 
 	 * @throws \Exception if any descriptor fails to validate
 	 */
@@ -64,7 +64,7 @@ class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param string $descriptor
 	 *
-	 * @return \Geckoboard\Widget\LineChartWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\LineChartWidget
 	 *
 	 * @throws \Exception if descriptor fails to validate
 	 */
@@ -79,7 +79,7 @@ class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param string[] $descriptors
 	 *
-	 * @return \Geckoboard\Widget\LineChartWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\LineChartWidget
 	 *
 	 * @throws \Exception if any descriptor fails to validate
 	 */
@@ -96,7 +96,7 @@ class LineChartWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param string $descriptor
 	 * 
-	 * @return \Geckoboard\Widget\LineChartWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\LineChartWidget
 	 * 
 	 * @throws \Exception if descriptor fails to validate
 	 */

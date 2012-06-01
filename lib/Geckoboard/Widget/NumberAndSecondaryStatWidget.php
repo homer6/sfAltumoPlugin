@@ -4,7 +4,7 @@
 namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
-class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
+class NumberAndSecondaryStatWidget extends \sfAltumoPlugin\Geckoboard\Widget\AbstractWidget
 {
 	
 	/**
@@ -61,7 +61,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @param bool $v
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 * 
 	 * @throws \Exception if $v doesn't validate
 	 */
@@ -88,7 +88,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @param bool $v
 	 *
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 *
 	 * @throws \Exception if $v doesn't validate
 	 */
@@ -112,7 +112,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param double $v
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 * 
 	 * @throws \Exception if value doesn't validate
 	 */
@@ -136,7 +136,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param string $v
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 * 
 	 * @throws \Exception if value doesn't validate
 	 */
@@ -161,7 +161,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @param double $value
 	 * @param string $text
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 * 
 	 * @throws \Exception if $value or $text doesn't validate
 	 */
@@ -177,7 +177,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param double $v
 	 *
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 *
 	 * @throws \Exception if value doesn't validate
 	 */
@@ -201,7 +201,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	/**
 	 * @param string $v
 	 *
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 *
 	 * @throws \Exception if value doesn't validate
 	 */
@@ -226,7 +226,7 @@ class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @param double $value
 	 * @param string $text
 	 *
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 *
 	 * @throws \Exception if $value or $text doesn't validate
 	 */

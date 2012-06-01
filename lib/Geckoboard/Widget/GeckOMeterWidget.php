@@ -4,7 +4,7 @@
 namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
-class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
+class GeckOMeterWidget extends \sfAltumoPlugin\Geckoboard\Widget\AbstractWidget
 {
 	
 	/**
@@ -53,7 +53,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @throws \Exception if $v doesn't validate 
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setMinValue( $v )
 	{
@@ -77,7 +77,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @throws \Exception if $v doesn't validate
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setMinText( $v )
 	{
@@ -103,7 +103,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @throws \Exception if $value doesn't validate
 	 * @throws \Exception if $text doesn't validate
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setMin( $value, $text )
 	{
@@ -119,7 +119,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @throws \Exception if $v doesn't validate
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setMaxValue( $v )
 	{
@@ -143,7 +143,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @throws \Exception if $v doesn't validate
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setMaxText( $v )
 	{
@@ -169,7 +169,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * @throws \Exception if $value doesn't validate
 	 * @throws \Exception if $text doesn't validate
 	 *
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setMax( $value, $text )
 	{
@@ -187,7 +187,7 @@ class GeckOMeterWidget extends \Geckoboard\Widget\AbstractWidget
 	 * 
 	 * @throws \Exception if $v doesn't validate
 	 * 
-	 * @return \Geckoboard\Widget\NumberAndSecondaryStatWidget
+	 * @return \sfAltumoPlugin\Geckoboard\Widget\NumberAndSecondaryStatWidget
 	 */
 	public function setItem( $v )
 	{
