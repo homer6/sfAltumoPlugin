@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Geckoboard\Widget;
+namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
 class NumberAndSecondaryStatWidget extends \Geckoboard\Widget\AbstractWidget

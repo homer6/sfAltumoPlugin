@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Geckoboard\Widget;
+namespace sfAltumoPlugin\Geckoboard\Widget;
 
 
 class RAGNumbersWidget extends \Geckoboard\Widget\AbstractWidget

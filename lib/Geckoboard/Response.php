@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Geckoboard;
+namespace sfAltumoPlugin\Geckoboard;
 
 
 class Response extends \sfWebResponse

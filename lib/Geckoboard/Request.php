@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Geckoboard;
+namespace sfAltumoPlugin\Geckoboard;
 
 
 class Request extends \sfWebRequest {
