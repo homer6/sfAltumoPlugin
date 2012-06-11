@@ -58,40 +58,6 @@ class CmsActions extends BaseActions {
 
 
     /**
-     * This is an action that handles the route that you'll use for saving changes to a fragment.
-     *
-     * This can be optionally implemented in the API as all of the functionallity lives in
-     * \sfAltumoPlugin\ContentManagement\Editable::updateElementContent
-     *
-     *
-     * @param sfWebRequest $request
-     *
-     * @return mixed
-     *  // returns sfView::NONE
-     */
-    public function executeSaveContentEdit(sfWebRequest $request){
-
-        $template_file_tag = $request->getParameter( 'tag', null );
-
-        $new_content = $request->getParameter( 'value', null );
-
-        $element_id = $request->getParameter( 'id', null );
-
-        $edited_content = \sfAltumoPlugin\ContentManagement\Editable::updateElementContent(
-            $template_file_tag,
-            $element_id,
-            $new_content
-        );
-
-        $this->getResponse()->setContent( $edited_content );
-
-        return sfView::NONE;
-
-
-    }
-
-
-    /**
      * Makes a couple of dynamic functions available to the template for quick access to CMS fragments.
      * The functions are:
      *
@@ -139,7 +105,7 @@ class CmsActions extends BaseActions {
      *
      * @return void
      */
-    public function startCmsFragment( $tag, $chrome_attributes = '' ){
+    public function startCmsFragment( $tag, $chrome_attributes = '', $fragment_type = 'text' ){
 
         $chrome_attributes = \Altumo\Validation\Strings::assertString(
             $chrome_attributes,
@@ -156,7 +122,7 @@ class CmsActions extends BaseActions {
 
         // if this is a new segment, create a new one.
         if( is_null($fragment) ){
-            $fragment = \CmsFragmentPeer::getStubCmsFragment( $tag );
+            $fragment = \CmsFragmentPeer::getStubCmsFragment( $tag, $fragment_type );
         }
 
         // set chrome attributes
