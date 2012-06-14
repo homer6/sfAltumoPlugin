@@ -10,14 +10,13 @@ class sfAltumoMakeGeckoboardRequestTask extends sfBaseTask
     // ));
 
     $this->addOptions(array(
-      new sfCommandOption('application', null, sfCommandOption::PARAMETER_REQUIRED, null ),
-      new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
-      new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel'),
+      new sfCommandOption( 'application', null, sfCommandOption::PARAMETER_REQUIRED, null ),
+      new sfCommandOption( 'env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev' ),
+      new sfCommandOption( 'connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel' ),
       // add your own options here
         		
-      new sfCommandOption( 'url', null, sfCommandOption::PARAMETER_REQUIRED ),
-      new sfCommandOption( 'key', null, sfCommandOption::PARAMETER_REQUIRED ),
-
+      new sfCommandOption( 'url', null, sfCommandOption::PARAMETER_REQUIRED, 'Url to request', null ),
+      new sfCommandOption( 'api_key', null, sfCommandOption::PARAMETER_REQUIRED, 'API key to authenticate with', null ),
     ));
 
     $this->namespace        = 'altumo';
@@ -40,7 +39,7 @@ EOF;
 
         
     $url = $options['url'];
-    $api_key = $options['key'];
+    $api_key = $options['api_key'];
 
     $request = new \Altumo\Http\OutgoingHttpRequest( $url );
     $request->setVerifySslPeer( false );
@@ -49,3 +48,4 @@ EOF;
 
   }
 }
+
