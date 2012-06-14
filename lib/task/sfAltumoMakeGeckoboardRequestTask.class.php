@@ -21,13 +21,13 @@ class sfAltumoMakeGeckoboardRequestTask extends sfBaseTask
     ));
 
     $this->namespace        = 'altumo';
-    $this->name             = 'run-geckoboard-request';
+    $this->name             = 'make-geckoboard-request';
     $this->briefDescription = '';
     $this->detailedDescription = <<<EOF
 The [run-gb-request|INFO] task makes a HTTP request with authentication as per Geckoboard spec
 Call it with:
 
-  [php symfony altumo:run-geckoboard-request|INFO]
+  [php symfony altumo:make-geckoboard-request|INFO]
 EOF;
   }
 
