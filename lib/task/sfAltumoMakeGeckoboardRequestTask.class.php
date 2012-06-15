@@ -39,7 +39,7 @@ EOF;
 
         
     $url = $options['url'];
-    $api_key = $options['api_key'];
+    $api_key = $options['api-key'];
 
     $request = new \Altumo\Http\OutgoingHttpRequest( $url );
     $request->setVerifySslPeer( false );
