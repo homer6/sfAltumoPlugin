@@ -43,7 +43,7 @@ EOF;
 
     $request = new \Altumo\Http\OutgoingHttpRequest( $url );
     $request->setVerifySslPeer( false );
-    $request->addHeader( 'Authorization', sprintf( 'Basic X:%s', $api_key ) );
+    $request->addHeader( 'Authorization', sprintf( 'Basic %s:X', $api_key ) );
     echo $request->send();
 
   }
