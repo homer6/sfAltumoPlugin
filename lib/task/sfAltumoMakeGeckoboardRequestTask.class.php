@@ -16,7 +16,7 @@ class sfAltumoMakeGeckoboardRequestTask extends sfBaseTask
       // add your own options here
         		
       new sfCommandOption( 'url', null, sfCommandOption::PARAMETER_REQUIRED, 'Url to request', null ),
-      new sfCommandOption( 'api_key', null, sfCommandOption::PARAMETER_REQUIRED, 'API key to authenticate with', null ),
+      new sfCommandOption( 'api-key', null, sfCommandOption::PARAMETER_REQUIRED, 'API key to authenticate with', null ),
     ));
 
     $this->namespace        = 'altumo';
@@ -43,9 +43,10 @@ EOF;
 
     $request = new \Altumo\Http\OutgoingHttpRequest( $url );
     $request->setVerifySslPeer( false );
-    $request->addHeader( 'Authorization', sprintf( 'Basic %s', $api_key ) );
+    $request->addHeader( 'Authorization', sprintf( 'Basic X:%s', $api_key ) );
     echo $request->send();
 
   }
 }
+
 
