@@ -79,5 +79,24 @@ class Request extends \sfWebRequest {
 	{
 		return str_replace(':X', '', $value);
 	}
+	
+	
+	/**
+	 * @param string $header
+	 * 
+	 * @return string
+	 */
+	protected function getApiKeyFromGeckoboardAuthorizationHeader( $header )
+	{
+		if( preg_match('/\\s*Basic\\s+(.*?)\\s*$/im', $header, $matches ) ) {
+
+			$key = $matches[ 1 ];
+			$key = $this->trimGeckoboardAuthorization( $key );
+			$key = base64_decode( $key );
+			
+			return $key;
+		}
+	}
 
 }
+
