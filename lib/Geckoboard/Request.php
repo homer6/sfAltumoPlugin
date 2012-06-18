@@ -91,8 +91,8 @@ class Request extends \sfWebRequest {
 		if( preg_match('/\\s*Basic\\s+(.*?)\\s*$/im', $header, $matches ) ) {
 
 			$key = $matches[ 1 ];
-			$key = $this->trimGeckoboardAuthorization( $key );
 			$key = base64_decode( $key );
+			$key = $this->trimGeckoboardAuthorization( $key );
 			
 			return $key;
 		}
