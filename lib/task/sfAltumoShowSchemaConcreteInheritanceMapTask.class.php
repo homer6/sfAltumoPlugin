@@ -51,27 +51,16 @@ EOF;
     /**
     * Returns an array of paths to schema.base.xml paths to be processed.
     * 
-    * //TODO: Use sfFinder to automate this.
-    * 
     * @returns array           // of string (paths)
     */
     static public function getSchemaFilePaths(){
         
-        $plugin_schema_path = __DIR__ . '/../../config/schema.xml';
+        $schema_files = \Altumo\Utils\Finder::type('file')
+            ->name( '*schema.xml' )
+        ->in( __DIR__ . '/../../../../config/', __DIR__ . '/../../config/' );
         
-        if( !is_readable($plugin_schema_path) ){
-            
-            $plugin_schema_path = __DIR__ . '/../../../../config/sfAltumoPlugin.schema.xml'; 
-            
-        }
         
-        return array(
-            // app's schema
-                __DIR__ . '/../../../../config/schema.xml',   
-                
-            // sfAltumoPlugin's schema
-                $plugin_schema_path
-        );
+        return $schema_files;
     }
 
   /**
