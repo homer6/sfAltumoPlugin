@@ -70,5 +70,27 @@ class User extends \BaseUser {
             return $sf_guard_user->getIsActive();
         
     }
+    
+    
+    /**
+    * If this context is within a web request, this attemps to
+    * retrieve the User's current IP address.
+    * 
+    * @return int
+    *   // ip address (in numeric format)
+    */
+    public function getCurrentIpAddress(){
+
+        $request = \sfContext::getInstance()->getRequest();
+
+        @$host = ip2long( $request->getRemoteAddress() );
+               
+        if( isset($host) && strlen($host) ){
+            return  $host;
+        }
+
+        return null;
+
+    }
 
 } 
