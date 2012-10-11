@@ -76,15 +76,33 @@ class User extends \BaseUser {
     * If this context is within a web request, this attemps to
     * retrieve the User's current IP address.
     * 
+    * It considers scenarios where the server might be running behind a reverse
+    * proxy or load balancer.
+    *  - In such cases, server_behind_proxy must be set to true in app.yml
+    *
+    * 
     * @return int
     *   // ip address (in numeric format)
     */
     public function getCurrentIpAddress(){
 
         $request = \sfContext::getInstance()->getRequest();
-
+        
         @$host = ip2long( $request->getRemoteAddress() );
-               
+        
+        // to prevent ip spoofing, we only consider the X-Forwarded-For header
+        // when we know for sure the server is beind a proxy that manages it.
+            if( \sfConfig::get( 'app_server_behind_proxy', false ) ){
+            
+                $forwarded_for = $request->getForwardedFor();
+                $forwarded_for = reset( $forwarded_for );
+                
+                if( strlen($forwarded_for) ){
+                    @$host = ip2long( $forwarded_for );
+                }
+            
+            }
+ 
         if( isset($host) && strlen($host) ){
             return  $host;
         }
