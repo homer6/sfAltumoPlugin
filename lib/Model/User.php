@@ -95,12 +95,17 @@ class User extends \BaseUser {
             if( \sfConfig::get( 'app_server_behind_proxy', false ) ){
             
                 $forwarded_for = $request->getForwardedFor();
-                $forwarded_for = reset( $forwarded_for );
                 
-                if( strlen($forwarded_for) ){
-                    @$host = ip2long( $forwarded_for );
-                }
-            
+                if( is_array($forwarded_for) && !empty($forwarded_for) ){
+                    
+                    $forwarded_for = array_pop( $forwarded_for );
+                    
+                    if( strlen($forwarded_for) ){
+                        @$host = ip2long( $forwarded_for );
+                    }
+                    
+                } 
+
             }
  
         if( isset($host) && strlen($host) ){
