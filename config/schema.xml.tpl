@@ -343,12 +343,14 @@
     </table>
 
 
-    <table name="sf_altumo_plugin_robot">
+    <table name="automation_robot">
 
         <!-- Represents an automated execution robot -->
 
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="robot_class_name" type="varchar" required="true" size="128" index="true" />
         <column name="name" type="varchar" required="true" size="128" index="true" />
+        <column name="description" type="longvarchar" required="false" />
         <column name="enabled" type="boolean" required="true" default="0" index="true" />
         <column name="start_at" type="timestamp" required="true" index="true" />
         <column name="stop_at" type="timestamp" required="false" />
@@ -358,20 +360,21 @@
         <unique name="unique_name">
             <unique-column name="name" />
         </unique>
+
     </table>
 
 
-    <table name="sf_altumo_plugin_robot_execution">
+    <table name="automation_robot_execution">
 
         <!-- Keeps track of every time a robot is executed -->
 
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-        <column name="sf_altumo_plugin_robot_id" type="integer" required="true" />
+        <column name="automation_robot_id" type="integer" required="true" />
         <column name="executed_at" type="timestamp" required="true" />
         <column name="output" type="varchar" required="true" size="255" />
 
-        <foreign-key foreignTable="sf_altumo_plugin_robot" onDelete="cascade" onUpdate="cascade">
-            <reference local="sf_altumo_plugin_robot_id" foreign="id" />
+        <foreign-key foreignTable="automation_robot" onDelete="cascade" onUpdate="cascade">
+            <reference local="automation_robot_id" foreign="id" />
         </foreign-key>
         
     </table>
