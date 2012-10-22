@@ -31,7 +31,8 @@ class sfAltumoAutomationExecuteRobotTask extends sfAltumoBaseTask {
             //new sfCommandOption( 'database-directory', null, sfCommandOption::PARAMETER_REQUIRED, 'The database directory.', null )
             new sfCommandOption('application', null, sfCommandOption::PARAMETER_OPTIONAL, 'The application name', null),
             new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
-            new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel')
+            new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel'),
+            new sfCommandOption('robot_instance_id', 'id', sfCommandOption::PARAMETER_REQUIRED, 'the sf_altumo_plugin_automation_robot instance id that originated this call', null)
         ));
 
         $this->name = 'automation-run-robot';
@@ -57,6 +58,15 @@ class sfAltumoAutomationExecuteRobotTask extends sfAltumoBaseTask {
                 'robot_name expects a non-empty string'
             );
 
+        // Get an instance of the model that initiated this robot
+            $robot_instance_id = \Altumo\Validation\Numerics::assertPositiveInteger(
+                $options['robot_instance_id'],
+                'robot_instance_id expects positive int'
+            );
+            
+            $automation_robot = \AutomationRobotPeer::assertAndRetrieveByIdAndName( $robot_instance_id, $robot_name );
+
+            
         // Robots are expected to be in the \Automation\Robot namespace
             $robot_class = '\\Automation\\Robot\\' . $robot_name;
             
@@ -64,16 +74,27 @@ class sfAltumoAutomationExecuteRobotTask extends sfAltumoBaseTask {
                 throw new \Exception( "{$robot_class} does not exist." );
             }
             
-            $robot_run_callable = array( $robot_class, "run" );
+            $robot_factory_callable = array( $robot_class, "create" );
             
-            if( !is_callable($robot_run_callable) ){
-                throw new \Exception( "$robot_class does not have a run method" );
+            if( !is_callable($robot_factory_callable) ){
+                throw new \Exception( "$robot_class does not have a create method" );
             }
 
             try{
                 
-                call_user_func( $robot_run_callable );
-                    
+                $robot = call_user_func( $robot_factory_callable );
+                if(0) $robot = new \Automation\Robot\sendNotificationOnProductSoldOut();
+
+                \Altumo\Validation\Objects::assertObjectInstanceOfClass(
+                    $robot,
+                    '\sfAltumoPlugin\Automation\Robot\Base',
+                    'Robot\'s create method didn\'t return an instancce of \sfAltumoPlugin\Automation\Robot\Base'
+                );
+
+                $robot->setAutomationRobot($automation_robot);
+                $robot->run();
+                
+                
             } catch( \Exception $e ){
                 
                 throw new \Exception( "The robot has ended with an exception:\n" . $e->getMessage() );
