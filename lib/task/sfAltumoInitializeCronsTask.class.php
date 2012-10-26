@@ -58,25 +58,34 @@ EOF;
             $data_dir = sfConfig::get( 'sf_data_dir' );
 
         // Initialize database
-            $databaseManager = new sfDatabaseManager($this->configuration);
+            $databaseManager = new sfDatabaseManager($this->configuration);           
+            
+        // Stop all running tasks (gracefully) first.
+            \sfAltumoPlugin\Automation\ScheduledTask::create()
+                ->findAll()
+            ->stop();
 
+        // Get a list of scheduled tasks to set up
+            $scheduled_tasks = \sfConfig::get("app_automation_scheduled_tasks");
             
-            \sfAltumoPlugin\Automation\ScheduledTask::create()->getRunningTasks();
+            foreach( $scheduled_tasks as $scheduled_task ){
+                
+                \sfAltumoPlugin\Automation\ScheduledTask::create()
+                    ->addNew( $scheduled_task['command'], $scheduled_task['frequency'] )
+                ->start();
+                
+            }
             
-            
-            
-            
-            die('');
-            
+        // Show all running tasks
+            $running_tasks = \sfAltumoPlugin\Automation\ScheduledTask::getAllRunningTasks();
         
-        \Altumo\Utils\Debug::dump(sfConfig::get("app_automation_crons"));
-            
-            
-            
-            
+            if( empty($running_tasks) ){
+                $this->logBlock( 'No tasks are running.', 'INFO' );
+            }
 
-            
-            //$this->logSection( '+ data_update', $hash );
+            foreach( $running_tasks as $running_task ){
+                $this->logSection( '+task', $running_task['command'] );
+            }
        
     }
     
