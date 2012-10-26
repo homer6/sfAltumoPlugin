@@ -10,3 +10,6 @@
 [submodule "lib/vendor/aws"]
 	path = lib/vendor/aws
 	url = git://github.com/amazonwebservices/aws-sdk-for-php.git
+[submodule "bin/frequent-cron"]
+	path = bin/frequent-cron
+	url = git://github.com/homer6/frequent-cron.git
