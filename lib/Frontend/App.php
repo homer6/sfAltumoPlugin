@@ -13,6 +13,16 @@ namespace sfAltumoPlugin\Frontend;
 
 
 /**
+* NOTE:
+* 
+* This class is being re-examined to use a new JS frontend framework and minifier.
+* Closure has been removed, and so app.js and app-deps.js will not be generated
+* until the new implementation is complete.
+* 
+* 
+* 
+* 
+* 
 * This class automates part of the process of loading and declaring javascript
 * resources for the front end application.
 * 
@@ -25,8 +35,8 @@ namespace sfAltumoPlugin\Frontend;
 *        echo $frontend->initialize();
 * 
 *        // This will:
-*           - Load all required javascriot libs ( jquery, underscore, backbone, closure-base )
-*           - Declare all base namespaces ( myApp, myApp.model, myApp.view )
+*           - Load all required javascriot libs ( jquery, [routing/model library TBA])
+*           - Declare all base namespaces ( e.g. myApp, myApp.model, myApp.view )
 *           - Load the application javascript(s)
 *               - In production, testing and staging: app.js ( compiled application, from altumo:build )
 *               - Otherwise, app-deps.js will be loaded ( generated bu altumo:build )
@@ -323,15 +333,6 @@ class App{
 
         // Crockford's JSON library (used by backbone)
             $javascripts['json2']           = '/sfAltumoPlugin/js/altumo/vendor/douglascrockford/json2.js';
-        
-        // Google Closure Base (for dependency management)
-            $javascripts['closure-base']    = '/sfAltumoPlugin/js/altumo/vendor/google/closure-library/closure/goog/base.js';
-                            
-        // Underscore
-            $javascripts['underscore']      = '/sfAltumoPlugin/js/altumo/vendor/underscore/underscore-1.3.1-min.js';
-                                                
-        // Backbone
-            $javascripts['backbone']        = '/sfAltumoPlugin/js/altumo/vendor/backbone/backbone-0.9.1-min.js';
                     
         foreach( $javascripts as $javascript ){
             
@@ -356,7 +357,7 @@ class App{
         
         // If this is a development environment, add the deps file generated
         // by closure to tell the library where to include javascripts from.
-            if( !in_array( 
+/*            if( !in_array( 
                     \sfContext::getInstance()->getConfiguration()->getEnvironment(), 
                     array('prod', 'production', 'testing', 'staging') 
             )){
@@ -369,7 +370,7 @@ class App{
                 
             }
         
-        \sfContext::getInstance()->getResponse()->addJavaScript( $frontend_app, 'last' );
+        \sfContext::getInstance()->getResponse()->addJavaScript( $frontend_app, 'last' );*/
         
         return $this;
 

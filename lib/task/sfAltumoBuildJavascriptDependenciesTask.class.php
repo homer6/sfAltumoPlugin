@@ -16,7 +16,7 @@
  * 
  * @author Juan Jaramillo <juan.jaramillo@altumo.com>
  */
-class sfAltumoBuildJavascriptDependenciesTask extends sfAltumoBaseTask {
+class sfAltumoBuildJavascriptDependenciesTaskDEPRECATED extends sfAltumoBaseTask {
 
     /**
     * @see sfTask
@@ -40,14 +40,7 @@ class sfAltumoBuildJavascriptDependenciesTask extends sfAltumoBaseTask {
         $this->briefDescription = 'Generates a Javascript dependencies file for the entire application';
 
     $this->detailedDescription = <<<EOF
-During development, it is very inconvenient to compile Javascripts every time a change is made to one of them.
-
-In order for the require() (provided by Google Closure) to work, it needs to know what path to include
-scripts from and what dependencies each provides.
-
-This task uses Closure's DepsWriter to generate a "deps file" which maps paths to dependencies.
-
-** This task must be executed every time a new javascript file is added to the assets folder **
+Temporarily deprecated.
 EOF;
     }
 
@@ -60,8 +53,10 @@ EOF;
    */
     protected function execute( $arguments = array(), $options = array() ) {
 
-        // Use Google Closure's DepsWriter to generate app-deps.js
-
+        // This closure-based system has been deprecated and it's planned
+        // to be replaced with something else.
+        
+            /*            
             $deps_writer = sfConfig::get( 'altumo_javascript_lib_dir' ) 
               . '/vendor/google/closure-library/closure/bin/build/depswriter.py';
 
@@ -70,12 +65,7 @@ EOF;
               . ' --root_with_prefix="' . sfConfig::get( 'sf_web_dir' ) . '/sfAltumoPlugin/js/lib/vendor/altumo' . ' /../../../../../../../../../altumo/js/src"'
               . ' --root_with_prefix="' . sfConfig::get( 'sf_web_dir' ) . '/js' . ' /../../../../../../../../../js"'
               . ' --output_file="'      . sfConfig::get( 'sf_web_dir' ) . '/js/app-deps.js"';
+            */
 
-
-            $this->log( "\nExecuting: " . $command );
-
-            `$command`;
-            
-            $this->log( "\nFinished\n" );
     }
 }
