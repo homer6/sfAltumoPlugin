@@ -1,6 +1,6 @@
 [submodule "lib/vendor/altumo"]
 	path = lib/vendor/altumo
-	url = git://github.com/homer6/altumo.git
+	url = git://github.com/altumo/altumo.git
 [submodule "lib/vendor/swiftmailer"]
 	path = lib/vendor/swiftmailer
 	url = https://github.com/swiftmailer/swiftmailer.git
